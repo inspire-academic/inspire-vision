@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Vision™ — Reforming Minds. Renewing Hearts. Rebuilding Nations.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy:      #0a1628;
+      --navy2:     #0d1f3c;
+      --navy3:     #111f38;
+      --gold:      #c9a84c;
+      --gold2:     #b8942e;
+      --white:     #ffffff;
+      --cream:     #f5f0e8;
+      --muted:     #94a3b8;
+      --border:    rgba(201,168,76,0.2);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      height: 72px;
+      background: rgba(10,22,40,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--navy2);
+      border: 1.5px solid var(--gold);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-logo-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .nav-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .nav-logo-text span:first-child {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.03em;
+    }
+
+    .nav-logo-text span:last-child {
+      font-size: 0.65rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: var(--navy2);
+      border: 1.5px solid var(--gold);
+      color: var(--white) !important;
+      padding: 0.55rem 1.4rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.88rem !important;
+      transition: background 0.2s, color 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--gold) !important;
+      color: var(--navy) !important;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('IV_Banner.png');
+      background-size: cover;
+      background-position: center top;
+      z-index: 0;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(10,22,40,0.82) 0%,
+        rgba(10,22,40,0.55) 50%,
+        rgba(10,22,40,0.15) 100%
+      );
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      padding: 0 3rem;
+      margin-top: 72px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1.5px;
+      background: var(--gold);
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      color: var(--white);
+    }
+
+    .hero h1 .gold { color: var(--gold); }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.82);
+      margin-bottom: 2.5rem;
+      max-width: 480px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--navy2);
+      border: 1.5px solid var(--gold);
+      color: var(--white);
+      padding: 0.85rem 2rem;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s, color 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: var(--white);
+      padding: 0.85rem 2rem;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-secondary .play-icon {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── CARDINALS ── */
+    .cardinals {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      min-height: 480px;
+    }
+
+    .cardinal {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .cardinal-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.6s ease;
+    }
+
+    .cardinal:hover .cardinal-bg {
+      transform: scale(1.05);
+    }
+
+    .cardinal-overlay {
+      position: absolute;
+      inset: 0;
+      transition: background 0.3s;
+    }
+
+    .cardinal-1 .cardinal-overlay { background: linear-gradient(to top, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.6) 50%, rgba(10,22,40,0.3) 100%); }
+    .cardinal-2 .cardinal-overlay { background: linear-gradient(to top, rgba(15,35,20,0.92) 0%, rgba(15,35,20,0.6) 50%, rgba(15,35,20,0.3) 100%); }
+    .cardinal-3 .cardinal-overlay { background: linear-gradient(to top, rgba(10,28,40,0.92) 0%, rgba(10,28,40,0.6) 50%, rgba(10,28,40,0.3) 100%); }
+    .cardinal-4 .cardinal-overlay { background: linear-gradient(to top, rgba(20,15,35,0.92) 0%, rgba(20,15,35,0.6) 50%, rgba(20,15,35,0.3) 100%); }
+
+    .cardinal-content {
+      position: relative;
+      z-index: 2;
+      padding: 2.5rem 2rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 480px;
+    }
+
+    .cardinal-icon {
+      width: 48px;
+      height: 48px;
+      border: 1.5px solid var(--gold);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      background: rgba(201,168,76,0.1);
+    }
+
+    .cardinal-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .cardinal h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+      line-height: 1.25;
+    }
+
+    .cardinal-tagline {
+      font-size: 0.82rem;
+      color: var(--gold);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .cardinal p {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 1.5rem;
+    }
+
+    .cardinal-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: gap 0.2s;
+    }
+
+    .cardinal-link:hover { gap: 0.8rem; }
+
+    .cardinal-divider {
+      width: 1px;
+      background: rgba(201,168,76,0.25);
+    }
+
+    /* ── STATS ── */
+    .stats-section {
+      background: var(--navy2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+      align-items: stretch;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stat-item {
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .stat-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+    }
+
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ── QUOTE SECTION ── */
+    .quote-section {
+      background: var(--navy);
+      padding: 5rem 3rem;
+    }
+
+    .quote-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .quote-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .quote-left p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2rem;
+    }
+
+    .quote-stats {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quote-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .quote-stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .quote-right {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .quote-right img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .quote-card {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      right: 2rem;
+      background: rgba(10,22,40,0.92);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      color: var(--gold);
+      line-height: 0.5;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .quote-text {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.9);
+      font-style: italic;
+      margin-bottom: 0.75rem;
+    }
+
+    .quote-attribution {
+      font-size: 0.75rem;
+      color: var(--gold);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── FOOTER TAGLINE ── */
+    .footer-tagline {
+      background: var(--navy2);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      text-align: center;
+    }
+
+    .footer-tagline p {
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .footer-tagline p span {
+      color: var(--gold);
+      margin: 0 0.5rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .cardinals { grid-template-columns: repeat(2, 1fr); }
+      .cardinal-divider { display: none; }
+      .stats-inner { grid-template-columns: repeat(3, 1fr); }
+      .stat-divider { display: none; }
+      .quote-inner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 1.5rem; }
+      .nav-links { display: none; }
+      .hero-content { padding: 0 1.5rem; }
+      .cardinals { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .quote-section { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5">
+          <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/>
+        </svg>
+      </div>
+      <div class="nav-logo-text">
+        <span>INSPIRE VISION</span>
+        <span>™</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Our Pillars</a></li>
+      <li><a href="#">Impact</a></li>
+      <li><a href="#">Stories</a></li>
+      <li><a href="#">Get Involved</a></li>
+      <li><a href="#" style="display:inline-flex;align-items:center;gap:0.3rem;">Resources <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.5"/></svg></a></li>
+      <li><a href="https://inspireacademic.org" class="nav-cta">Begin Your Journey</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">A Movement for Human Flourishing</div>
+      <h1>
+        Reforming Minds.<br>
+        Renewing Hearts.<br>
+        <span class="gold">Rebuilding Nations.</span>
+      </h1>
+      <p class="hero-desc">
+        A movement dedicated to raising men and women of character,
+        competence, wisdom, and purpose who will shape the future of
+        their communities, nations, and the world.
+      </p>
+      <div class="hero-btns">
+        <a href="#" class="btn-primary">
+          Explore the Vision →
+        </a>
+        <a href="#" class="btn-secondary">
+          <span class="play-icon">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><path d="M0 0l10 6-10 6V0z"/></svg>
+          </span>
+          Watch Our Story
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARDINALS -->
+  <section class="cardinals">
+
+    <!-- Academic -->
+    <div class="cardinal cardinal-1">
+      <div class="cardinal-bg" style="background-image: url('IV_Academic_1.png');"></div>
+      <div class="cardinal-overlay"></div>
+      <div class="cardinal-content">
+        <div class="cardinal-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 19V8l8-5 8 5v11"/><rect x="8" y="13" width="8" height="6"/><path d="M12 13v6"/></svg>
+        </div>
+        <h3>Inspire Academic™</h3>
+        <div class="cardinal-tagline">Rigour &amp; Excellence</div>
+        <p>Advancing knowledge through world-class education, discovery, and research that prepares minds to lead and innovate.</p>
+        <a href="https://inspireacademic.org" class="cardinal-link">Explore Academic →</a>
+      </div>
+    </div>
+
+    <div class="cardinal-divider"></div>
+
+    <!-- Mentorship -->
+    <div class="cardinal cardinal-2">
+      <div class="cardinal-bg" style="background-image: url('IV_mentorship.png');"></div>
+      <div class="cardinal-overlay"></div>
+      <div class="cardinal-content">
+        <div class="cardinal-icon">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2"/><path d="M2 21v-2a5 5 0 0110 0v2"/><path d="M17 15c2 0 5 1 5 3v1"/></svg>
+        </div>
+        <h3>Mentorship &amp; Formation™</h3>
+        <div class="cardinal-tagline">Meaning &amp; Character</div>
+        <p>Building character, resilience, and leadership through mentorship, life skills, and values that empower purposeful lives.</p>
+        <a href="#" class="cardinal-link">Explore Mentorship →</a>
+      </div>
+    </div>
+
+    <div class="cardinal-divider"></div>
+
+    <!-- Health -->
+    <div class="cardinal cardinal-3">
+      <div class="cardinal-bg" style="background-image: url('IV_Health.png');"></div>
+      <div class="cardinal-overlay"></div>
+      <div class="cardinal-content">
+        <div class="cardinal-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <h3>Health &amp; Wellbeing™</h3>
+        <div class="cardinal-tagline">Healing &amp; Innovation</div>
+        <p>Promoting physical, mental, and emotional wellbeing through education, innovation, and compassionate care.</p>
+        <a href="#" class="cardinal-link">Explore Health →</a>
+      </div>
+    </div>
+
+    <div class="cardinal-divider"></div>
+
+    <!-- Faith -->
+    <div class="cardinal cardinal-4">
+      <div class="cardinal-bg" style="background-image: url('IV_Faith.png');"></div>
+      <div class="cardinal-overlay"></div>
+      <div class="cardinal-content">
+        <div class="cardinal-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+        </div>
+        <h3>Faith &amp; Spiritual Formation™</h3>
+        <div class="cardinal-tagline">Truth &amp; Transformation</div>
+        <p>Grounding lives in enduring truth, spiritual growth, and service to God and humanity, and into children.</p>
+        <a href="#" class="cardinal-link">Explore Faith →</a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <span class="stat-icon">🎓</span>
+        <div class="stat-number">25,000+</div>
+        <div class="stat-label">Students<br>Empowered</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">👥</span>
+        <div class="stat-number">5,000+</div>
+        <div class="stat-label">Young People<br>Mentored</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">🔬</span>
+        <div class="stat-number">1,200+</div>
+        <div class="stat-label">Projects &amp; Research<br>Initiatives</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">❤️</span>
+        <div class="stat-number">100+</div>
+        <div class="stat-label">Communities<br>Impacted</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">🌍</span>
+        <div class="stat-number">15+</div>
+        <div class="stat-label">Countries<br>Reached</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE / FUTURE SECTION -->
+  <section class="quote-section">
+    <div class="quote-inner">
+      <div class="quote-left">
+        <h2>The Future We<br>Are Building</h2>
+        <p>
+          Together, we are creating a legacy of hope, transformation,
+          and impact for generations to come.
+        </p>
+        <div class="quote-stats">
+          <div>
+            <div class="quote-stat-num">25,000+</div>
+            <div class="quote-stat-label">Students Empowered</div>
+          </div>
+          <div>
+            <div class="quote-stat-num">5,000+</div>
+            <div class="quote-stat-label">Young People Mentored</div>
+          </div>
+          <div>
+            <div class="quote-stat-num">100+</div>
+            <div class="quote-stat-label">Communities Impacted</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-right">
+        <img src="IV_Banner.png" alt="Inspire Vision students" />
+        <div class="quote-card">
+          <span class="quote-mark">"</span>
+          <p class="quote-text">
+            The mind, when rightly educated,
+            the heart, when rightly formed,
+            and the will, when rightly directed,
+            can change the world.
+          </p>
+          <div class="quote-attribution">— Inspire Vision™</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER TAGLINE -->
+  <footer class="footer-tagline">
+    <p>
+      Educating Minds
+      <span>·</span>
+      Forming Hearts
+      <span>·</span>
+      Transforming Lives
+      <span>·</span>
+      Rebuilding Nations
+    </p>
+  </footer>
+
+</body>
+</html>
