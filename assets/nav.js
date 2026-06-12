@@ -4,7 +4,7 @@
 // ============================================================
 
 const INSPIRE_VISION_CONFIG = {
-  logoSrc: 'assets/logo.png',        // ← UPDATE THIS ONE LINE to change logo everywhere
+  logoSrc: 'assets/images/Inspire_vision_Logo1.png',  // ← Inspire Vision™ official logo
   logoFallbackIcon: `
     <svg viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" width="22" height="22">
       <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/>
