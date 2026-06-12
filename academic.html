@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Academic™ — Rigour &amp; Excellence | Inspire Vision</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    body { background: var(--white); color: var(--navy); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      width: 100%;
+      min-height: 560px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      padding-top: 110px;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('IV_Academic_1.png');
+      background-size: cover;
+      background-position: center 20%;
+      z-index: 0;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(10,22,40,0.88) 0%, rgba(10,22,40,0.65) 55%, rgba(10,22,40,0.25) 100%);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 3rem 3rem 4rem;
+      max-width: 600px;
+    }
+    .hero-icon {
+      width: 64px;
+      height: 64px;
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      background: rgba(201,168,76,0.1);
+    }
+    .hero-icon svg { width: 32px; height: 32px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+    .hero h1 { font-family: var(--font-display); font-size: clamp(2.5rem, 4.5vw, 3.8rem); font-weight: 700; color: var(--white); line-height: 1.1; margin-bottom: 0.5rem; }
+    .hero-tagline { font-size: 1.15rem; font-weight: 500; color: var(--gold); margin-bottom: 1.5rem; font-style: italic; }
+    .hero-desc { font-size: 0.98rem; line-height: 1.7; color: rgba(255,255,255,0.82); margin-bottom: 2rem; }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* PROGRAMS */
+    .programs-section {
+      padding: 5rem 3rem;
+      background: var(--white);
+    }
+    .programs-inner { max-width: var(--max-width); margin: 0 auto; }
+    .programs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .program-card {
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background: var(--white);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .program-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(10,22,40,0.12);
+    }
+    .program-card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: var(--navy2);
+      display: block;
+      position: relative;
+    }
+    .program-card-img-placeholder {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, var(--navy2) 0%, var(--navy3) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .program-card-img-placeholder svg { width: 48px; height: 48px; stroke: var(--gold); fill: none; stroke-width: 1; opacity: 0.6; }
+    .program-card-body { padding: 1.5rem; }
+    .program-card-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--navy);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      margin-top: -2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .program-card-icon svg { width: 20px; height: 20px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+    .program-card h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.6rem; line-height: 1.3; }
+    .program-card p { font-size: 0.85rem; line-height: 1.6; color: #64748b; margin-bottom: 1rem; }
+    .program-card-link { font-size: 0.82rem; font-weight: 500; color: var(--navy); display: inline-flex; align-items: center; gap: 0.4rem; transition: gap 0.2s, color 0.2s; }
+    .program-card:hover .program-card-link { gap: 0.7rem; color: var(--gold2); }
+
+    /* EXCELLENCE BANNER */
+    .excellence-banner {
+      background: var(--navy);
+      padding: 3.5rem 3rem;
+    }
+    .excellence-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+    }
+    .excellence-logo {
+      width: 72px;
+      height: 72px;
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(201,168,76,0.1);
+    }
+    .excellence-logo svg { width: 36px; height: 36px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+    .excellence-text h2 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--white); line-height: 1.3; }
+    .excellence-divider { width: 1px; height: 60px; background: var(--border); flex-shrink: 0; }
+    .excellence-desc { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.7); max-width: 400px; }
+
+    /* IMPACT */
+    .impact-section {
+      padding: 5rem 3rem;
+      background: var(--light-bg);
+    }
+    .impact-inner { max-width: var(--max-width); margin: 0 auto; }
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .impact-item { text-align: center; }
+    .impact-icon { width: 56px; height: 56px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; }
+    .impact-icon svg { width: 40px; height: 40px; stroke: var(--navy); fill: none; stroke-width: 1.2; }
+    .impact-number { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+    .impact-label { font-size: 0.82rem; color: #64748b; line-height: 1.4; }
+
+    /* CTA */
+    .cta-section {
+      position: relative;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('IV_Academic_1.png');
+      background-size: cover;
+      background-position: center 70%;
+      z-index: 0;
+    }
+    .cta-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.75) 60%, rgba(10,22,40,0.4) 100%);
+      z-index: 1;
+    }
+    .cta-content {
+      position: relative;
+      z-index: 2;
+      padding: 4rem 3rem;
+      max-width: 600px;
+    }
+    .cta-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: block; }
+    .cta-content h2 { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 700; color: var(--white); margin-bottom: 1rem; line-height: 1.2; }
+    .cta-content p { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.78); margin-bottom: 2rem; }
+
+    @media (max-width: 1024px) {
+      .programs-grid { grid-template-columns: repeat(2, 1fr); }
+      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .excellence-inner { flex-wrap: wrap; }
+      .excellence-divider { display: none; }
+    }
+    @media (max-width: 768px) {
+      .programs-section, .impact-section { padding: 3rem 1.5rem; }
+      .hero-content { padding: 2rem 1.5rem 3rem; }
+      .programs-grid { grid-template-columns: 1fr; }
+      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-content { padding: 3rem 1.5rem; }
+      .excellence-banner { padding: 2.5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="iv-nav"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </div>
+      <h1>Inspire Academic™</h1>
+      <div class="hero-tagline">Rigour &amp; Excellence</div>
+      <p class="hero-desc">Advancing knowledge through world-class education, discovery, and research that prepares minds to lead and innovate.</p>
+      <div class="hero-btns">
+        <a href="#programs" class="btn-primary">Explore Our Programs ↓</a>
+        <a href="#" class="btn-outline-white">
+          <span style="width:28px;height:28px;border:1.5px solid currentColor;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><path d="M0 0l10 6-10 6V0z"/></svg>
+          </span>
+          Watch Our Story
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAMS -->
+  <section class="programs-section" id="programs">
+    <div class="programs-inner">
+      <div class="text-center">
+        <span class="section-eyebrow">Our Programs</span>
+        <h2 class="section-title">Programs That Inspire Minds<br>and Build Futures</h2>
+        <p class="section-desc">Through a diverse range of initiatives, Inspire Academic™ equips learners with the knowledge, skills, and experiences to excel today and lead tomorrow.</p>
+      </div>
+
+      <div class="programs-grid">
+
+        <!-- Inspire Science -->
+        <a href="https://inspireacademic.org" class="program-card" target="_blank">
+          <div class="program-card-img-placeholder" id="img-science">
+            <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="program-card-body">
+            <div class="program-card-icon">
+              <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+            </div>
+            <h3>Inspire Science</h3>
+            <p>High-quality science education that fosters curiosity, critical thinking, and a passion for discovery.</p>
+            <span class="program-card-link">Learn More →</span>
+          </div>
+        </a>
+
+        <!-- Year Six -->
+        <a href="https://inspireacademic.org/year6-dashboard.html" class="program-card" target="_blank">
+          <div class="program-card-img-placeholder" id="img-y6">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <div class="program-card-body">
+            <div class="program-card-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <h3>Year Six Science Bridging Programme</h3>
+            <p>Preparing Grade 8 learners with strong foundational skills and confidence for high school science.</p>
+            <span class="program-card-link">Learn More →</span>
+          </div>
+        </a>
+
+        <!-- Protégé -->
+        <a href="https://inspireacademic.org" class="program-card" target="_blank">
+          <div class="program-card-img-placeholder" id="img-protege">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="program-card-body">
+            <div class="program-card-icon">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <h3>Protégé</h3>
+            <p>A mentorship and enrichment program that develops potential, character, and leadership.</p>
+            <span class="program-card-link">Learn More →</span>
+          </div>
+        </a>
+
+        <!-- Inspire Labs -->
+        <a href="https://inspireacademic.org" class="program-card" target="_blank">
+          <div class="program-card-img-placeholder" id="img-labs">
+            <svg viewBox="0 0 24 24"><path d="M9 3v11a6 6 0 006 6v0a6 6 0 006-6V3"/><path d="M9 9h12"/></svg>
+          </div>
+          <div class="program-card-body">
+            <div class="program-card-icon">
+              <svg viewBox="0 0 24 24"><path d="M9 3v11a6 6 0 006 6v0a6 6 0 006-6V3"/><path d="M9 9h12"/></svg>
+            </div>
+            <h3>Inspire Labs</h3>
+            <p>Innovative labs and practical experiences that turn ideas into solutions and learning into impact.</p>
+            <span class="program-card-link">Learn More →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EXCELLENCE BANNER -->
+  <div class="excellence-banner">
+    <div class="excellence-inner">
+      <div class="excellence-logo">
+        <svg viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/></svg>
+      </div>
+      <div class="excellence-text">
+        <h2>Excellence in Learning.<br>Purpose in Action.</h2>
+      </div>
+      <div class="excellence-divider"></div>
+      <p class="excellence-desc">We don't just teach subjects — we ignite potential, cultivate character, and empower the next generation of innovators and leaders.</p>
+    </div>
+  </div>
+
+  <!-- IMPACT -->
+  <section class="impact-section" id="impact">
+    <div class="impact-inner">
+      <div class="text-center">
+        <span class="section-eyebrow">Our Impact</span>
+      </div>
+      <div class="impact-grid">
+        <div class="impact-item">
+          <div class="impact-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+          <div class="impact-number">25,000+</div>
+          <div class="impact-label">Students Empowered</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-icon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg></div>
+          <div class="impact-number">1,200+</div>
+          <div class="impact-label">Research &amp; Innovation<br>Initiatives</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+          <div class="impact-number">100+</div>
+          <div class="impact-label">Global University<br>Partners</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-icon"><svg viewBox="0 0 24 24"><polyline points="2,9 12,4 22,9"/><rect x="4" y="9" width="16" height="11"/><line x1="12" y1="9" x2="12" y2="20"/></svg></div>
+          <div class="impact-number">95%</div>
+          <div class="impact-label">Graduates in Meaningful<br>Careers or Further Study</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <span class="cta-eyebrow">The Journey Starts Here</span>
+      <h2>Be Part of a Legacy<br>That Transforms Nations</h2>
+      <p>Join a community of learners, mentors, researchers, and leaders committed to building a better future.</p>
+      <a href="https://inspireacademic.org" class="btn-primary" target="_blank">Begin Your Academic Journey →</a>
+    </div>
+  </section>
+
+  <footer class="iv-footer">
+    <p>Educating Minds <span>·</span> Forming Hearts <span>·</span> Transforming Lives <span>·</span> Rebuilding Nations</p>
+  </footer>
+
+  <script src="assets/nav.js"></script>
+  <script>
+    renderNav('Our Pillars', [
+      { label: 'Our Pillars', href: 'index.html#pillars' },
+      { label: 'Inspire Academic™', href: 'academic.html' }
+    ]);
+  </script>
+</body>
+</html>
