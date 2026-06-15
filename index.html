@@ -90,6 +90,45 @@
     }
     .btn-outline-white:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); }
 
+    /* ── CARDINALS SEPARATOR ── */
+    .cardinals-separator {
+      background: var(--white);
+      padding: 3.5rem 3rem;
+      text-align: center;
+    }
+    .cardinals-separator-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .cardinals-sep-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+    }
+    .cardinals-sep-divider::before,
+    .cardinals-sep-divider::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.6;
+    }
+    .cardinals-sep-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .cardinals-sep-desc {
+      font-size: 0.95rem;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
     /* ── FOUR CARDINALS — full bleed ── */
     .cardinals {
       display: grid;
@@ -631,6 +670,16 @@
       </div>
     </div>
   </section>
+
+  <!-- CARDINALS SEPARATOR -->
+  <div class="cardinals-separator">
+    <div class="cardinals-separator-inner">
+      <div class="cardinals-sep-divider">
+        <span class="cardinals-sep-label">Our Four Cardinals</span>
+      </div>
+      <p class="cardinals-sep-desc">Everything we do flows from these four dimensions of our calling.</p>
+    </div>
+  </div>
 
   <!-- FOUR CARDINALS — full bleed -->
   <section class="cardinals" id="pillars">
