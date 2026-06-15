@@ -143,63 +143,61 @@
 <footer><div class="wrap"><div class="foot"><div><a class="brand" href="#top"><span class="mark">✺</span><span>INSPIRE<br><small>INNOVATION LABS AFRICA</small></span></a><p>A movement for African innovation, formation, science, enterprise and community transformation.</p></div><div><h4>Blueprint</h4><a href="#vision">The Vision</a><a href="#problem">The Problem</a><a href="#pilot">The Pilot</a><a href="#model">The Lab Model</a></div><div><h4>Investment</h4><a href="#investment">Packages</a><a href="#dashboard">Impact Dashboard</a><a href="#register">Register Interest</a><a href="#partner">Partner With Us</a></div><div><h4>Resources</h4><a>Reports</a><a>Curriculum</a><a>FAQs</a><a>Safeguarding</a></div><div><h4>Contact</h4><p>info@inspirelabs.africa</p><p>London, United Kingdom</p><p>Accra, Ghana</p></div></div><div class="copyright">© 2026 Inspire Innovation Labs Africa. All rights reserved.</div></div></footer>
 <script src="assets/supabase.js"></script>
 <script>
-  window.addEventListener('inspireDBReady', () => {
+  // Registration form
+  document.getElementById('reg-submit-btn').addEventListener('click', async () => {
+    const msg = document.getElementById('reg-msg');
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const role = document.getElementById('reg-role').value;
+    const location = document.getElementById('reg-location').value.trim();
+    const interest_area = document.getElementById('reg-interest').value;
+    const message = document.getElementById('reg-message').value.trim();
+    if (!name || !email || !email.includes('@')) {
+      msg.style.color = '#e05'; msg.textContent = 'Please enter your name and a valid email address.'; return;
+    }
+    msg.style.color = '#aaa'; msg.textContent = 'Submitting…';
+    const db = await window.getDB();
+    const { error } = await db
+      .schema('vision')
+      .from('registrations')
+      .insert({ full_name: name, email, phone, role, location, interest_area, message, source: 'innovation-labs' });
+    if (error) {
+      msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
+      console.error(error);
+    } else {
+      msg.style.color = '#c9a84c';
+      msg.textContent = '✓ Thank you. We\'ll be in touch as the pilot develops.';
+      document.getElementById('register-form').querySelectorAll('input, select, textarea').forEach(el => el.value = '');
+    }
+  });
 
-    // Registration form
-    document.getElementById('reg-submit-btn').addEventListener('click', async () => {
-      const msg = document.getElementById('reg-msg');
-      const name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
-      const role = document.getElementById('reg-role').value;
-      const location = document.getElementById('reg-location').value.trim();
-      const interest_area = document.getElementById('reg-interest').value;
-      const message = document.getElementById('reg-message').value.trim();
-      if (!name || !email || !email.includes('@')) {
-        msg.style.color = '#e05'; msg.textContent = 'Please enter your name and a valid email address.'; return;
-      }
-      msg.style.color = '#aaa'; msg.textContent = 'Submitting…';
-      const { error } = await inspireDB
-        .schema('vision')
-        .from('registrations')
-        .insert({ full_name: name, email, phone, role, location, interest_area, message, source: 'innovation-labs' });
-      if (error) {
-        msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
-        console.error(error);
-      } else {
-        msg.style.color = '#c9a84c';
-        msg.textContent = '✓ Thank you. We\'ll be in touch as the pilot develops.';
-        document.getElementById('register-form').querySelectorAll('input, select, textarea').forEach(el => el.value = '');
-      }
-    });
-
-    // Partner form
-    document.getElementById('partner-submit-btn').addEventListener('click', async () => {
-      const msg = document.getElementById('partner-msg');
-      const name = document.getElementById('p-name').value.trim();
-      const organisation = document.getElementById('p-org').value.trim();
-      const email = document.getElementById('p-email').value.trim();
-      const partnership_type = document.getElementById('p-type').value;
-      const funding_range = document.getElementById('p-funding').value;
-      const message = document.getElementById('p-message').value.trim();
-      if (!name || !email || !email.includes('@')) {
-        msg.style.color = '#e05'; msg.textContent = 'Please enter your name and a valid email address.'; return;
-      }
-      msg.style.color = '#aaa'; msg.textContent = 'Sending…';
-      const { error } = await inspireDB
-        .schema('vision')
-        .from('partners')
-        .insert({ name, organisation, email, partnership_type, funding_range, message });
-      if (error) {
-        msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
-        console.error(error);
-      } else {
-        msg.style.color = '#c9a84c';
-        msg.textContent = '✓ Thank you. We\'ll be in touch about your partnership.';
-        document.getElementById('partner-form').querySelectorAll('input, select, textarea').forEach(el => el.value = '');
-      }
-    });
-
+  // Partner form
+  document.getElementById('partner-submit-btn').addEventListener('click', async () => {
+    const msg = document.getElementById('partner-msg');
+    const name = document.getElementById('p-name').value.trim();
+    const organisation = document.getElementById('p-org').value.trim();
+    const email = document.getElementById('p-email').value.trim();
+    const partnership_type = document.getElementById('p-type').value;
+    const funding_range = document.getElementById('p-funding').value;
+    const message = document.getElementById('p-message').value.trim();
+    if (!name || !email || !email.includes('@')) {
+      msg.style.color = '#e05'; msg.textContent = 'Please enter your name and a valid email address.'; return;
+    }
+    msg.style.color = '#aaa'; msg.textContent = 'Sending…';
+    const db = await window.getDB();
+    const { error } = await db
+      .schema('vision')
+      .from('partners')
+      .insert({ name, organisation, email, partnership_type, funding_range, message });
+    if (error) {
+      msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
+      console.error(error);
+    } else {
+      msg.style.color = '#c9a84c';
+      msg.textContent = '✓ Thank you. We\'ll be in touch about your partnership.';
+      document.getElementById('partner-form').querySelectorAll('input, select, textarea').forEach(el => el.value = '');
+    }
   });
 </script>
 </body>

@@ -920,29 +920,28 @@
       if (nav) nav.style.background = window.scrollY > 60 ? 'rgba(10,22,40,0.99)' : 'rgba(10,22,40,0.97)';
     });
 
-    // Homepage email subscribe — wait for Supabase client to be ready
-    window.addEventListener('inspireDBReady', () => {
-      document.getElementById('home-subscribe-btn').addEventListener('click', async () => {
-        const input = document.getElementById('home-email-input');
-        const msg = document.getElementById('home-subscribe-msg');
-        const email = input.value.trim();
-        if (!email || !email.includes('@')) {
-          msg.style.color = '#e05'; msg.textContent = 'Please enter a valid email address.'; return;
-        }
-        msg.style.color = '#aaa'; msg.textContent = 'Subscribing…';
-        const { error } = await inspireDB
-          .schema('vision')
-          .from('subscribers')
-          .insert({ email, source: 'homepage' });
-        if (error && error.code === '23505') {
-          msg.style.color = '#c9a84c'; msg.textContent = 'You\'re already subscribed!';
-        } else if (error) {
-          msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
-        } else {
-          msg.style.color = '#c9a84c'; msg.textContent = '✓ You\'re subscribed. Welcome to Inspire Vision.';
-          input.value = '';
-        }
-      });
+    // Homepage email subscribe
+    document.getElementById('home-subscribe-btn').addEventListener('click', async () => {
+      const input = document.getElementById('home-email-input');
+      const msg = document.getElementById('home-subscribe-msg');
+      const email = input.value.trim();
+      if (!email || !email.includes('@')) {
+        msg.style.color = '#e05'; msg.textContent = 'Please enter a valid email address.'; return;
+      }
+      msg.style.color = '#aaa'; msg.textContent = 'Subscribing…';
+      const db = await window.getDB();
+      const { error } = await db
+        .schema('vision')
+        .from('subscribers')
+        .insert({ email, source: 'homepage' });
+      if (error && error.code === '23505') {
+        msg.style.color = '#c9a84c'; msg.textContent = 'You\'re already subscribed!';
+      } else if (error) {
+        msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
+      } else {
+        msg.style.color = '#c9a84c'; msg.textContent = '✓ You\'re subscribed. Welcome to Inspire Vision.';
+        input.value = '';
+      }
     });
   </script>
 </body>
