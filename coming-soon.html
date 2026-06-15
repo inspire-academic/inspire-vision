@@ -266,9 +266,10 @@
 
     <!-- Subscribe -->
     <div class="cs-subscribe">
-      <input type="email" placeholder="Enter your email to be notified">
-      <button>Notify Me</button>
+      <input type="email" id="cs-email-input" placeholder="Enter your email to be notified">
+      <button id="cs-notify-btn">Notify Me</button>
     </div>
+    <div id="cs-subscribe-msg" style="font-size:0.85rem;margin-top:0.5rem;min-height:1.2em;text-align:center;"></div>
 
     <div class="cs-divider"></div>
 
@@ -309,5 +310,31 @@
     <p>Reforming Minds <span>·</span> Renewing Hearts <span>·</span> Rebuilding Nations</p>
   </footer>
 
+  <script src="assets/supabase.js"></script>
+  <script>
+    window.addEventListener('inspireDBReady', () => {
+      document.getElementById('cs-notify-btn').addEventListener('click', async () => {
+        const input = document.getElementById('cs-email-input');
+        const msg = document.getElementById('cs-subscribe-msg');
+        const email = input.value.trim();
+        if (!email || !email.includes('@')) {
+          msg.style.color = '#e05'; msg.textContent = 'Please enter a valid email address.'; return;
+        }
+        msg.style.color = '#aaa'; msg.textContent = 'Saving…';
+        const { error } = await inspireDB
+          .schema('vision')
+          .from('subscribers')
+          .insert({ email, source: 'coming-soon' });
+        if (error && error.code === '23505') {
+          msg.style.color = '#c9a84c'; msg.textContent = 'You\'re already on the list!';
+        } else if (error) {
+          msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
+        } else {
+          msg.style.color = '#c9a84c'; msg.textContent = '✓ We\'ll notify you when this launches.';
+          input.value = '';
+        }
+      });
+    });
+  </script>
 </body>
 </html>

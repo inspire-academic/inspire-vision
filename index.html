@@ -844,9 +844,10 @@
         <div class="bottom-col-title">Join Our Community</div>
         <p class="community-desc">Receive updates, stories, and resources to inspire and equip you.</p>
         <div class="subscribe-form">
-          <input type="email" class="subscribe-input" placeholder="Enter your email address">
-          <button class="subscribe-btn">Subscribe</button>
+          <input type="email" class="subscribe-input" id="home-email-input" placeholder="Enter your email address">
+          <button class="subscribe-btn" id="home-subscribe-btn">Subscribe</button>
         </div>
+        <div id="home-subscribe-msg" style="font-size:0.85rem;margin-top:0.5rem;min-height:1.2em;"></div>
         <div class="follow-label">Follow us</div>
         <div class="social-links">
           <a href="#" class="social-link" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
@@ -905,6 +906,7 @@
     </div>
   </footer>
 
+  <script src="assets/supabase.js"></script>
   <script>
     // Hero zoom
     document.querySelector('.hero').classList.add('loaded');
@@ -916,6 +918,31 @@
     window.addEventListener('scroll', () => {
       const nav = document.querySelector('.iv-nav');
       if (nav) nav.style.background = window.scrollY > 60 ? 'rgba(10,22,40,0.99)' : 'rgba(10,22,40,0.97)';
+    });
+
+    // Homepage email subscribe — wait for Supabase client to be ready
+    window.addEventListener('inspireDBReady', () => {
+      document.getElementById('home-subscribe-btn').addEventListener('click', async () => {
+        const input = document.getElementById('home-email-input');
+        const msg = document.getElementById('home-subscribe-msg');
+        const email = input.value.trim();
+        if (!email || !email.includes('@')) {
+          msg.style.color = '#e05'; msg.textContent = 'Please enter a valid email address.'; return;
+        }
+        msg.style.color = '#aaa'; msg.textContent = 'Subscribing…';
+        const { error } = await inspireDB
+          .schema('vision')
+          .from('subscribers')
+          .insert({ email, source: 'homepage' });
+        if (error && error.code === '23505') {
+          msg.style.color = '#c9a84c'; msg.textContent = 'You\'re already subscribed!';
+        } else if (error) {
+          msg.style.color = '#e05'; msg.textContent = 'Something went wrong. Please try again.';
+        } else {
+          msg.style.color = '#c9a84c'; msg.textContent = '✓ You\'re subscribed. Welcome to Inspire Vision.';
+          input.value = '';
+        }
+      });
     });
   </script>
 </body>
