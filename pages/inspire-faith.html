@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inspire Faith & Spiritual Formation | Inspire Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  INSPIRE FAITH — CONTENT MANAGEMENT GUIDE                       ║
+  ║                                                                  ║
+  ║  ⚠ BOOKS, SERMONS & PODCASTS ARE NOW DYNAMIC ⚠                  ║
+  ║  Do NOT hand-edit those cards in this file — they are fetched   ║
+  ║  live from Supabase (vision.books / vision.sermons /             ║
+  ║  vision.podcasts) and rendered by the script near the bottom    ║
+  ║  of this file. To add, edit, publish, or delete a book,         ║
+  ║  sermon, or podcast episode, use the admin page instead:        ║
+  ║      faith-admin.html                                            ║
+  ║  Any change made there appears on this page within seconds —    ║
+  ║  no redeployment needed.                                         ║
+  ║                                                                  ║
+  ║  STATIC CONTENT YOU CAN STILL EDIT DIRECTLY IN THIS FILE:       ║
+  ║  • Hero banner image  → .hero-bg { background-image: url(...) } ║
+  ║  • Topics grid images → each <img src="PLACEHOLDER_..." />      ║
+  ║  • Devotional candle  → .dev-candle { background: url(...) }    ║
+  ║  • Community Fellowship card image → search PLACEHOLDER_COMMUNITY_PHOTO ║
+  ║  • Scripture quote    → <!-- CONTENT: SCRIPTURE -->             ║
+  ║  • Daily verse        → <!-- CONTENT: DAILY VERSE -->           ║
+  ║  • Podcast platform links (Spotify/Apple/YouTube URLs)           ║
+  ║      → search "pod-platforms", update each href once             ║
+  ║                                                                  ║
+  ║  SUPABASE: anon key + project URL are in the <script> block     ║
+  ║  at the top. The footer email form writes to:                    ║
+  ║  vision schema → faith_subscribers table                        ║
+  ╚══════════════════════════════════════════════════════════════════╝
+  -->
+
+  <!-- Supabase JS client -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    window.inspireDB = createClient(
+      'https://ygtsrdwoikqnrbexjrtl.supabase.co',
+      'sb_publishable_XxmrO4J18iyQ1Srub73BhQ_FBhd8mXR'
+    );
+  </script>
+
+  <style>
+    /* ═══ TOKENS ══════════════════════════════════════════════════ */
+    :root {
+      --navy:       #0D1B2A;
+      --navy-mid:   #162032;
+      --navy-dark:  #0A1520;
+      --gold:       #C9A84C;
+      --gold-light: #D4B96A;
+      --cream:      #F6F4EF;
+      --white:      #FFFFFF;
+      --text:       #1A1A2E;
+      --text-mid:   #4A4A5A;
+      --text-light: #7A7A8A;
+      --border:     #E0DDD5;
+      --serif:      'Playfair Display', Georgia, serif;
+      --sans:       'Inter', system-ui, sans-serif;
+      --radius:     6px;
+    }
+
+    /* ═══ RESET ════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html  { scroll-behavior: smooth; }
+    body  { font-family: var(--sans); color: var(--text); background: var(--white); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a     { text-decoration: none; color: inherit; }
+    img   { display: block; max-width: 100%; }
+    ul    { list-style: none; }
+    button { cursor: pointer; font-family: var(--sans); }
+
+    /* ═══ LAYOUT ══════════════════════════════════════════════ */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+    /* ═══ BUTTONS ═════════════════════════════════════════════ */
+    .btn-dark {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--navy); color: var(--white);
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 12px 24px; border-radius: var(--radius); border: none;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-dark:hover { background: #1e3050; }
+
+    .btn-outline-white {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1.5px solid rgba(255,255,255,0.75); color: var(--white);
+      font-size: 0.82rem; font-weight: 600;
+      padding: 10px 22px; border-radius: var(--radius);
+      transition: background 0.2s;
+    }
+    .btn-outline-white:hover { background: rgba(255,255,255,0.1); }
+
+    .btn-outline-navy {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1.5px solid var(--navy); color: var(--navy);
+      font-size: 0.8rem; font-weight: 600;
+      padding: 10px 22px; border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+    .btn-outline-navy:hover { background: var(--navy); color: var(--white); }
+
+    .eyebrow {
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════════════════════ */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white); border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+    .nav-logo  { display: flex; align-items: center; gap: 10px; }
+    .logo-badge {
+      width: 34px; height: 34px; background: var(--navy); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .logo-badge svg { width: 18px; height: 18px; fill: var(--gold); }
+    .logo-text .name { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; color: var(--navy); letter-spacing: 0.05em; line-height: 1; }
+    .logo-text .sub  { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--text); transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links .has-arrow::after { content: ' ▾'; font-size: 0.65rem; }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-search-btn { background: none; border: none; padding: 4px; color: var(--text-mid); display: flex; align-items: center; }
+    .nav-search-btn svg { width: 17px; height: 17px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO  — text anchored BOTTOM-LEFT so faces stay clear
+    ═══════════════════════════════════════════════════════════ */
+    .hero {
+      position: relative; min-height: 580px;
+      display: flex; align-items: flex-end; /* ← bottom alignment */
+      overflow: hidden; background: var(--navy-dark);
+    }
+    /* ── REPLACE THIS IMAGE PATH when you have new hero art ── */
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('insp_faith_standard.png');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+    /*
+      Gradient: heavy at BOTTOM (behind text), light at top.
+      Left edge also darkened so text stays readable over faces on right.
+    */
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to top,  rgba(10,21,32,0.96) 0%, rgba(10,21,32,0.60) 38%, rgba(10,21,32,0.0) 65%),
+        linear-gradient(to right, rgba(10,21,32,0.55) 0%, rgba(10,21,32,0.0) 45%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 0 56px 0; /* text sits at the bottom */
+      max-width: 560px;
+    }
+    .hero-content h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 700; line-height: 1.1;
+      color: var(--white); margin-bottom: 16px;
+    }
+    .hero-content h1 em { color: var(--gold); font-style: normal; display: block; }
+    .hero-tagline { font-size: 0.92rem; color: rgba(255,255,255,0.82); line-height: 1.75; margin-bottom: 32px; }
+    .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .btn-watch { display: inline-flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.85); font-size: 0.82rem; font-weight: 500; transition: color 0.2s; }
+    .btn-watch:hover { color: var(--white); }
+    .play-ring { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.65); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .play-ring svg { width: 9px; height: 9px; fill: white; margin-left: 2px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       PILLAR BAR
+    ═══════════════════════════════════════════════════════════ */
+    .pillars-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 24px 0; }
+    .pillars-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; text-align: center; }
+    .pillar { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 8px 4px; cursor: pointer; transition: color 0.2s; }
+    .pillar svg { width: 24px; height: 24px; stroke: var(--text-mid); fill: none; stroke-width: 1.5; }
+    .pillar:hover svg { stroke: var(--gold); }
+    .pillar-lbl { font-size: 0.66rem; font-weight: 500; color: var(--text-mid); white-space: nowrap; }
+    .pillar:hover .pillar-lbl { color: var(--gold); }
+
+    /* ═══════════════════════════════════════════════════════════
+       SCRIPTURE BANNER
+    ═══════════════════════════════════════════════════════════ */
+    .scripture { background: var(--navy-mid); padding: 48px 0; }
+    .scripture-inner { display: grid; grid-template-columns: 1fr 300px; gap: 40px; align-items: center; }
+    .quote-wrap { display: flex; gap: 18px; align-items: flex-start; }
+    .big-quote { font-family: var(--serif); font-size: 4.5rem; line-height: 0.75; color: var(--gold); flex-shrink: 0; margin-top: 4px; }
+    .quote-text { font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--white); line-height: 1.55; }
+    .quote-ref  { font-size: 0.78rem; font-weight: 600; color: var(--gold-light); margin-top: 10px; letter-spacing: 0.04em; }
+    .daily-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13); border-radius: 8px; padding: 26px 28px; }
+    .daily-card .daily-label { font-size: 0.8rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .daily-card p { font-size: 0.8rem; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 18px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       FEATURED RESOURCES (Books)
+    ═══════════════════════════════════════════════════════════ */
+    .resources { background: var(--cream); padding: 72px 0; }
+    .section-top { display: grid; grid-template-columns: 260px 1fr; gap: 60px; align-items: start; margin-bottom: 40px; }
+    .section-top h2 { font-family: var(--serif); font-size: 2.1rem; font-weight: 700; color: var(--navy); line-height: 1.2; margin-top: 8px; }
+    .section-desc { font-size: 0.88rem; color: var(--text-mid); line-height: 1.75; margin-bottom: 18px; }
+    .res-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; position: relative; }
+    .res-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.25s, transform 0.25s; }
+    .res-card:hover { box-shadow: 0 10px 36px rgba(0,0,0,0.10); transform: translateY(-3px); }
+    .res-cover { aspect-ratio: 3/4; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+    .cover-cream { background: #E8E4D9; }
+    .cover-navy  { background: #0D1B2A; }
+    .cover-olive { background: #2E3B2E; }
+    .book-label  { font-family: var(--serif); font-weight: 700; letter-spacing: 0.08em; line-height: 1.3; }
+    .cover-cream .book-label { font-size: 1rem; color: var(--navy); }
+    .cover-navy  .book-label { font-size: 1rem; color: var(--white); }
+    .cover-olive .book-label { font-size: 1rem; color: var(--white); }
+    .book-edition { font-size: 0.58rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 10px; color: rgba(255,255,255,0.6); }
+
+    /*
+      PLACEHOLDER PHOTO CARD — replace background-image URL when ready.
+      Search for "PLACEHOLDER_COMMUNITY_PHOTO" to find it.
+    */
+    .res-photo {
+      aspect-ratio: 3/4;
+      /* PLACEHOLDER_COMMUNITY_PHOTO — replace with your own image */
+      background: url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80') center/cover;
+    }
+    .res-body { padding: 18px; }
+    .res-title { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+    .res-text  { font-size: 0.76rem; color: var(--text-mid); line-height: 1.55; margin-bottom: 12px; }
+    .res-link  { font-size: 0.76rem; font-weight: 700; color: var(--navy); display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s; }
+    .res-link:hover { color: var(--gold); }
+    .carousel-next {
+      position: absolute; right: -16px; top: 40%; transform: translateY(-50%);
+      width: 32px; height: 32px; background: var(--white); border: 1px solid var(--border);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; z-index: 2;
+    }
+    .carousel-next svg { width: 14px; height: 14px; stroke: var(--navy); fill: none; stroke-width: 2; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SERMONS
+    ═══════════════════════════════════════════════════════════ */
+    .sermons { background: var(--white); padding: 72px 0; }
+    .sermons-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 40px; }
+    .sermon-card { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.25s, transform 0.25s; }
+    .sermon-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.09); transform: translateY(-2px); }
+    .sermon-thumb {
+      position: relative; aspect-ratio: 16/9; overflow: hidden;
+      background: var(--navy-mid);
+    }
+    .sermon-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .sermon-card:hover .sermon-thumb img { transform: scale(1.04); }
+    .sermon-play-btn {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(10,21,32,0.35); transition: background 0.2s;
+    }
+    .sermon-card:hover .sermon-play-btn { background: rgba(10,21,32,0.55); }
+    .sermon-play-btn .play-circle {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(201,168,76,0.9); display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    .sermon-card:hover .play-circle { transform: scale(1.1); }
+    .sermon-play-btn svg { width: 18px; height: 18px; fill: var(--navy); margin-left: 3px; }
+    .sermon-body { padding: 18px; }
+    .sermon-meta { font-size: 0.68rem; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .sermon-title { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; line-height: 1.3; }
+    .sermon-speaker { font-size: 0.76rem; color: var(--text-mid); margin-bottom: 12px; }
+    .sermon-duration { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text-light); }
+    .sermon-duration svg { width: 12px; height: 12px; stroke: var(--text-light); fill: none; stroke-width: 1.8; }
+
+    /* ═══════════════════════════════════════════════════════════
+       PODCAST
+    ═══════════════════════════════════════════════════════════ */
+    .podcast { background: var(--navy); padding: 72px 0; }
+    .podcast-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; }
+    .podcast-top h2 { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--white); margin-top: 8px; }
+    .podcast-top p { font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 8px; max-width: 420px; line-height: 1.65; }
+    .podcast-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .podcast-card {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius); overflow: hidden;
+      display: flex; align-items: stretch;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .podcast-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(201,168,76,0.4); }
+    .pod-thumb {
+      width: 90px; flex-shrink: 0;
+      /* PLACEHOLDER_PODCAST_THUMB — replace each one with your episode art */
+      background: var(--navy-mid) center/cover;
+      position: relative;
+    }
+    .pod-play {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(10,21,32,0.45); transition: background 0.2s;
+    }
+    .podcast-card:hover .pod-play { background: rgba(10,21,32,0.6); }
+    .pod-play svg { width: 20px; height: 20px; fill: var(--gold); }
+    .pod-info { padding: 14px 16px; }
+    .pod-ep   { font-size: 0.62rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+    .pod-title { font-family: var(--serif); font-size: 0.88rem; font-weight: 700; color: var(--white); line-height: 1.3; margin-bottom: 5px; }
+    .pod-guest { font-size: 0.72rem; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+    .pod-dur   { display: inline-flex; align-items: center; gap: 5px; font-size: 0.68rem; color: rgba(255,255,255,0.4); }
+    .pod-dur svg { width: 11px; height: 11px; stroke: rgba(255,255,255,0.4); fill: none; stroke-width: 1.8; }
+
+    /* Podcast platforms strip */
+    .pod-platforms { margin-top: 36px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .pod-platforms span { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+    .pod-platform-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.76rem; font-weight: 600; color: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 20px;
+      padding: 6px 14px; transition: all 0.2s;
+    }
+    .pod-platform-link:hover { border-color: var(--gold); color: var(--gold); }
+    .pod-platform-link svg { width: 13px; height: 13px; fill: currentColor; }
+
+    /* ═══════════════════════════════════════════════════════════
+       TOPICS GRID
+    ═══════════════════════════════════════════════════════════ */
+    .topics { background: var(--white); padding: 72px 0; }
+    .topics-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .topics-hdr h2 { font-family: var(--serif); font-size: 1.85rem; font-weight: 700; color: var(--navy); }
+    .view-all { font-size: 0.78rem; font-weight: 700; color: var(--navy); display: inline-flex; align-items: center; gap: 4px; }
+    .view-all:hover { color: var(--gold); }
+    .topics-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; }
+    .topic-card { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/5; cursor: pointer; }
+    .topic-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+    .topic-card:hover img { transform: scale(1.07); }
+    .topic-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,21,32,0.88) 40%, rgba(10,21,32,0.04) 100%); }
+    .topic-body { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px; }
+    .topic-icon-ring { width: 26px; height: 26px; border-radius: 50%; background: rgba(201,168,76,0.2); border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; margin-bottom: 7px; }
+    .topic-icon-ring svg { width: 12px; height: 12px; stroke: var(--gold); fill: none; stroke-width: 1.8; }
+    .topic-name { font-family: var(--serif); font-size: 0.88rem; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+    .topic-desc { font-size: 0.65rem; color: rgba(255,255,255,0.72); line-height: 1.45; }
+
+    /* ═══════════════════════════════════════════════════════════
+       DAILY DEVOTIONAL BANNER
+    ═══════════════════════════════════════════════════════════ */
+    .devotional { background: var(--navy); position: relative; overflow: hidden; }
+    .devotional-grid { display: grid; grid-template-columns: 220px 1fr 220px; min-height: 280px; }
+    /* PLACEHOLDER_CANDLE_PHOTO — replace with your candle/Bible image */
+    .dev-candle { background: url('https://images.unsplash.com/photo-1587468922891-5e5ca0cbfa5d?w=400&q=80') center/cover; }
+    .dev-center { padding: 52px 48px; text-align: center; }
+    .dev-center .eyebrow { margin-bottom: 12px; }
+    .dev-center h2 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; color: var(--white); line-height: 1.2; margin-bottom: 12px; }
+    .dev-center p { font-size: 0.85rem; color: rgba(255,255,255,0.68); line-height: 1.65; margin-bottom: 26px; max-width: 440px; margin-left: auto; margin-right: auto; }
+    .dev-verse { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 26px; margin: 40px 24px; align-self: center; }
+    .dev-verse blockquote { font-family: var(--serif); font-style: italic; font-size: 0.9rem; color: rgba(255,255,255,0.88); line-height: 1.6; margin-bottom: 8px; }
+    .dev-verse cite { font-size: 0.76rem; color: var(--gold-light); font-weight: 600; font-style: normal; }
+
+    /* ═══════════════════════════════════════════════════════════
+       COMMUNITY CTA
+    ═══════════════════════════════════════════════════════════ */
+    .community { background: var(--cream); padding: 68px 0; border-top: 1px solid var(--border); }
+    .community-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .community-inner h2 { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+    .community-inner > div:first-child p { font-size: 0.88rem; color: var(--text-mid); line-height: 1.75; max-width: 380px; }
+    .cta-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 28px; }
+    .cta-item { text-align: center; }
+    .cta-icon-wrap { width: 38px; height: 38px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+    .cta-icon-wrap svg { width: 22px; height: 22px; stroke: var(--navy); fill: none; stroke-width: 1.5; }
+    .cta-item-lbl { font-size: 0.78rem; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+    .cta-item-sub { font-size: 0.69rem; color: var(--text-light); line-height: 1.45; }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════ */
+    .footer { background: var(--navy); padding: 60px 0 24px; }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1.3fr; gap: 36px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,0.09); margin-bottom: 24px; }
+    .ft-brand-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .ft-badge { width: 34px; height: 34px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .ft-badge svg { width: 16px; height: 16px; fill: var(--gold); }
+    .ft-brand-name { font-family: var(--serif); font-size: 0.9rem; font-weight: 700; color: var(--white); }
+    .ft-brand-sub  { font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.45); line-height: 1.5; }
+    .ft-tagline { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.65; margin-bottom: 18px; }
+    .ft-socials { display: flex; gap: 8px; }
+    .ft-socials a { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .ft-socials a:hover { background: var(--gold); }
+    .ft-socials svg { width: 13px; height: 13px; fill: white; }
+    .ft-col h5 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
+    .ft-col ul li { margin-bottom: 8px; }
+    .ft-col ul li a { font-size: 0.78rem; color: rgba(255,255,255,0.60); transition: color 0.2s; }
+    .ft-col ul li a:hover { color: var(--gold); }
+    .ft-subscribe h5 { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+    .ft-subscribe p { font-size: 0.76rem; color: rgba(255,255,255,0.5); margin-bottom: 14px; line-height: 1.55; }
+    .ft-email-row { display: flex; }
+    .ft-email-row input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-right: none; border-radius: 4px 0 0 4px; padding: 9px 12px; font-size: 0.78rem; color: var(--white); outline: none; font-family: var(--sans); }
+    .ft-email-row input::placeholder { color: rgba(255,255,255,0.3); }
+    .ft-email-row button { background: var(--gold); border: none; padding: 9px 14px; border-radius: 0 4px 4px 0; display: flex; align-items: center; transition: background 0.2s; }
+    .ft-email-row button:hover { background: var(--gold-light); }
+    .ft-email-row button svg { width: 14px; height: 14px; stroke: var(--navy); fill: none; stroke-width: 2; }
+    /* Sub feedback */
+    .ft-sub-msg { font-size: 0.72rem; margin-top: 8px; min-height: 18px; }
+    .ft-sub-msg.success { color: #7ecb8f; }
+    .ft-sub-msg.error   { color: #f08080; }
+
+    .ft-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .ft-bottom span { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+    .ft-bottom-links { display: flex; gap: 20px; }
+    .ft-bottom-links a { font-size: 0.72rem; color: rgba(255,255,255,0.35); transition: color 0.2s; }
+    .ft-bottom-links a:hover { color: rgba(255,255,255,0.65); }
+
+    /* ═══════════════════════════════════════════════════════════
+       LOADING SKELETON (shown briefly while Supabase content loads)
+    ═══════════════════════════════════════════════════════════ */
+    .res-skeleton, .res-skeleton * { animation: pulse 1.4s ease-in-out infinite; }
+    .res-skeleton .res-title { color: var(--text-light) !important; }
+    .podcast .res-skeleton .pod-title { color: rgba(255,255,255,0.4) !important; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 1080px) {
+      .topics-grid { grid-template-columns: repeat(3,1fr); }
+      .res-grid    { grid-template-columns: repeat(2,1fr); }
+      .pillars-grid { grid-template-columns: repeat(4,1fr); }
+      .footer-grid  { grid-template-columns: 1fr 1fr 1fr; }
+      .sermons-grid { grid-template-columns: repeat(2,1fr); }
+      .podcast-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero-content { padding-bottom: 40px; }
+      .scripture-inner { grid-template-columns: 1fr; }
+      .section-top { grid-template-columns: 1fr; gap: 16px; }
+      .res-grid { grid-template-columns: 1fr 1fr; }
+      .topics-grid { grid-template-columns: repeat(2,1fr); }
+      .devotional-grid { grid-template-columns: 1fr; }
+      .dev-candle { display: none; }
+      .community-inner { grid-template-columns: 1fr; gap: 36px; }
+      .cta-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .sermons-grid { grid-template-columns: 1fr; }
+      .podcast-grid { grid-template-columns: 1fr; }
+      .podcast-top { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 18px; }
+      .pillars-grid { grid-template-columns: repeat(3,1fr); }
+      .res-grid { grid-template-columns: 1fr; }
+      .topics-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════ NAV ═══════════════════════════ -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="https://inspirevision.org" class="nav-logo">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 6.5V12c0 5.25 3.9 10.15 9 11.35C17.1 22.15 21 17.25 21 12V6.5L12 2z"/></svg>
+        </div>
+        <div class="logo-text">
+          <div class="name">INSPIRE VISION</div>
+          <div class="sub">— Faith &amp; Spiritual Formation —</div>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="https://inspirevision.org/about">About Us</a></li>
+        <li><a href="https://inspirevision.org/pillars">Our Pillars</a></li>
+        <li><a href="https://inspirevision.org/impact">Impact</a></li>
+        <li><a href="https://inspirevision.org/stories">Stories</a></li>
+        <li><a href="#resources" class="has-arrow">Resources</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="nav-search-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <a href="#get-involved" class="btn-dark">Get Involved</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════ HERO ══════════════════════════
+     Text is anchored at the BOTTOM of the hero so the faces
+     in the photo remain fully visible above the text.
+     The gradient rises from the bottom — heavy dark behind text,
+     transparent at the top.
+═══════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div><!-- ← IMAGE: insp_faith_standard.png -->
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <div class="hero-content">
+      <h1>Inspire<em>Faith &amp;<br>Spiritual<br>Formation</em></h1>
+      <p class="hero-tagline">
+        Encounter God. Grow in Truth.<br>
+        Live with Purpose. Love with Grace.
+      </p>
+      <div class="hero-actions">
+        <a href="#resources" class="btn-dark">Explore the Journey</a>
+        <a href="#welcome-video" class="btn-watch">
+          <span class="play-ring"><svg viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></span>
+          Watch Welcome Video
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ PILLAR BAR ════════════════════════ -->
+<section class="pillars-bar">
+  <div class="container">
+    <div class="pillars-grid">
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="7" x2="19" y2="7"/></svg>
+        <span class="pillar-lbl">Faith &amp; Belief</span>
+      </div>
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <span class="pillar-lbl">Spiritual Growth</span>
+      </div>
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><rect x="4" y="3" width="6" height="18" rx="1"/><rect x="14" y="3" width="6" height="18" rx="1"/></svg>
+        <span class="pillar-lbl">Prayer &amp; Worship</span>
+      </div>
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span class="pillar-lbl">Apologetics</span>
+      </div>
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="pillar-lbl">Youth Ministry</span>
+      </div>
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span class="pillar-lbl">Outreach &amp; Missions</span>
+      </div>
+      <div class="pillar">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+        <span class="pillar-lbl">Daily Inspiration</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ SCRIPTURE ═════════════════════════
+     CONTENT: SCRIPTURE — update quote text + reference here
+═══════════════════════════════════════════════════════════ -->
+<section class="scripture">
+  <div class="container">
+    <div class="scripture-inner">
+      <div class="quote-wrap">
+        <div class="big-quote">"</div>
+        <div>
+          <!-- CONTENT: SCRIPTURE -->
+          <p class="quote-text">"But grow in the grace and knowledge of our Lord and Savior Jesus Christ."</p>
+          <p class="quote-ref">2 Peter 3:18</p>
+        </div>
+      </div>
+      <div class="daily-card">
+        <div class="daily-label">Daily Inspiration</div>
+        <p>Your daily source of hope, wisdom and encouragement.</p>
+        <a href="#devotional" class="btn-outline-white">Start Your Day →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════ FEATURED RESOURCES (Books) ════════════
+     DYNAMIC — books load from vision.books via Supabase.
+     To add/edit a book, use the admin page (faith-admin.html),
+     NOT this file. Do not hand-edit cards here — they get
+     overwritten by loadBooks() on every page load.
+
+     The "Community Fellowship" card is a fixed static card,
+     not a book, and stays here permanently.
+═══════════════════════════════════════════════════════════ -->
+<section class="resources" id="resources">
+  <div class="container">
+    <div class="section-top">
+      <div>
+        <p class="eyebrow">Featured Resources</p>
+        <h2>Resources for<br>Every Season</h2>
+      </div>
+      <div>
+        <p class="section-desc">Deepen your understanding, strengthen your faith, and live out the truth with confidence and compassion.</p>
+        <a href="#" class="btn-outline-navy">Browse All Resources →</a>
+      </div>
+    </div>
+    <div class="res-grid" id="books-grid">
+
+      <!-- Dynamic book cards are injected here by loadBooks() -->
+      <div class="res-card res-skeleton"><div class="res-cover" style="background:#EDEAE2"></div><div class="res-body"><div class="res-title">Loading…</div></div></div>
+      <div class="res-card res-skeleton"><div class="res-cover" style="background:#EDEAE2"></div><div class="res-body"><div class="res-title">Loading…</div></div></div>
+      <div class="res-card res-skeleton"><div class="res-cover" style="background:#EDEAE2"></div><div class="res-body"><div class="res-title">Loading…</div></div></div>
+
+      <!-- Fixed static card — not a book, always shows -->
+      <div class="res-card">
+        <div class="res-photo"
+             style="background-image:url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80')">
+          <!-- PLACEHOLDER_COMMUNITY_PHOTO -->
+        </div>
+        <div class="res-body">
+          <div class="res-title">Community Fellowship</div>
+          <p class="res-text">Grow together in faith, encouragement and unity.</p>
+          <a href="#" class="res-link">Join Community →</a>
+        </div>
+      </div>
+
+      <div class="carousel-next">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ SERMONS ════════════════════════════
+     DYNAMIC — sermons load from vision.sermons via Supabase.
+     To add/edit a sermon, use the admin page (faith-admin.html),
+     NOT this file. Cards here are placeholders replaced by
+     loadSermons() on every page load.
+═══════════════════════════════════════════════════════════ -->
+<section class="sermons" id="sermons">
+  <div class="container">
+    <div class="section-top">
+      <div>
+        <p class="eyebrow">Latest Sermons</p>
+        <h2>The Word<br>Preached</h2>
+      </div>
+      <div>
+        <p class="section-desc">Powerful messages rooted in Scripture, delivered to equip you for life and mission.</p>
+        <a href="#" class="btn-outline-navy">View All Sermons →</a>
+      </div>
+    </div>
+    <div class="sermons-grid" id="sermons-grid">
+      <!-- Dynamic sermon cards are injected here by loadSermons() -->
+      <div class="sermon-card res-skeleton"><div class="sermon-thumb" style="background:#EDEAE2"></div><div class="sermon-body"><div class="sermon-title">Loading…</div></div></div>
+      <div class="sermon-card res-skeleton"><div class="sermon-thumb" style="background:#EDEAE2"></div><div class="sermon-body"><div class="sermon-title">Loading…</div></div></div>
+      <div class="sermon-card res-skeleton"><div class="sermon-thumb" style="background:#EDEAE2"></div><div class="sermon-body"><div class="sermon-title">Loading…</div></div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ PODCAST ════════════════════════════
+     DYNAMIC — episodes load from vision.podcasts via Supabase.
+     To add/edit an episode, use the admin page (faith-admin.html),
+     NOT this file. Cards here are placeholders replaced by
+     loadPodcasts() on every page load.
+     Platform links below stay static — update hrefs once to your
+     real Spotify/Apple/YouTube channel URLs.
+═══════════════════════════════════════════════════════════ -->
+<section class="podcast" id="podcast">
+  <div class="container">
+    <div class="podcast-top">
+      <div>
+        <p class="eyebrow">The Inspire Faith Podcast</p>
+        <h2>Conversations<br>That Build Faith</h2>
+        <p>Deep, honest conversations about faith, culture, Scripture and living a purposeful Christian life.</p>
+      </div>
+      <a href="#" class="btn-outline-white" style="align-self:flex-end;">All Episodes →</a>
+    </div>
+
+    <div class="podcast-grid" id="podcasts-grid">
+      <!-- Dynamic podcast cards are injected here by loadPodcasts() -->
+      <div class="podcast-card res-skeleton"><div class="pod-thumb" style="background:rgba(255,255,255,0.08)"></div><div class="pod-info"><div class="pod-title">Loading…</div></div></div>
+      <div class="podcast-card res-skeleton"><div class="pod-thumb" style="background:rgba(255,255,255,0.08)"></div><div class="pod-info"><div class="pod-title">Loading…</div></div></div>
+      <div class="podcast-card res-skeleton"><div class="pod-thumb" style="background:rgba(255,255,255,0.08)"></div><div class="pod-info"><div class="pod-title">Loading…</div></div></div>
+    </div>
+
+    <!-- Platform links — update hrefs to your real podcast channel URLs -->
+    <div class="pod-platforms">
+      <span>Listen on:</span>
+      <a href="#" class="pod-platform-link">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Spotify
+      </a>
+      <a href="#" class="pod-platform-link">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Apple Podcasts
+      </a>
+      <a href="#" class="pod-platform-link">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        YouTube
+      </a>
+      <a href="#" class="pod-platform-link">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        Google Podcasts
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ TOPICS ═════════════════════════════
+     PLACEHOLDER images — replace each img src when you have photos.
+     Search PLACEHOLDER_TOPIC_N to find each one.
+═══════════════════════════════════════════════════════════ -->
+<section class="topics">
+  <div class="container">
+    <div class="topics-hdr">
+      <h2>Grow in What Matters</h2>
+      <a href="#" class="view-all">View All Topics →</a>
+    </div>
+    <div class="topics-grid">
+
+      <div class="topic-card">
+        <!-- PLACEHOLDER_TOPIC_1 — Faith Foundations -->
+        <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=500&q=80" alt="Faith Foundations" loading="lazy" />
+        <div class="topic-grad"></div>
+        <div class="topic-body">
+          <div class="topic-icon-ring"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="7" x2="19" y2="7"/></svg></div>
+          <div class="topic-name">Faith Foundations</div>
+          <div class="topic-desc">Explore the core truths that build a life of faith.</div>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <!-- PLACEHOLDER_TOPIC_2 — Worship -->
+        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80" alt="Worship" loading="lazy" />
+        <div class="topic-grad"></div>
+        <div class="topic-body">
+          <div class="topic-icon-ring"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div class="topic-name">Worship</div>
+          <div class="topic-desc">Celebrate God through music, songs and praise.</div>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <!-- PLACEHOLDER_TOPIC_3 — Prayer -->
+        <img src="https://images.unsplash.com/photo-1476231682828-37e571bc172f?w=500&q=80" alt="Prayer" loading="lazy" />
+        <div class="topic-grad"></div>
+        <div class="topic-body">
+          <div class="topic-icon-ring"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="6" height="18" rx="1"/><rect x="14" y="3" width="6" height="18" rx="1"/></svg></div>
+          <div class="topic-name">Prayer</div>
+          <div class="topic-desc">Guides and resources to deepen your prayer life.</div>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <!-- PLACEHOLDER_TOPIC_4 — Apologetics -->
+        <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80" alt="Apologetics" loading="lazy" />
+        <div class="topic-grad"></div>
+        <div class="topic-body">
+          <div class="topic-icon-ring"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <div class="topic-name">Apologetics</div>
+          <div class="topic-desc">Answers to strengthen your faith and engage the world.</div>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <!-- PLACEHOLDER_TOPIC_5 — Youth Ministry -->
+        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&q=80" alt="Youth Ministry" loading="lazy" />
+        <div class="topic-grad"></div>
+        <div class="topic-body">
+          <div class="topic-icon-ring"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="topic-name">Youth Ministry</div>
+          <div class="topic-desc">Equipping young people to know, love and follow Jesus.</div>
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <!-- PLACEHOLDER_TOPIC_6 — Outreach -->
+        <img src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=500&q=80" alt="Outreach & Missions" loading="lazy" />
+        <div class="topic-grad"></div>
+        <div class="topic-body">
+          <div class="topic-icon-ring"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="topic-name">Outreach &amp; Missions</div>
+          <div class="topic-desc">Taking the love of Christ to communities and nations.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════ DAILY DEVOTIONAL ══════════════════════
+     CONTENT: DAILY VERSE — update blockquote + cite
+═══════════════════════════════════════════════════════════ -->
+<section class="devotional" id="devotional">
+  <div class="devotional-grid">
+    <div class="dev-candle"></div><!-- PLACEHOLDER_CANDLE_PHOTO -->
+    <div class="dev-center">
+      <p class="eyebrow">Daily Devotional</p>
+      <h2>Wisdom for Today.<br>Hope for Tomorrow.</h2>
+      <p>Short devotionals, powerful truths and practical encouragement delivered daily to your heart.</p>
+      <a href="#" class="btn-outline-white">Get Daily Inspiration →</a>
+    </div>
+    <div class="dev-verse">
+      <!-- CONTENT: DAILY VERSE -->
+      <blockquote>"Your word is a lamp to my feet and a light to my path."</blockquote>
+      <cite>Psalm 119:105</cite>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════ COMMUNITY CTA ═════════════════════════ -->
+<section class="community" id="get-involved">
+  <div class="container">
+    <div class="community-inner">
+      <div>
+        <h2>Be Part of What God is Doing</h2>
+        <p>Join a global community seeking to know God, make Him known and live on mission.</p>
+      </div>
+      <div>
+        <div class="cta-grid">
+          <div class="cta-item">
+            <div class="cta-icon-wrap"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div class="cta-item-lbl">Connect</div>
+            <div class="cta-item-sub">Join a community near you.</div>
+          </div>
+          <div class="cta-item">
+            <div class="cta-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg></div>
+            <div class="cta-item-lbl">Serve</div>
+            <div class="cta-item-sub">Use your gifts to make an impact.</div>
+          </div>
+          <div class="cta-item">
+            <div class="cta-icon-wrap"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+            <div class="cta-item-lbl">Give</div>
+            <div class="cta-item-sub">Support the mission and outreach.</div>
+          </div>
+          <div class="cta-item">
+            <div class="cta-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+            <div class="cta-item-lbl">Share</div>
+            <div class="cta-item-sub">Invite others and spread the hope.</div>
+          </div>
+        </div>
+        <a href="#" class="btn-dark" style="padding:13px 32px;">Get Involved →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════ FOOTER ════════════════════════════
+     Supabase email subscribe wired to vision.faith_subscribers
+═══════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+
+      <div>
+        <div class="ft-brand-logo">
+          <div class="ft-badge"><svg viewBox="0 0 24 24"><path d="M12 2L3 6.5V12c0 5.25 3.9 10.15 9 11.35C17.1 22.15 21 17.25 21 12V6.5L12 2z"/></svg></div>
+          <div>
+            <div class="ft-brand-name">INSPIRE VISION</div>
+            <div class="ft-brand-sub">Faith &amp; Spiritual Formation</div>
+          </div>
+        </div>
+        <p class="ft-tagline">Reforming minds. Renewing hearts.<br>Rebuilding nations.</p>
+        <div class="ft-socials">
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" style="fill:#0D1B2A"/></svg></a>
+          <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
+        </div>
+      </div>
+
+      <div class="ft-col">
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="https://inspirevision.org/about">About Us</a></li>
+          <li><a href="https://inspirevision.org/pillars">Our Pillars</a></li>
+          <li><a href="https://inspirevision.org/stories">Stories</a></li>
+          <li><a href="#resources">Resources</a></li>
+          <li><a href="https://inspirevision.org/contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="ft-col">
+        <h5>Faith &amp; Growth</h5>
+        <ul>
+          <li><a href="#devotional">Daily Inspiration</a></li>
+          <li><a href="#">Devotionals</a></li>
+          <li><a href="#">Sermons</a></li>
+          <li><a href="#podcast">Podcast</a></li>
+          <li><a href="#">Apologetics</a></li>
+        </ul>
+      </div>
+
+      <div class="ft-col">
+        <h5>Get Involved</h5>
+        <ul>
+          <li><a href="#">Volunteer</a></li>
+          <li><a href="#">Give</a></li>
+          <li><a href="#">Events</a></li>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Missions</a></li>
+        </ul>
+      </div>
+
+      <div class="ft-subscribe">
+        <h5>Stay Connected</h5>
+        <p>Subscribe for daily inspiration and ministry updates.</p>
+        <div class="ft-email-row">
+          <input type="email" id="footer-email" placeholder="Your email address" />
+          <button type="button" id="footer-subscribe-btn" aria-label="Subscribe">
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+        <div class="ft-sub-msg" id="footer-sub-msg"></div>
+      </div>
+
+    </div>
+
+    <div class="ft-bottom">
+      <span>© 2025 Inspire Vision. All Rights Reserved.</span>
+      <div class="ft-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+
+<!-- ══════════════ DYNAMIC CONTENT SCRIPT ═════════════════════
+     Fetches books, sermons & podcasts from Supabase (vision schema)
+     and renders them into the page on load.
+
+     Content is managed entirely through the admin page
+     (faith-admin.html) — never edit cards by hand in this file.
+
+     If a table is empty or the fetch fails, each section falls
+     back to a friendly "check back soon" message rather than
+     showing a broken or blank section.
+═══════════════════════════════════════════════════════════ -->
+<script>
+  function getInspireDB(cb) {
+    if (window.inspireDB) { cb(window.inspireDB); return; }
+    const t = setInterval(() => { if (window.inspireDB) { clearInterval(t); cb(window.inspireDB); } }, 50);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ── BOOKS ──────────────────────────────────────────────── */
+  function renderBookCard(b) {
+    const coverHtml = b.cover_image_url
+      ? `<div class="res-cover" style="background-image:url('${escapeHtml(b.cover_image_url)}');background-size:cover;background-position:center;"></div>`
+      : `<div class="res-cover cover-navy"><p class="book-label">${escapeHtml(b.title).toUpperCase()}</p>${b.edition_label ? `<p class="book-edition">${escapeHtml(b.edition_label)}</p>` : ''}</div>`;
+
+    return `
+      <div class="res-card">
+        ${coverHtml}
+        <div class="res-body">
+          <div class="res-title">${escapeHtml(b.title)}${b.edition_label ? ' — ' + escapeHtml(b.edition_label) : ''}</div>
+          <p class="res-text">${escapeHtml(b.description || '')}</p>
+          <a href="${b.link_url ? escapeHtml(b.link_url) : '#'}" class="res-link">${escapeHtml(b.link_text || 'Read Now')} →</a>
+        </div>
+      </div>`;
+  }
+
+  function loadBooks() {
+    getInspireDB(async (db) => {
+      const grid = document.getElementById('books-grid');
+      const skeletons = grid.querySelectorAll('.res-skeleton');
+      try {
+        const { data, error } = await db
+          .schema('vision')
+          .from('books')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order');
+
+        if (error) throw error;
+        skeletons.forEach(el => el.remove());
+
+        if (!data || data.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'res-card';
+          empty.innerHTML = `<div class="res-body" style="padding:32px 18px;text-align:center;"><p class="res-text">New resources coming soon.</p></div>`;
+          grid.insertBefore(empty, grid.querySelector('.carousel-next'));
+          return;
+        }
+
+        const fragment = document.createElement('template');
+        fragment.innerHTML = data.map(renderBookCard).join('');
+        grid.insertBefore(fragment.content, grid.querySelector('.carousel-next'));
+      } catch (err) {
+        console.error('Error loading books:', err);
+        skeletons.forEach(el => el.remove());
+      }
+    });
+  }
+
+  /* ── SERMONS ────────────────────────────────────────────── */
+  function fmtSermonDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  }
+
+  function renderSermonCard(s) {
+    const thumb = s.thumbnail_url || 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=700&q=80';
+    const metaParts = [s.series_name ? 'Series · ' + escapeHtml(s.series_name) : null].filter(Boolean);
+    const speakerParts = [escapeHtml(s.speaker || ''), fmtSermonDate(s.sermon_date)].filter(Boolean);
+
+    return `
+      <div class="sermon-card">
+        <div class="sermon-thumb">
+          <img src="${escapeHtml(thumb)}" alt="${escapeHtml(s.title)}" loading="lazy" />
+          <a href="${s.video_url ? escapeHtml(s.video_url) : '#'}" class="sermon-play-btn" aria-label="Play sermon" target="_blank" rel="noopener">
+            <div class="play-circle"><svg viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14"/></svg></div>
+          </a>
+        </div>
+        <div class="sermon-body">
+          ${metaParts.length ? `<div class="sermon-meta">${metaParts.join('')}</div>` : ''}
+          <div class="sermon-title">${escapeHtml(s.title)}</div>
+          <div class="sermon-speaker">${speakerParts.join(' · ')}</div>
+          ${s.duration_minutes ? `<div class="sermon-duration"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${s.duration_minutes} min</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function loadSermons() {
+    getInspireDB(async (db) => {
+      const grid = document.getElementById('sermons-grid');
+      try {
+        const { data, error } = await db
+          .schema('vision')
+          .from('sermons')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order');
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-light);font-size:0.88rem;">New sermons coming soon. Check back shortly.</div>`;
+          return;
+        }
+        grid.innerHTML = data.map(renderSermonCard).join('');
+      } catch (err) {
+        console.error('Error loading sermons:', err);
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-light);font-size:0.88rem;">New sermons coming soon. Check back shortly.</div>`;
+      }
+    });
+  }
+
+  /* ── PODCASTS ───────────────────────────────────────────── */
+  function renderPodcastCard(p) {
+    const thumbStyle = p.thumbnail_url ? `background-image:url('${escapeHtml(p.thumbnail_url)}')` : '';
+    const playHref = p.audio_url || p.external_link || '#';
+
+    return `
+      <div class="podcast-card">
+        <div class="pod-thumb" style="${thumbStyle}">
+          <a href="${escapeHtml(playHref)}" class="pod-play" aria-label="Play episode" target="_blank" rel="noopener">
+            <svg viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14"/></svg>
+          </a>
+        </div>
+        <div class="pod-info">
+          ${p.episode_number ? `<div class="pod-ep">Episode ${p.episode_number}</div>` : ''}
+          <div class="pod-title">${escapeHtml(p.title)}</div>
+          ${p.guest_name ? `<div class="pod-guest">with ${escapeHtml(p.guest_name)}</div>` : ''}
+          ${p.duration_minutes ? `<div class="pod-dur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${p.duration_minutes} min</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function loadPodcasts() {
+    getInspireDB(async (db) => {
+      const grid = document.getElementById('podcasts-grid');
+      try {
+        const { data, error } = await db
+          .schema('vision')
+          .from('podcasts')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order');
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,0.5);font-size:0.88rem;">New episodes coming soon. Check back shortly.</div>`;
+          return;
+        }
+        grid.innerHTML = data.map(renderPodcastCard).join('');
+      } catch (err) {
+        console.error('Error loading podcasts:', err);
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,0.5);font-size:0.88rem;">New episodes coming soon. Check back shortly.</div>`;
+      }
+    });
+  }
+
+  /* ── RUN ON LOAD ────────────────────────────────────────── */
+  loadBooks();
+  loadSermons();
+  loadPodcasts();
+</script>
+
+
+<!-- ══════════════════ SUBSCRIBE SCRIPT ══════════════════════
+     Writes to: vision schema → faith_subscribers table
+     Required Supabase setup (if not done):
+       CREATE TABLE IF NOT EXISTS vision.faith_subscribers (
+         id         uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+         email      text NOT NULL UNIQUE,
+         source     text DEFAULT 'inspire-faith-footer',
+         created_at timestamptz DEFAULT now()
+       );
+       GRANT INSERT ON vision.faith_subscribers TO anon;
+═══════════════════════════════════════════════════════════ -->
+<script>
+  function getDB(cb) {
+    if (window.inspireDB) { cb(window.inspireDB); return; }
+    const t = setInterval(() => { if (window.inspireDB) { clearInterval(t); cb(window.inspireDB); } }, 50);
+  }
+
+  document.getElementById('footer-subscribe-btn').addEventListener('click', async () => {
+    const emailInput = document.getElementById('footer-email');
+    const msgEl     = document.getElementById('footer-sub-msg');
+    const email     = emailInput.value.trim();
+
+    msgEl.className = 'ft-sub-msg';
+    msgEl.textContent = '';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      msgEl.className = 'ft-sub-msg error';
+      msgEl.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    const btn = document.getElementById('footer-subscribe-btn');
+    btn.disabled = true;
+
+    getDB(async (db) => {
+      try {
+        const { error } = await db
+          .schema('vision')
+          .from('faith_subscribers')
+          .insert({ email, source: 'inspire-faith-footer' });
+
+        if (error) {
+          if (error.code === '23505') { // unique violation
+            msgEl.className = 'ft-sub-msg success';
+            msgEl.textContent = "You're already subscribed — God bless you!";
+          } else {
+            throw error;
+          }
+        } else {
+          emailInput.value = '';
+          msgEl.className = 'ft-sub-msg success';
+          msgEl.textContent = 'Thank you! You\'re now subscribed. 🙏';
+        }
+      } catch (err) {
+        msgEl.className = 'ft-sub-msg error';
+        msgEl.textContent = 'Something went wrong. Please try again.';
+        console.error('Subscribe error:', err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+  // Allow Enter key in email field
+  document.getElementById('footer-email').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('footer-subscribe-btn').click();
+  });
+</script>
+
+</body>
+</html>

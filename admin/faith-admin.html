@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inspire Faith — Content Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║  INSPIRE FAITH — ADMIN UPLOAD PAGE                               ║
+║                                                                    ║
+║  PRIVATE PAGE — do not link to this from the public site nav.    ║
+║  Access it directly via its URL, e.g.:                            ║
+║    inspirevision.org/admin/faith-admin.html                      ║
+║                                                                    ║
+║  Protected by Supabase Auth (email + password login).            ║
+║  Only logged-in users can add/edit/delete content — the public   ║
+║  site only ever reads published rows, it never needs to log in.  ║
+║                                                                    ║
+║  SETUP REQUIRED BEFORE FIRST USE:                                  ║
+║  1. Run inspire-faith-content-schema.sql in Supabase SQL Editor  ║
+║  2. Create your admin login: Supabase Dashboard → Authentication ║
+║     → Users → Add User → enter your email + a password           ║
+║  3. Open this page and log in with those credentials              ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  window.db = createClient(
+    'https://ygtsrdwoikqnrbexjrtl.supabase.co',
+    'sb_publishable_XxmrO4J18iyQ1Srub73BhQ_FBhd8mXR'
+  );
+  window.dispatchEvent(new Event('db-ready'));
+</script>
+
+<style>
+  :root {
+    --navy: #0D1B2A; --navy-mid:#162032; --gold:#C9A84C; --gold-light:#D4B96A;
+    --cream:#F6F4EF; --white:#fff; --text:#1A1A2E; --text-mid:#4A4A5A; --text-light:#7A7A8A;
+    --border:#E0DDD5; --success:#2E7D4F; --error:#C0392B;
+    --serif:'Playfair Display',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: var(--sans); background: var(--cream); color: var(--text); line-height:1.6; }
+  ::placeholder { color: var(--text-light); }
+
+  /* ── LOGIN SCREEN ───────────────────────────────────────── */
+  #login-screen {
+    min-height: 100vh; display:flex; align-items:center; justify-content:center; padding: 20px;
+  }
+  .login-box {
+    background: var(--white); border:1px solid var(--border); border-radius:10px;
+    padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .login-box .badge {
+    width:44px;height:44px;background:var(--navy);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+  }
+  .login-box .badge svg { width:24px;height:24px;fill:var(--gold); }
+  .login-box h1 { font-family: var(--serif); font-size:1.4rem; color:var(--navy); margin-bottom:6px; }
+  .login-box p.sub { font-size:0.82rem; color:var(--text-light); margin-bottom:26px; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:0.78rem; font-weight:600; color:var(--text-mid); margin-bottom:6px; }
+  .field input, .field textarea, .field select {
+    width:100%; padding:11px 13px; border:1px solid var(--border); border-radius:6px;
+    font-size:0.88rem; font-family: var(--sans); color: var(--text); background: var(--white);
+    outline:none; transition: border-color 0.2s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--gold); }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background: var(--navy); color: var(--white); border:none; border-radius:6px;
+    font-size:0.86rem; font-weight:600; padding:12px 22px; cursor:pointer; transition: background 0.2s;
+    width: 100%;
+  }
+  .btn:hover { background:#1e3050; }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .btn-gold { background: var(--gold); color: var(--navy); }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text-mid); }
+  .btn-ghost:hover { background:#f2f0eb; }
+  .btn-danger { background:transparent; border:1px solid var(--error); color:var(--error); }
+  .btn-danger:hover { background:#fdf0ee; }
+  .msg { font-size:0.8rem; margin-top:12px; padding:10px 12px; border-radius:6px; display:none; }
+  .msg.show { display:block; }
+  .msg.error   { background:#fdf0ee; color: var(--error); }
+  .msg.success { background:#eaf6ee; color: var(--success); }
+
+  /* ── ADMIN SHELL ────────────────────────────────────────── */
+  #admin-screen { display:none; min-height:100vh; }
+  .topbar {
+    background: var(--navy); padding:0 28px; height:62px;
+    display:flex; align-items:center; justify-content:space-between;
+    position: sticky; top:0; z-index: 50;
+  }
+  .topbar-left { display:flex; align-items:center; gap:10px; }
+  .topbar-left .badge { width:30px;height:30px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center; }
+  .topbar-left .badge svg { width:16px;height:16px;fill:var(--gold); }
+  .topbar-left span { font-family: var(--serif); font-size:0.92rem; font-weight:700; color:var(--white); }
+  .topbar-left small { display:block; font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.45); }
+  .topbar-right { display:flex; align-items:center; gap:14px; }
+  .topbar-right .user-email { font-size:0.78rem; color:rgba(255,255,255,0.6); }
+  .logout-btn {
+    background:transparent; border:1px solid rgba(255,255,255,0.25); color:var(--white);
+    font-size:0.78rem; padding:7px 14px; border-radius:6px; cursor:pointer; transition: background 0.2s;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.1); }
+
+  .layout { display:flex; min-height: calc(100vh - 62px); }
+  .sidebar {
+    width: 210px; background:var(--white); border-right:1px solid var(--border);
+    padding: 22px 0; flex-shrink:0;
+  }
+  .sidebar button {
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    background:none; border:none; padding:12px 22px; font-size:0.86rem; font-weight:500;
+    color:var(--text-mid); cursor:pointer; transition: all 0.15s; border-left: 3px solid transparent;
+  }
+  .sidebar button svg { width:17px;height:17px; stroke: var(--text-mid); fill:none; stroke-width:1.8; flex-shrink:0; }
+  .sidebar button:hover { background:#faf9f6; color: var(--navy); }
+  .sidebar button.active { background:#faf6ec; color:var(--navy); font-weight:700; border-left-color: var(--gold); }
+  .sidebar button.active svg { stroke: var(--gold); }
+
+  .main { flex:1; padding: 32px 36px; max-width: 1100px; }
+  .panel { display:none; }
+  .panel.active { display:block; }
+  .panel-hdr { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+  .panel-hdr h2 { font-family:var(--serif); font-size:1.5rem; color:var(--navy); }
+  .panel-hdr p { font-size:0.82rem; color:var(--text-light); margin-top:4px; }
+
+  /* Form card */
+  .form-card {
+    background: var(--white); border:1px solid var(--border); border-radius:10px;
+    padding: 26px; margin-bottom: 28px;
+  }
+  .form-card h3 { font-size:0.9rem; font-weight:700; color: var(--navy); margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+  .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  /* File upload zone */
+  .file-drop {
+    border: 1.5px dashed var(--border); border-radius:8px; padding: 18px;
+    text-align:center; cursor:pointer; transition: all 0.2s; background:#fafaf8;
+    position:relative; overflow:hidden;
+  }
+  .file-drop:hover { border-color: var(--gold); background:#fdfbf4; }
+  .file-drop.has-file { border-style:solid; border-color: var(--gold); }
+  .file-drop input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .file-drop-icon { width:24px;height:24px; stroke: var(--text-light); fill:none; stroke-width:1.6; margin: 0 auto 8px; }
+  .file-drop-text { font-size:0.78rem; color: var(--text-mid); font-weight:500; }
+  .file-drop-sub { font-size:0.68rem; color: var(--text-light); margin-top:3px; }
+  .file-drop-preview { max-height: 90px; border-radius:4px; margin: 0 auto 8px; }
+  .upload-progress {
+    height:4px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden; display:none;
+  }
+  .upload-progress.show { display:block; }
+  .upload-progress-bar { height:100%; background:var(--gold); width:0%; transition: width 0.2s; }
+
+  /* Item list / table */
+  .item-list { display:flex; flex-direction:column; gap:10px; }
+  .item-row {
+    background: var(--white); border:1px solid var(--border); border-radius:8px;
+    padding: 14px 16px; display:flex; align-items:center; gap:14px;
+  }
+  .item-thumb {
+    width:52px; height:52px; border-radius:6px; background:var(--cream) center/cover;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .item-thumb svg { width:20px;height:20px; stroke: var(--text-light); fill:none; stroke-width:1.6; }
+  .item-thumb img { width:100%;height:100%;object-fit:cover; }
+  .item-info { flex:1; min-width:0; }
+  .item-title { font-size:0.88rem; font-weight:600; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .item-meta { font-size:0.74rem; color:var(--text-light); margin-top:2px; }
+  .item-badge {
+    font-size:0.65rem; font-weight:700; padding:3px 9px; border-radius:20px;
+    background:#eaf6ee; color:var(--success); text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .item-badge.draft { background:#f5f0e6; color:#a87f1f; }
+  .item-actions { display:flex; gap:8px; flex-shrink:0; }
+  .icon-btn {
+    width:32px; height:32px; border-radius:6px; border:1px solid var(--border); background:var(--white);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; transition: all 0.15s;
+  }
+  .icon-btn svg { width:14px;height:14px; stroke: var(--text-mid); fill:none; stroke-width:1.8; }
+  .icon-btn:hover { background:#faf9f6; }
+  .icon-btn.danger:hover { background:#fdf0ee; border-color:var(--error); }
+  .icon-btn.danger:hover svg { stroke: var(--error); }
+  .empty-state { text-align:center; padding: 50px 20px; color: var(--text-light); font-size:0.86rem; }
+
+  /* Loading spinner */
+  .spinner {
+    width:16px;height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff;
+    border-radius:50%; animation: spin 0.7s linear infinite; display:inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 860px) {
+    .layout { flex-direction: column; }
+    .sidebar { width:100%; display:flex; overflow-x:auto; padding: 10px; gap:4px; }
+    .sidebar button { white-space:nowrap; border-left:none; border-bottom:3px solid transparent; }
+    .sidebar button.active { border-left:none; border-bottom-color: var(--gold); }
+    .main { padding: 22px 18px; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 2L3 6.5V12c0 5.25 3.9 10.15 9 11.35C17.1 22.15 21 17.25 21 12V6.5L12 2z"/></svg></div>
+    <h1>Inspire Faith Admin</h1>
+    <p class="sub">Log in to manage books, sermons &amp; podcasts.</p>
+
+    <div class="field">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@inspirevision.org" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn" id="login-btn">Log In</button>
+    <div class="msg" id="login-msg"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ADMIN SCREEN
+═══════════════════════════════════════════════════════════════ -->
+<div id="admin-screen">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 2L3 6.5V12c0 5.25 3.9 10.15 9 11.35C17.1 22.15 21 17.25 21 12V6.5L12 2z"/></svg></div>
+      <div>
+        <span>INSPIRE FAITH</span>
+        <small>Content Admin</small>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="user-email" id="user-email-display"></span>
+      <button class="logout-btn" id="logout-btn">Log Out</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <button class="nav-btn active" data-panel="books">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Books &amp; Resources
+      </button>
+      <button class="nav-btn" data-panel="sermons">
+        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Sermons
+      </button>
+      <button class="nav-btn" data-panel="podcasts">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        Podcast Episodes
+      </button>
+    </div>
+
+    <div class="main">
+
+      <!-- ══════════════ BOOKS PANEL ══════════════ -->
+      <div class="panel active" id="panel-books">
+        <div class="panel-hdr">
+          <div>
+            <h2>Books &amp; Resources</h2>
+            <p>These appear in the "Featured Resources" section of the Inspire Faith page.</p>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3 id="book-form-title">+ Add a New Book</h3>
+          <input type="hidden" id="book-id" />
+          <div class="form-grid">
+            <div class="field">
+              <label>Title *</label>
+              <input type="text" id="book-title" placeholder="e.g. The Apostles' Creed" />
+            </div>
+            <div class="field">
+              <label>Edition Label (optional)</label>
+              <input type="text" id="book-edition" placeholder="e.g. Youth Edition" />
+            </div>
+            <div class="field full">
+              <label>Description</label>
+              <textarea id="book-description" placeholder="A short blurb shown on the card..."></textarea>
+            </div>
+            <div class="field">
+              <label>Button Text</label>
+              <input type="text" id="book-link-text" placeholder="Read Now" value="Read Now" />
+            </div>
+            <div class="field">
+              <label>Link URL (PDF or page)</label>
+              <input type="url" id="book-link-url" placeholder="https://..." />
+            </div>
+            <div class="field full">
+              <label>Cover Image</label>
+              <div class="file-drop" id="book-cover-drop">
+                <input type="file" id="book-cover-file" accept="image/*" />
+                <svg class="file-drop-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="file-drop-text">Click or drag a cover image here</div>
+                <div class="file-drop-sub">JPG or PNG, ideally 600×800px</div>
+                <div class="upload-progress" id="book-cover-progress"><div class="upload-progress-bar"></div></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <button class="btn btn-gold" id="book-save-btn" style="width:auto; padding:12px 26px;">Save Book</button>
+            <button class="btn btn-ghost" id="book-cancel-btn" style="width:auto; padding:12px 26px; display:none;">Cancel Edit</button>
+          </div>
+          <div class="msg" id="book-msg"></div>
+        </div>
+
+        <div class="item-list" id="books-list">
+          <div class="empty-state">Loading books…</div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════ SERMONS PANEL ══════════════ -->
+      <div class="panel" id="panel-sermons">
+        <div class="panel-hdr">
+          <div>
+            <h2>Sermons</h2>
+            <p>These appear in the "Latest Sermons" section of the Inspire Faith page.</p>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3 id="sermon-form-title">+ Add a New Sermon</h3>
+          <input type="hidden" id="sermon-id" />
+          <div class="form-grid">
+            <div class="field full">
+              <label>Title *</label>
+              <input type="text" id="sermon-title" placeholder="e.g. Walking in Faith When You Cannot See" />
+            </div>
+            <div class="field">
+              <label>Series Name</label>
+              <input type="text" id="sermon-series" placeholder="e.g. Faith Foundations" />
+            </div>
+            <div class="field">
+              <label>Speaker</label>
+              <input type="text" id="sermon-speaker" placeholder="e.g. Pastor James Osei" />
+            </div>
+            <div class="field">
+              <label>Date</label>
+              <input type="date" id="sermon-date" />
+            </div>
+            <div class="field">
+              <label>Duration (minutes)</label>
+              <input type="number" id="sermon-duration" placeholder="42" min="0" />
+            </div>
+            <div class="field full">
+              <label>Video URL (YouTube, Vimeo, or direct link)</label>
+              <input type="url" id="sermon-video-url" placeholder="https://youtube.com/watch?v=..." />
+            </div>
+            <div class="field full">
+              <label>Thumbnail Image</label>
+              <div class="file-drop" id="sermon-thumb-drop">
+                <input type="file" id="sermon-thumb-file" accept="image/*" />
+                <svg class="file-drop-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="file-drop-text">Click or drag a thumbnail here</div>
+                <div class="file-drop-sub">JPG or PNG, ideally 700×394px (16:9)</div>
+                <div class="upload-progress" id="sermon-thumb-progress"><div class="upload-progress-bar"></div></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <button class="btn btn-gold" id="sermon-save-btn" style="width:auto; padding:12px 26px;">Save Sermon</button>
+            <button class="btn btn-ghost" id="sermon-cancel-btn" style="width:auto; padding:12px 26px; display:none;">Cancel Edit</button>
+          </div>
+          <div class="msg" id="sermon-msg"></div>
+        </div>
+
+        <div class="item-list" id="sermons-list">
+          <div class="empty-state">Loading sermons…</div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════ PODCASTS PANEL ══════════════ -->
+      <div class="panel" id="panel-podcasts">
+        <div class="panel-hdr">
+          <div>
+            <h2>Podcast Episodes</h2>
+            <p>These appear in the "Podcast" section of the Inspire Faith page.</p>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3 id="podcast-form-title">+ Add a New Episode</h3>
+          <input type="hidden" id="podcast-id" />
+          <div class="form-grid">
+            <div class="field">
+              <label>Episode Number</label>
+              <input type="number" id="podcast-ep-num" placeholder="12" min="0" />
+            </div>
+            <div class="field">
+              <label>Duration (minutes)</label>
+              <input type="number" id="podcast-duration" placeholder="48" min="0" />
+            </div>
+            <div class="field full">
+              <label>Title *</label>
+              <input type="text" id="podcast-title" placeholder="e.g. Why the Apostles' Creed Still Matters Today" />
+            </div>
+            <div class="field">
+              <label>Guest Name</label>
+              <input type="text" id="podcast-guest" placeholder="e.g. Dr. Grace Mensah" />
+            </div>
+            <div class="field">
+              <label>External Link (Spotify/Apple, optional)</label>
+              <input type="url" id="podcast-external-link" placeholder="https://open.spotify.com/..." />
+            </div>
+            <div class="field full">
+              <label>Episode Artwork</label>
+              <div class="file-drop" id="podcast-art-drop">
+                <input type="file" id="podcast-art-file" accept="image/*" />
+                <svg class="file-drop-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="file-drop-text">Click or drag episode artwork here</div>
+                <div class="file-drop-sub">JPG or PNG, ideally square (1:1)</div>
+                <div class="upload-progress" id="podcast-art-progress"><div class="upload-progress-bar"></div></div>
+              </div>
+            </div>
+            <div class="field full">
+              <label>Audio File (MP3) — or paste a hosted link below instead</label>
+              <div class="file-drop" id="podcast-audio-drop">
+                <input type="file" id="podcast-audio-file" accept="audio/*" />
+                <svg class="file-drop-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                <div class="file-drop-text">Click or drag an MP3 file here</div>
+                <div class="file-drop-sub">MP3, up to ~50MB</div>
+                <div class="upload-progress" id="podcast-audio-progress"><div class="upload-progress-bar"></div></div>
+              </div>
+            </div>
+            <div class="field full">
+              <label>...or Audio URL (if already hosted elsewhere)</label>
+              <input type="url" id="podcast-audio-url" placeholder="https://..." />
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <button class="btn btn-gold" id="podcast-save-btn" style="width:auto; padding:12px 26px;">Save Episode</button>
+            <button class="btn btn-ghost" id="podcast-cancel-btn" style="width:auto; padding:12px 26px; display:none;">Cancel Edit</button>
+          </div>
+          <div class="msg" id="podcast-msg"></div>
+        </div>
+
+        <div class="item-list" id="podcasts-list">
+          <div class="empty-state">Loading episodes…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function getDB(cb) {
+  if (window.db) { cb(window.db); return; }
+  window.addEventListener('db-ready', () => cb(window.db), { once: true });
+}
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg show ' + type;
+}
+function hideMsg(id) {
+  document.getElementById(id).className = 'msg';
+}
+function fmtDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+/* ════════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════ */
+getDB(async (db) => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) showAdmin(session);
+
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') showAdmin(session);
+    if (event === 'SIGNED_OUT') showLogin();
+  });
+});
+
+function showAdmin(session) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  document.getElementById('user-email-display').textContent = session.user.email;
+  loadBooks();
+  loadSermons();
+  loadPodcasts();
+}
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-screen').style.display = 'none';
+}
+
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  hideMsg('login-msg');
+
+  if (!email || !password) {
+    showMsg('login-msg', 'Please enter both email and password.', 'error');
+    return;
+  }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+
+  getDB(async (db) => {
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Log In';
+    if (error) {
+      showMsg('login-msg', 'Login failed — check your email and password.', 'error');
+    }
+  });
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  getDB((db) => db.auth.signOut());
+});
+
+// Allow Enter key to submit login
+document.getElementById('login-password').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+
+/* ════════════════════════════════════════════════════════════
+   SIDEBAR NAVIGATION
+═══════════════════════════════════════════════════════════ */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
+
+/* ════════════════════════════════════════════════════════════
+   FILE DROP ZONES — generic handler
+   Returns the uploaded public URL via callback
+═══════════════════════════════════════════════════════════ */
+function setupFileDrop(dropId, inputId, progressId, bucket, onUploaded) {
+  const drop = document.getElementById(dropId);
+  const input = document.getElementById(inputId);
+  const progress = document.getElementById(progressId);
+  const bar = progress.querySelector('.upload-progress-bar');
+
+  let pendingUrl = null;
+
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    drop.classList.add('has-file');
+    progress.classList.add('show');
+    bar.style.width = '15%';
+
+    // Show preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const existingPreview = drop.querySelector('.file-drop-preview');
+        if (existingPreview) existingPreview.remove();
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'file-drop-preview';
+        drop.insertBefore(img, drop.firstChild.nextSibling);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    getDB(async (db) => {
+      try {
+        bar.style.width = '50%';
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${fileExt}`;
+
+        const { error } = await db.storage.from(bucket).upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+        if (error) throw error;
+
+        bar.style.width = '85%';
+        const { data: urlData } = db.storage.from(bucket).getPublicUrl(fileName);
+        pendingUrl = urlData.publicUrl;
+
+        bar.style.width = '100%';
+        drop.querySelector('.file-drop-text').textContent = '✓ ' + file.name;
+        setTimeout(() => progress.classList.remove('show'), 800);
+
+        onUploaded(pendingUrl);
+      } catch (err) {
+        console.error('Upload error:', err);
+        drop.querySelector('.file-drop-text').textContent = 'Upload failed — try again';
+        progress.classList.remove('show');
+      }
+    });
+  });
+
+  return {
+    reset: () => {
+      input.value = '';
+      pendingUrl = null;
+      drop.classList.remove('has-file');
+      const existingPreview = drop.querySelector('.file-drop-preview');
+      if (existingPreview) existingPreview.remove();
+      drop.querySelector('.file-drop-text').textContent = drop.dataset.defaultText || 'Click or drag a file here';
+    }
+  };
+}
+
+let bookCoverUrl = null;
+let sermonThumbUrl = null;
+let podcastArtUrl = null;
+let podcastAudioFileUrl = null;
+
+const bookCoverDrop = setupFileDrop('book-cover-drop', 'book-cover-file', 'book-cover-progress', 'faith-covers', (url) => { bookCoverUrl = url; });
+const sermonThumbDrop = setupFileDrop('sermon-thumb-drop', 'sermon-thumb-file', 'sermon-thumb-progress', 'faith-sermons', (url) => { sermonThumbUrl = url; });
+const podcastArtDrop = setupFileDrop('podcast-art-drop', 'podcast-art-file', 'podcast-art-progress', 'faith-podcasts', (url) => { podcastArtUrl = url; });
+const podcastAudioDrop = setupFileDrop('podcast-audio-drop', 'podcast-audio-file', 'podcast-audio-progress', 'faith-podcasts', (url) => { podcastAudioFileUrl = url; });
+
+
+/* ════════════════════════════════════════════════════════════
+   BOOKS — CRUD
+═══════════════════════════════════════════════════════════ */
+function clearBookForm() {
+  document.getElementById('book-id').value = '';
+  document.getElementById('book-title').value = '';
+  document.getElementById('book-edition').value = '';
+  document.getElementById('book-description').value = '';
+  document.getElementById('book-link-text').value = 'Read Now';
+  document.getElementById('book-link-url').value = '';
+  bookCoverUrl = null;
+  bookCoverDrop.reset();
+  document.getElementById('book-form-title').textContent = '+ Add a New Book';
+  document.getElementById('book-cancel-btn').style.display = 'none';
+  hideMsg('book-msg');
+}
+
+document.getElementById('book-save-btn').addEventListener('click', async () => {
+  const title = document.getElementById('book-title').value.trim();
+  if (!title) { showMsg('book-msg', 'Title is required.', 'error'); return; }
+
+  const id = document.getElementById('book-id').value;
+  const payload = {
+    title,
+    edition_label: document.getElementById('book-edition').value.trim() || null,
+    description: document.getElementById('book-description').value.trim() || null,
+    link_text: document.getElementById('book-link-text').value.trim() || 'Read Now',
+    link_url: document.getElementById('book-link-url').value.trim() || null,
+  };
+  if (bookCoverUrl) payload.cover_image_url = bookCoverUrl;
+
+  const btn = document.getElementById('book-save-btn');
+  btn.disabled = true;
+
+  getDB(async (db) => {
+    let error;
+    if (id) {
+      ({ error } = await db.schema('vision').from('books').update(payload).eq('id', id));
+    } else {
+      ({ error } = await db.schema('vision').from('books').insert(payload));
+    }
+    btn.disabled = false;
+    if (error) {
+      showMsg('book-msg', 'Save failed: ' + error.message, 'error');
+    } else {
+      showMsg('book-msg', 'Book saved successfully.', 'success');
+      clearBookForm();
+      loadBooks();
+    }
+  });
+});
+
+document.getElementById('book-cancel-btn').addEventListener('click', clearBookForm);
+
+function loadBooks() {
+  getDB(async (db) => {
+    const { data, error } = await db.schema('vision').from('books').select('*').order('sort_order');
+    const list = document.getElementById('books-list');
+    if (error) { list.innerHTML = `<div class="empty-state">Error loading books: ${error.message}</div>`; return; }
+    if (!data || data.length === 0) { list.innerHTML = `<div class="empty-state">No books yet — add your first one above.</div>`; return; }
+
+    list.innerHTML = data.map(b => `
+      <div class="item-row">
+        <div class="item-thumb">
+          ${b.cover_image_url ? `<img src="${b.cover_image_url}" alt="">` : `<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`}
+        </div>
+        <div class="item-info">
+          <div class="item-title">${b.title}${b.edition_label ? ' — ' + b.edition_label : ''}</div>
+          <div class="item-meta">${b.description || 'No description'}</div>
+        </div>
+        <span class="item-badge ${b.is_published ? '' : 'draft'}">${b.is_published ? 'Live' : 'Draft'}</span>
+        <div class="item-actions">
+          <button class="icon-btn" title="Edit" onclick='editBook(${JSON.stringify(b).replace(/'/g, "&apos;")})'>
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn" title="${b.is_published ? 'Unpublish' : 'Publish'}" onclick="toggleBookPublish('${b.id}', ${b.is_published})">
+            <svg viewBox="0 0 24 24">${b.is_published ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>' : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'}</svg>
+          </button>
+          <button class="icon-btn danger" title="Delete" onclick="deleteBook('${b.id}')">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+window.editBook = function(b) {
+  document.getElementById('book-id').value = b.id;
+  document.getElementById('book-title').value = b.title || '';
+  document.getElementById('book-edition').value = b.edition_label || '';
+  document.getElementById('book-description').value = b.description || '';
+  document.getElementById('book-link-text').value = b.link_text || 'Read Now';
+  document.getElementById('book-link-url').value = b.link_url || '';
+  bookCoverUrl = b.cover_image_url || null;
+  document.getElementById('book-form-title').textContent = 'Editing: ' + b.title;
+  document.getElementById('book-cancel-btn').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.toggleBookPublish = function(id, current) {
+  getDB(async (db) => {
+    await db.schema('vision').from('books').update({ is_published: !current }).eq('id', id);
+    loadBooks();
+  });
+};
+
+window.deleteBook = function(id) {
+  if (!confirm('Delete this book? This cannot be undone.')) return;
+  getDB(async (db) => {
+    await db.schema('vision').from('books').delete().eq('id', id);
+    loadBooks();
+  });
+};
+
+
+/* ════════════════════════════════════════════════════════════
+   SERMONS — CRUD
+═══════════════════════════════════════════════════════════ */
+function clearSermonForm() {
+  document.getElementById('sermon-id').value = '';
+  document.getElementById('sermon-title').value = '';
+  document.getElementById('sermon-series').value = '';
+  document.getElementById('sermon-speaker').value = '';
+  document.getElementById('sermon-date').value = '';
+  document.getElementById('sermon-duration').value = '';
+  document.getElementById('sermon-video-url').value = '';
+  sermonThumbUrl = null;
+  sermonThumbDrop.reset();
+  document.getElementById('sermon-form-title').textContent = '+ Add a New Sermon';
+  document.getElementById('sermon-cancel-btn').style.display = 'none';
+  hideMsg('sermon-msg');
+}
+
+document.getElementById('sermon-save-btn').addEventListener('click', async () => {
+  const title = document.getElementById('sermon-title').value.trim();
+  if (!title) { showMsg('sermon-msg', 'Title is required.', 'error'); return; }
+
+  const id = document.getElementById('sermon-id').value;
+  const payload = {
+    title,
+    series_name: document.getElementById('sermon-series').value.trim() || null,
+    speaker: document.getElementById('sermon-speaker').value.trim() || null,
+    sermon_date: document.getElementById('sermon-date').value || null,
+    duration_minutes: document.getElementById('sermon-duration').value ? parseInt(document.getElementById('sermon-duration').value) : null,
+    video_url: document.getElementById('sermon-video-url').value.trim() || null,
+  };
+  if (sermonThumbUrl) payload.thumbnail_url = sermonThumbUrl;
+
+  const btn = document.getElementById('sermon-save-btn');
+  btn.disabled = true;
+
+  getDB(async (db) => {
+    let error;
+    if (id) {
+      ({ error } = await db.schema('vision').from('sermons').update(payload).eq('id', id));
+    } else {
+      ({ error } = await db.schema('vision').from('sermons').insert(payload));
+    }
+    btn.disabled = false;
+    if (error) {
+      showMsg('sermon-msg', 'Save failed: ' + error.message, 'error');
+    } else {
+      showMsg('sermon-msg', 'Sermon saved successfully.', 'success');
+      clearSermonForm();
+      loadSermons();
+    }
+  });
+});
+
+document.getElementById('sermon-cancel-btn').addEventListener('click', clearSermonForm);
+
+function loadSermons() {
+  getDB(async (db) => {
+    const { data, error } = await db.schema('vision').from('sermons').select('*').order('sort_order');
+    const list = document.getElementById('sermons-list');
+    if (error) { list.innerHTML = `<div class="empty-state">Error loading sermons: ${error.message}</div>`; return; }
+    if (!data || data.length === 0) { list.innerHTML = `<div class="empty-state">No sermons yet — add your first one above.</div>`; return; }
+
+    list.innerHTML = data.map(s => `
+      <div class="item-row">
+        <div class="item-thumb">
+          ${s.thumbnail_url ? `<img src="${s.thumbnail_url}" alt="">` : `<svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`}
+        </div>
+        <div class="item-info">
+          <div class="item-title">${s.title}</div>
+          <div class="item-meta">${[s.speaker, s.series_name, fmtDate(s.sermon_date), s.duration_minutes ? s.duration_minutes + ' min' : null].filter(Boolean).join(' · ')}</div>
+        </div>
+        <span class="item-badge ${s.is_published ? '' : 'draft'}">${s.is_published ? 'Live' : 'Draft'}</span>
+        <div class="item-actions">
+          <button class="icon-btn" title="Edit" onclick='editSermon(${JSON.stringify(s).replace(/'/g, "&apos;")})'>
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn" title="${s.is_published ? 'Unpublish' : 'Publish'}" onclick="toggleSermonPublish('${s.id}', ${s.is_published})">
+            <svg viewBox="0 0 24 24">${s.is_published ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>' : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'}</svg>
+          </button>
+          <button class="icon-btn danger" title="Delete" onclick="deleteSermon('${s.id}')">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+window.editSermon = function(s) {
+  document.getElementById('sermon-id').value = s.id;
+  document.getElementById('sermon-title').value = s.title || '';
+  document.getElementById('sermon-series').value = s.series_name || '';
+  document.getElementById('sermon-speaker').value = s.speaker || '';
+  document.getElementById('sermon-date').value = s.sermon_date || '';
+  document.getElementById('sermon-duration').value = s.duration_minutes || '';
+  document.getElementById('sermon-video-url').value = s.video_url || '';
+  sermonThumbUrl = s.thumbnail_url || null;
+  document.getElementById('sermon-form-title').textContent = 'Editing: ' + s.title;
+  document.getElementById('sermon-cancel-btn').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.toggleSermonPublish = function(id, current) {
+  getDB(async (db) => {
+    await db.schema('vision').from('sermons').update({ is_published: !current }).eq('id', id);
+    loadSermons();
+  });
+};
+
+window.deleteSermon = function(id) {
+  if (!confirm('Delete this sermon? This cannot be undone.')) return;
+  getDB(async (db) => {
+    await db.schema('vision').from('sermons').delete().eq('id', id);
+    loadSermons();
+  });
+};
+
+
+/* ════════════════════════════════════════════════════════════
+   PODCASTS — CRUD
+═══════════════════════════════════════════════════════════ */
+function clearPodcastForm() {
+  document.getElementById('podcast-id').value = '';
+  document.getElementById('podcast-ep-num').value = '';
+  document.getElementById('podcast-duration').value = '';
+  document.getElementById('podcast-title').value = '';
+  document.getElementById('podcast-guest').value = '';
+  document.getElementById('podcast-external-link').value = '';
+  document.getElementById('podcast-audio-url').value = '';
+  podcastArtUrl = null;
+  podcastAudioFileUrl = null;
+  podcastArtDrop.reset();
+  podcastAudioDrop.reset();
+  document.getElementById('podcast-form-title').textContent = '+ Add a New Episode';
+  document.getElementById('podcast-cancel-btn').style.display = 'none';
+  hideMsg('podcast-msg');
+}
+
+document.getElementById('podcast-save-btn').addEventListener('click', async () => {
+  const title = document.getElementById('podcast-title').value.trim();
+  if (!title) { showMsg('podcast-msg', 'Title is required.', 'error'); return; }
+
+  const id = document.getElementById('podcast-id').value;
+  const payload = {
+    title,
+    episode_number: document.getElementById('podcast-ep-num').value ? parseInt(document.getElementById('podcast-ep-num').value) : null,
+    duration_minutes: document.getElementById('podcast-duration').value ? parseInt(document.getElementById('podcast-duration').value) : null,
+    guest_name: document.getElementById('podcast-guest').value.trim() || null,
+    external_link: document.getElementById('podcast-external-link').value.trim() || null,
+    audio_url: document.getElementById('podcast-audio-url').value.trim() || podcastAudioFileUrl || null,
+  };
+  if (podcastArtUrl) payload.thumbnail_url = podcastArtUrl;
+
+  const btn = document.getElementById('podcast-save-btn');
+  btn.disabled = true;
+
+  getDB(async (db) => {
+    let error;
+    if (id) {
+      ({ error } = await db.schema('vision').from('podcasts').update(payload).eq('id', id));
+    } else {
+      ({ error } = await db.schema('vision').from('podcasts').insert(payload));
+    }
+    btn.disabled = false;
+    if (error) {
+      showMsg('podcast-msg', 'Save failed: ' + error.message, 'error');
+    } else {
+      showMsg('podcast-msg', 'Episode saved successfully.', 'success');
+      clearPodcastForm();
+      loadPodcasts();
+    }
+  });
+});
+
+document.getElementById('podcast-cancel-btn').addEventListener('click', clearPodcastForm);
+
+function loadPodcasts() {
+  getDB(async (db) => {
+    const { data, error } = await db.schema('vision').from('podcasts').select('*').order('sort_order');
+    const list = document.getElementById('podcasts-list');
+    if (error) { list.innerHTML = `<div class="empty-state">Error loading episodes: ${error.message}</div>`; return; }
+    if (!data || data.length === 0) { list.innerHTML = `<div class="empty-state">No episodes yet — add your first one above.</div>`; return; }
+
+    list.innerHTML = data.map(p => `
+      <div class="item-row">
+        <div class="item-thumb">
+          ${p.thumbnail_url ? `<img src="${p.thumbnail_url}" alt="">` : `<svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>`}
+        </div>
+        <div class="item-info">
+          <div class="item-title">${p.episode_number ? 'Ep. ' + p.episode_number + ' — ' : ''}${p.title}</div>
+          <div class="item-meta">${[p.guest_name, p.duration_minutes ? p.duration_minutes + ' min' : null, p.audio_url ? 'Audio attached' : null].filter(Boolean).join(' · ')}</div>
+        </div>
+        <span class="item-badge ${p.is_published ? '' : 'draft'}">${p.is_published ? 'Live' : 'Draft'}</span>
+        <div class="item-actions">
+          <button class="icon-btn" title="Edit" onclick='editPodcast(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn" title="${p.is_published ? 'Unpublish' : 'Publish'}" onclick="togglePodcastPublish('${p.id}', ${p.is_published})">
+            <svg viewBox="0 0 24 24">${p.is_published ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>' : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'}</svg>
+          </button>
+          <button class="icon-btn danger" title="Delete" onclick="deletePodcast('${p.id}')">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+window.editPodcast = function(p) {
+  document.getElementById('podcast-id').value = p.id;
+  document.getElementById('podcast-ep-num').value = p.episode_number || '';
+  document.getElementById('podcast-duration').value = p.duration_minutes || '';
+  document.getElementById('podcast-title').value = p.title || '';
+  document.getElementById('podcast-guest').value = p.guest_name || '';
+  document.getElementById('podcast-external-link').value = p.external_link || '';
+  document.getElementById('podcast-audio-url').value = p.audio_url || '';
+  podcastArtUrl = p.thumbnail_url || null;
+  document.getElementById('podcast-form-title').textContent = 'Editing: ' + p.title;
+  document.getElementById('podcast-cancel-btn').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.togglePodcastPublish = function(id, current) {
+  getDB(async (db) => {
+    await db.schema('vision').from('podcasts').update({ is_published: !current }).eq('id', id);
+    loadPodcasts();
+  });
+};
+
+window.deletePodcast = function(id) {
+  if (!confirm('Delete this episode? This cannot be undone.')) return;
+  getDB(async (db) => {
+    await db.schema('vision').from('podcasts').delete().eq('id', id);
+    loadPodcasts();
+  });
+};
+</script>
+
+</body>
+</html>
