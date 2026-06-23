@@ -1,0 +1,621 @@
+/* ================================================================
+   tokens.css — Inspire Vision™ Design System
+   The single source of truth for every colour, font, spacing value,
+   breakpoint, shadow, and animation timing in the platform.
+
+   RULE: No other stylesheet defines these values. They only ever
+   inherit or extend from here. When the brand evolves, this one
+   file changes and the entire platform updates.
+
+   Architecture:
+     tokens.css          ← you are here (import first, always)
+     ├── reset.css       ← browser normalisation
+     ├── global.css      ← base styles, mobile-first
+     ├── components.css  ← shared UI: nav, cards, buttons
+     ├── utilities.css   ← helper classes
+     └── [cardinal].css  ← extends tokens, never redefines them
+
+   Afrofuturist Design Language:
+     Geometric precision of Kente · Adinkra symbolic vocabulary
+     West African textile colour confidence · Ancient African
+     architectural clarity · Bold with purpose, never timid.
+   ================================================================ */
+
+
+/* ── @font-face / Google Fonts ──────────────────────────────────
+   Load via <link> in <head> before this stylesheet:
+
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+   Fraunces           → Display headings, hero text, cardinal names (optical size aware)
+   Plus Jakarta Sans  → Body text, UI labels, navigation, data
+   JetBrains Mono     → Code, assessments, data tables
+   ──────────────────────────────────────────────────────────────── */
+
+
+:root {
+
+  /* ============================================================
+     BRAND PALETTE — Foundation
+     Navy + Gold. Every other colour is in service of these two.
+     ============================================================ */
+
+  /* Core Brand */
+  --clr-navy:            #0A1628;   /* Deep African night sky */
+  --clr-navy-mid:        #0F2040;   /* Navigation, sidebars */
+  --clr-navy-light:      #162B52;   /* Cards on dark surfaces */
+  --clr-navy-muted:      #1E3A6B;   /* Hover states on dark */
+
+  --clr-gold:            #C9971C;   /* Primary gold — African afternoon sun */
+  --clr-gold-bright:     #E0AA22;   /* Hover, active gold states */
+  --clr-gold-light:      #F0C842;   /* Accents, highlights */
+  --clr-gold-pale:       #FDF6DC;   /* Gold tint backgrounds */
+  --clr-gold-glow:       rgba(201, 151, 28, 0.22);
+
+  /* ============================================================
+     CARDINAL ACCENT COLOURS
+     Each cardinal has a distinct identity that extends from the
+     Navy/Gold foundation. Bold with purpose, never corporate.
+     ============================================================ */
+
+  /* Inspire Academic™ — Rigour & Excellence */
+  --clr-academic:        #1A56A0;   /* Deep cobalt — precision, intellect */
+  --clr-academic-mid:    #2563EB;   /* Active states */
+  --clr-academic-light:  #DBEAFE;   /* Backgrounds, badges */
+  --clr-academic-glow:   rgba(26, 86, 160, 0.20);
+
+  /* Mentorship & Formation™ — Meaning & Character */
+  --clr-mentorship:      #B85C1A;   /* Terracotta/ochre — earth, warmth */
+  --clr-mentorship-mid:  #D97706;   /* Active states */
+  --clr-mentorship-light:#FEF3C7;   /* Backgrounds, badges */
+  --clr-mentorship-glow: rgba(184, 92, 26, 0.20);
+
+  /* Health & Wellbeing™ — Healing & Innovation */
+  --clr-health:          #1A7A45;   /* Forest green — life, vitality */
+  --clr-health-mid:      #16A34A;   /* Active states */
+  --clr-health-light:    #DCFCE7;   /* Backgrounds, badges */
+  --clr-health-glow:     rgba(26, 122, 69, 0.20);
+
+  /* Faith & Spiritual Formation™ — Truth & Transformation */
+  --clr-faith:           #5B2D8E;   /* Royal purple — depth, truth */
+  --clr-faith-mid:       #7C3AED;   /* Active states */
+  --clr-faith-light:     #EDE9FE;   /* Backgrounds, badges */
+  --clr-faith-glow:      rgba(91, 45, 142, 0.20);
+
+  /* ============================================================
+     NEUTRAL PALETTE
+     Warm-leaning greys to complement the African earth-tone
+     identity. Never pure grey — always slightly warm.
+     ============================================================ */
+
+  --clr-white:           #FFFFFF;
+  --clr-off-white:       #FAF8F5;   /* Warm white — page backgrounds */
+  --clr-grey-50:         #F5F3EF;   /* Section backgrounds */
+  --clr-grey-100:        #EAE7E0;   /* Dividers on light */
+  --clr-grey-200:        #D4CFC5;   /* Borders */
+  --clr-grey-300:        #B8B2A6;   /* Placeholder text */
+  --clr-grey-400:        #8C8579;   /* Secondary text on light */
+  --clr-grey-500:        #6B6459;   /* Muted text */
+  --clr-grey-600:        #4A4540;   /* Body text (light mode) */
+  --clr-grey-700:        #332F2A;   /* Headings (light mode) */
+  --clr-grey-800:        #1E1B18;   /* Near-black */
+  --clr-grey-900:        #0D0B09;   /* Pure dark */
+
+  /* ============================================================
+     SEMANTIC / FUNCTIONAL COLOURS
+     ============================================================ */
+
+  --clr-success:         #16A34A;
+  --clr-success-light:   #DCFCE7;
+  --clr-warning:         #D97706;
+  --clr-warning-light:   #FEF3C7;
+  --clr-danger:          #DC2626;
+  --clr-danger-light:    #FEE2E2;
+  --clr-info:            #0284C7;
+  --clr-info-light:      #E0F2FE;
+
+  /* ============================================================
+     SURFACE SYSTEM — Light Mode (default)
+     Named semantically so dark mode only changes these variables.
+     ============================================================ */
+
+  --surface-page:        var(--clr-off-white);
+  --surface-card:        var(--clr-white);
+  --surface-card-hover:  var(--clr-grey-50);
+  --surface-sidebar:     var(--clr-navy);
+  --surface-hero:        var(--clr-navy);
+  --surface-overlay:     rgba(10, 22, 40, 0.72);
+  --surface-modal:       var(--clr-white);
+
+  --border-default:      var(--clr-grey-200);
+  --border-strong:       var(--clr-grey-300);
+  --border-focus:        var(--clr-academic);
+
+  --text-primary:        var(--clr-grey-700);
+  --text-secondary:      var(--clr-grey-500);
+  --text-muted:          var(--clr-grey-400);
+  --text-on-dark:        var(--clr-white);
+  --text-on-dark-muted:  rgba(255, 255, 255, 0.65);
+  --text-on-dark-faint:  rgba(255, 255, 255, 0.40);
+  --text-link:           var(--clr-academic);
+  --text-link-hover:     var(--clr-navy);
+
+  /* ============================================================
+     TYPOGRAPHY
+     Plus Jakarta Sans for display · Inter for UI/body
+     ============================================================ */
+
+  /* Font families */
+  --font-display:  'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* ── Type scale (1.250 Major Third) ────────────────────────
+     Base: 16px. Scale factor: 1.250
+     xs → sm → base → lg → xl → 2xl → 3xl → 4xl → 5xl → 6xl
+  ──────────────────────────────────────────────────────────── */
+  --text-xs:    0.64rem;    /*  ~10px — labels, captions */
+  --text-sm:    0.80rem;    /*  ~13px — secondary UI, nav */
+  --text-base:  1.00rem;    /*   16px — body copy */
+  --text-lg:    1.25rem;    /*   20px — lead paragraphs */
+  --text-xl:    1.563rem;   /*   25px — card titles, section heads */
+  --text-2xl:   1.953rem;   /*   31px — page titles */
+  --text-3xl:   2.441rem;   /*   39px — hero subheadings */
+  --text-4xl:   3.052rem;   /*   49px — hero headings */
+  --text-5xl:   3.815rem;   /*   61px — display statements */
+  --text-6xl:   4.768rem;   /*   76px — hero monuments */
+
+  /* Font weights */
+  --font-light:    300;
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+  --font-extrabold:800;
+
+  /* Line heights */
+  --leading-tight:  1.15;
+  --leading-snug:   1.30;
+  --leading-normal: 1.55;
+  --leading-relaxed:1.70;
+  --leading-loose:  1.90;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.03em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.04em;
+  --tracking-wider:   0.08em;
+  --tracking-widest:  0.14em;   /* ALL CAPS labels */
+
+  /* ============================================================
+     SPACING — 4px base grid
+     Every spacing value is a multiple of 4px.
+     ============================================================ */
+
+  --space-0:    0;
+  --space-1:    0.25rem;   /*  4px */
+  --space-2:    0.50rem;   /*  8px */
+  --space-3:    0.75rem;   /* 12px */
+  --space-4:    1.00rem;   /* 16px */
+  --space-5:    1.25rem;   /* 20px */
+  --space-6:    1.50rem;   /* 24px */
+  --space-8:    2.00rem;   /* 32px */
+  --space-10:   2.50rem;   /* 40px */
+  --space-12:   3.00rem;   /* 48px */
+  --space-16:   4.00rem;   /* 64px */
+  --space-20:   5.00rem;   /* 80px */
+  --space-24:   6.00rem;   /* 96px */
+  --space-32:   8.00rem;   /* 128px */
+  --space-40:  10.00rem;   /* 160px */
+  --space-48:  12.00rem;   /* 192px */
+
+  /* Semantic spacing shortcuts */
+  --gap-xs:    var(--space-2);   /*  8px — tight clusters */
+  --gap-sm:    var(--space-3);   /* 12px — icon + label */
+  --gap-md:    var(--space-4);   /* 16px — standard gap */
+  --gap-lg:    var(--space-6);   /* 24px — card internal */
+  --gap-xl:    var(--space-8);   /* 32px — section elements */
+  --gap-2xl:   var(--space-12);  /* 48px — major sections */
+  --gap-3xl:   var(--space-16);  /* 64px — page sections */
+
+  --padding-card:     var(--space-6);    /* 24px */
+  --padding-card-sm:  var(--space-4);    /* 16px */
+  --padding-section:  var(--space-16);   /* 64px */
+  --padding-page:     var(--space-5);    /* 20px — mobile horizontal */
+
+  /* ============================================================
+     BORDER RADIUS
+     Inspired by Kente precision — clear geometry, not bubbly.
+     ============================================================ */
+
+  --radius-none:   0;
+  --radius-xs:     2px;
+  --radius-sm:     4px;
+  --radius-md:     8px;
+  --radius-lg:     12px;
+  --radius-xl:     16px;
+  --radius-2xl:    24px;
+  --radius-3xl:    32px;
+  --radius-full:   9999px;   /* Pills, avatars */
+
+  /* ============================================================
+     SHADOWS
+     Warm-toned, never cold grey. Inspired by African afternoon
+     light — golden, directional.
+     ============================================================ */
+
+  --shadow-xs:  0 1px 2px rgba(10, 22, 40, 0.06);
+  --shadow-sm:  0 2px 6px rgba(10, 22, 40, 0.08);
+  --shadow-md:  0 4px 16px rgba(10, 22, 40, 0.10), 0 1px 4px rgba(10, 22, 40, 0.06);
+  --shadow-lg:  0 8px 32px rgba(10, 22, 40, 0.14), 0 2px 8px rgba(10, 22, 40, 0.08);
+  --shadow-xl:  0 16px 48px rgba(10, 22, 40, 0.18), 0 4px 16px rgba(10, 22, 40, 0.10);
+  --shadow-2xl: 0 32px 80px rgba(10, 22, 40, 0.24);
+
+  /* Focus ring — Gold, prominent and accessible */
+  --shadow-focus:          0 0 0 3px rgba(184, 134, 11, 0.45);
+  --shadow-focus-academic: 0 0 0 3px rgba(26, 86, 160, 0.40);
+  --shadow-card-hover:     0 8px 32px rgba(10, 22, 40, 0.14), 0 0 0 1px var(--clr-grey-200);
+
+  /* Cardinal glow shadows (for active cards, hero elements) */
+  --shadow-gold:       0 4px 24px var(--clr-gold-glow);
+  --shadow-academic:   0 4px 24px var(--clr-academic-glow);
+  --shadow-mentorship: 0 4px 24px var(--clr-mentorship-glow);
+  --shadow-health:     0 4px 24px var(--clr-health-glow);
+  --shadow-faith:      0 4px 24px var(--clr-faith-glow);
+
+  /* ============================================================
+     BREAKPOINTS
+     Mobile-first always: 320px → tablet → desktop.
+     Use in CSS as @media (min-width: var(--bp-md)) does NOT work
+     in standard CSS — use the px values directly in media queries.
+     These are documented here as the canonical reference.
+     ============================================================ */
+
+  /* --bp-xs:  320px   — small phones (design starts here)    */
+  /* --bp-sm:  480px   — large phones                         */
+  /* --bp-md:  768px   — tablets, landscape phones            */
+  /* --bp-lg:  1024px  — laptops, iPads Pro                   */
+  /* --bp-xl:  1280px  — desktops                             */
+  /* --bp-2xl: 1536px  — wide screens                         */
+
+  /* Max content width */
+  --max-width-prose:  68ch;     /* Long-form reading */
+  --max-width-card:   400px;
+  --max-width-content:960px;    /* Standard page content */
+  --max-width-wide:   1280px;   /* Full-width page shell */
+
+  /* ============================================================
+     LAYOUT — Grid & Sidebar
+     ============================================================ */
+
+  --sidebar-width:       260px;
+  --sidebar-collapsed:   64px;
+  --topbar-height:       64px;
+  --content-max:         var(--max-width-wide);
+
+  /* Grid columns */
+  --grid-cols-1: repeat(1, minmax(0, 1fr));
+  --grid-cols-2: repeat(2, minmax(0, 1fr));
+  --grid-cols-3: repeat(3, minmax(0, 1fr));
+  --grid-cols-4: repeat(4, minmax(0, 1fr));
+
+  /* ============================================================
+     ANIMATION & TRANSITIONS
+     Deliberate, purposeful motion. Nothing that jitters.
+     Inspired by the rhythmic precision of African drumming —
+     everything has a beat, nothing is arbitrary.
+     ============================================================ */
+
+  /* Durations */
+  --duration-instant:  80ms;
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --duration-slower:  600ms;
+  --duration-page:    800ms;
+
+  /* Easing curves */
+  --ease-default:  cubic-bezier(0.4, 0, 0.2, 1);   /* Material standard */
+  --ease-out:      cubic-bezier(0.0, 0, 0.2, 1);   /* Elements entering */
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);     /* Elements leaving */
+  --ease-spring:   cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy */
+  --ease-linear:   linear;
+
+  /* Standard transition combos */
+  --transition-fast:   all var(--duration-fast) var(--ease-default);
+  --transition-normal: all var(--duration-normal) var(--ease-default);
+  --transition-color:  color var(--duration-fast) var(--ease-default),
+                       background-color var(--duration-fast) var(--ease-default),
+                       border-color var(--duration-fast) var(--ease-default);
+  --transition-shadow: box-shadow var(--duration-normal) var(--ease-default);
+  --transition-transform: transform var(--duration-normal) var(--ease-default);
+
+  /* ============================================================
+     Z-INDEX SCALE
+     Prevent z-index wars. Always use these names.
+     ============================================================ */
+
+  --z-below:     -1;
+  --z-base:       0;
+  --z-raised:    10;
+  --z-dropdown:  20;
+  --z-sticky:    30;
+  --z-overlay:   40;
+  --z-modal:     50;
+  --z-toast:     60;
+  --z-tooltip:   70;
+
+  /* ============================================================
+     ICONS
+     Touch target minimum: 44×44px (Apple HIG / WCAG 2.5.5)
+     Thumb-friendly sizing for African mobile-first users.
+     ============================================================ */
+
+  --icon-xs:    16px;
+  --icon-sm:    20px;
+  --icon-md:    24px;
+  --icon-lg:    32px;
+  --icon-xl:    40px;
+  --icon-2xl:   48px;
+
+  --touch-target: 44px;   /* Minimum interactive target */
+
+  /* ============================================================
+     SPECIFIC COMPONENT TOKENS
+     Consistent across every cardinal. Override in cardinal.css
+     only if the cardinal genuinely needs a different value.
+     ============================================================ */
+
+  /* Buttons */
+  --btn-height-sm:   36px;
+  --btn-height-md:   44px;   /* Also the touch target minimum */
+  --btn-height-lg:   52px;
+  --btn-padding-sm:  var(--space-2) var(--space-4);
+  --btn-padding-md:  var(--space-3) var(--space-6);
+  --btn-padding-lg:  var(--space-4) var(--space-8);
+  --btn-radius:      var(--radius-md);
+  --btn-font-sm:     var(--text-sm);
+  --btn-font-md:     var(--text-base);
+  --btn-font-lg:     var(--text-lg);
+  --btn-font-weight: var(--font-semibold);
+
+  /* Inputs */
+  --input-height:    44px;
+  --input-radius:    var(--radius-md);
+  --input-padding:   var(--space-3) var(--space-4);
+  --input-border:    var(--border-default);
+  --input-border-focus: var(--clr-academic);
+  --input-bg:        var(--clr-white);
+  --input-bg-focus:  var(--clr-white);
+  --input-font:      var(--text-base);
+  --input-color:     var(--text-primary);
+  --input-placeholder: var(--text-muted);
+
+  /* Cards */
+  --card-radius:     var(--radius-xl);
+  --card-radius-sm:  var(--radius-lg);
+  --card-shadow:     var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-border:     1px solid var(--border-default);
+  --card-padding:    var(--padding-card);
+  --card-padding-sm: var(--padding-card-sm);
+
+  /* Badges / Tags */
+  --badge-radius:    var(--radius-full);
+  --badge-padding:   var(--space-1) var(--space-3);
+  --badge-font:      var(--text-xs);
+  --badge-weight:    var(--font-semibold);
+
+  /* Progress bars */
+  --progress-height:    6px;
+  --progress-radius:    var(--radius-full);
+  --progress-bg:        var(--clr-grey-100);
+
+  /* Avatars */
+  --avatar-sm:   32px;
+  --avatar-md:   40px;
+  --avatar-lg:   56px;
+  --avatar-xl:   80px;
+  --avatar-2xl:  120px;
+  --avatar-radius: var(--radius-full);
+
+  /* Sidebar */
+  --sidebar-bg:        var(--clr-navy);
+  --sidebar-border:    rgba(255, 255, 255, 0.08);
+  --sidebar-text:      rgba(255, 255, 255, 0.65);
+  --sidebar-text-active: var(--clr-white);
+  --sidebar-icon:      rgba(255, 255, 255, 0.45);
+  --sidebar-hover-bg:  rgba(255, 255, 255, 0.06);
+  --sidebar-active-bg: rgba(184, 134, 11, 0.18);   /* Gold tint on active */
+  --sidebar-active-border: var(--clr-gold);
+
+  /* Navigation (topbar) */
+  --nav-bg:       var(--clr-white);
+  --nav-border:   var(--border-default);
+  --nav-height:   var(--topbar-height);
+  --nav-shadow:   var(--shadow-sm);
+
+  /* ============================================================
+     AFROFUTURIST PATTERN TOKENS
+     For decorative geometric elements inspired by Kente and
+     Adinkra. Applied sparingly — as accents, not wallpaper.
+     ============================================================ */
+
+  /* Kente strip colours (accent use only) */
+  --kente-gold:   #D4A017;
+  --kente-green:  #1A7A45;
+  --kente-red:    #8B1A1A;
+  --kente-black:  #0D0B09;
+  --kente-blue:   #1A3A6B;
+  --kente-width:  4px;   /* Standard Kente strip thickness */
+
+  /* Adinkra symbol accent (SVG fill reference) */
+  --adinkra-fill:        var(--clr-gold);
+  --adinkra-fill-subtle: rgba(184, 134, 11, 0.12);
+
+  /* ============================================================
+     PERFORMANCE BUDGET REMINDERS (read-only reference)
+     These values are targets, not CSS properties.
+
+     Time to First Contentful Paint:  < 1.5s on 3G mobile
+     Time to Interactive:             < 3.5s on 3G mobile
+     Total page weight (initial):     < 200KB compressed
+     LCP (Core Web Vitals):           < 2.5s
+     CLS (Core Web Vitals):           < 0.1
+     Image weight per page:           < 100KB total (WebP, lazy)
+     JS bundle (initial):             < 80KB compressed
+     ============================================================ */
+
+}
+
+
+/* ================================================================
+   DARK MODE
+   Activated by prefers-color-scheme or .dark class on <html>.
+   Only surfaces, text, and borders change — brand colours stay.
+   ================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-page:      #0D1117;
+    --surface-card:      #161B22;
+    --surface-card-hover:#1C2128;
+    --surface-modal:     #161B22;
+
+    --border-default:    rgba(255, 255, 255, 0.10);
+    --border-strong:     rgba(255, 255, 255, 0.18);
+
+    --text-primary:      rgba(255, 255, 255, 0.92);
+    --text-secondary:    rgba(255, 255, 255, 0.60);
+    --text-muted:        rgba(255, 255, 255, 0.38);
+    --text-link:         var(--clr-gold-light);
+    --text-link-hover:   var(--clr-gold-bright);
+
+    --input-bg:          #1C2128;
+    --input-border-focus: var(--clr-gold);
+    --nav-bg:            #0D1117;
+    --nav-border:        rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Manual dark mode toggle class */
+html.dark {
+  --surface-page:      #0D1117;
+  --surface-card:      #161B22;
+  --surface-card-hover:#1C2128;
+  --surface-modal:     #161B22;
+  --border-default:    rgba(255, 255, 255, 0.10);
+  --border-strong:     rgba(255, 255, 255, 0.18);
+  --text-primary:      rgba(255, 255, 255, 0.92);
+  --text-secondary:    rgba(255, 255, 255, 0.60);
+  --text-muted:        rgba(255, 255, 255, 0.38);
+  --text-link:         var(--clr-gold-light);
+  --text-link-hover:   var(--clr-gold-bright);
+  --input-bg:          #1C2128;
+  --nav-bg:            #0D1117;
+  --nav-border:        rgba(255, 255, 255, 0.08);
+}
+
+
+/* ================================================================
+   CARDINAL THEME CLASSES
+   Apply to <body> or a root wrapper to activate a cardinal theme.
+   The cardinal's accent colour becomes the primary interactive colour.
+
+   Usage:
+     <body class="theme-academic">   → Academic blue
+     <body class="theme-mentorship"> → Mentorship terracotta
+     <body class="theme-health">     → Health green
+     <body class="theme-faith">      → Faith purple
+   ================================================================ */
+
+.theme-academic {
+  --clr-cardinal:        var(--clr-academic);
+  --clr-cardinal-mid:    var(--clr-academic-mid);
+  --clr-cardinal-light:  var(--clr-academic-light);
+  --clr-cardinal-glow:   var(--clr-academic-glow);
+  --shadow-cardinal:     var(--shadow-academic);
+  --border-focus:        var(--clr-academic);
+  --shadow-focus:        var(--shadow-focus-academic);
+  --progress-fill:       var(--clr-academic);
+}
+
+.theme-mentorship {
+  --clr-cardinal:        var(--clr-mentorship);
+  --clr-cardinal-mid:    var(--clr-mentorship-mid);
+  --clr-cardinal-light:  var(--clr-mentorship-light);
+  --clr-cardinal-glow:   var(--clr-mentorship-glow);
+  --shadow-cardinal:     var(--shadow-mentorship);
+  --border-focus:        var(--clr-mentorship);
+  --shadow-focus:        0 0 0 3px var(--clr-mentorship-glow);
+  --progress-fill:       var(--clr-mentorship);
+}
+
+.theme-health {
+  --clr-cardinal:        var(--clr-health);
+  --clr-cardinal-mid:    var(--clr-health-mid);
+  --clr-cardinal-light:  var(--clr-health-light);
+  --clr-cardinal-glow:   var(--clr-health-glow);
+  --shadow-cardinal:     var(--shadow-health);
+  --border-focus:        var(--clr-health);
+  --shadow-focus:        0 0 0 3px var(--clr-health-glow);
+  --progress-fill:       var(--clr-health);
+}
+
+.theme-faith {
+  --clr-cardinal:        var(--clr-faith);
+  --clr-cardinal-mid:    var(--clr-faith-mid);
+  --clr-cardinal-light:  var(--clr-faith-light);
+  --clr-cardinal-glow:   var(--clr-faith-glow);
+  --shadow-cardinal:     var(--shadow-faith);
+  --border-focus:        var(--clr-faith);
+  --shadow-focus:        0 0 0 3px var(--clr-faith-glow);
+  --progress-fill:       var(--clr-faith);
+}
+
+
+/* ================================================================
+   ACCESSIBILITY UTILITIES (defined here so they're always present)
+   ================================================================ */
+
+/* Visually hidden — accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: var(--z-toast);
+  padding: var(--space-3) var(--space-6);
+  background: var(--clr-navy);
+  color: var(--clr-gold);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

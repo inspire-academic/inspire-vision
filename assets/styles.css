@@ -1,34 +1,40 @@
 /* ============================================================
-   INSPIRE VISION™ - Shared Design Tokens & Base Styles
+   INSPIRE VISION™ - Base Styles
+   Design tokens live in assets/css/tokens.css (loaded first).
+   This file maps legacy variable names to the token system
+   so all existing CSS continues to work without changes.
    ============================================================ */
 
 :root {
+  /* ── Compatibility bridge ───────────────────────────────────
+     Maps old shorthand names → canonical token values.
+     New CSS should use token names directly (--clr-*, --font-*).
+  ──────────────────────────────────────────────────────────── */
+
   /* Core palette */
-  --navy:      #0a1628;
-  --navy2:     #0d1f3c;
-  --navy3:     #111f38;
-  --gold:      #c9a84c;
-  --gold2:     #b8942e;
-  --white:     #ffffff;
-  --cream:     #f5f0e8;
-  --light-bg:  #f8f7f4;
-  --muted:     #94a3b8;
-  --border:    rgba(201,168,76,0.2);
-  --border-light: rgba(0,0,0,0.08);
+  --navy:        var(--clr-navy);
+  --navy2:       var(--clr-navy-mid);
+  --navy3:       var(--clr-navy-light);
+  --gold:        var(--clr-gold);
+  --gold2:       var(--clr-gold-bright);
+  --white:       var(--clr-white);
+  --cream:       var(--clr-off-white);
+  --light-bg:    var(--clr-grey-50);
+  --muted:       var(--clr-grey-400);
+  --border:      rgba(201, 151, 28, 0.20);
+  --border-light: var(--border-default);
 
-  /* Cardinal accent colours */
-  --academic:   #c9a84c;
-  --mentorship: #4a9e6b;
-  --health:     #2a9db5;
-  --faith:      #8b6bb5;
+  /* Cardinal accents */
+  --academic:    var(--clr-academic);
+  --mentorship:  var(--clr-mentorship);
+  --health:      var(--clr-health);
+  --faith:       var(--clr-faith);
 
-  /* Typography */
-  --font-display: 'Playfair Display', serif;
-  --font-body:    'DM Sans', sans-serif;
+  /* Typography — font-display & font-body come from tokens.css */
 
   /* Spacing */
   --section-pad: 5rem 3rem;
-  --max-width:   1200px;
+  --max-width:   var(--max-width-wide);
 }
 
 /* ── RESET ── */
