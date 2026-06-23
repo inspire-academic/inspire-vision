@@ -1,0 +1,8 @@
+[build]
+publish = "."
+
+[context.production]
+  branch = "main"
+
+[context.staging]
+  branch = "staging"
