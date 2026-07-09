@@ -60,11 +60,16 @@
       const role = user.user_metadata?.mentorship_role;
       const mentorStatus = user.user_metadata?.mentor_status;
       if (role === 'mentor') {
-        if (mentorStatus === 'pending_review') {
-          showMsg("Your mentor application is still under review — we'll email you once it's approved.", 'success');
+        if (mentorStatus === 'approved') {
+          window.location.href = '/mentorship/mentor-portal/';
           return;
         }
-        window.location.href = '/mentorship/mentor-portal/';
+        if (mentorStatus === 'rejected') {
+          showMsg("Your mentor application wasn't approved this time. Contact our team if you'd like to know more.", 'error');
+          return;
+        }
+        // pending_review, or any other/unset status — never assume access.
+        showMsg("Your mentor application is still under review — we'll email you once it's approved.", 'success');
         return;
       }
       if (!user.user_metadata?.onboarding_complete) {

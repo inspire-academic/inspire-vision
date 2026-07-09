@@ -17,3 +17,8 @@ functions = "netlify/functions"
   from = "/mentorship/dashboard"
   to = "/mentorship/dashboard/"
   status = 301
+
+[[redirects]]
+  from = "/mentorship/mentor-portal"
+  to = "/mentorship/mentor-portal/"
+  status = 301
