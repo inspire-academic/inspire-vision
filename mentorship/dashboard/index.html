@@ -400,6 +400,34 @@
             </div>
           </div>
 
+          <!-- Admin Tools — hidden by default, only revealed once the
+               server confirms the signed-in email is on ADMIN_EMAILS
+               (see the isAdmin check below). Regular mentees/mentors
+               never see this card. -->
+          <div class="card" id="adminToolsCard" style="display:none">
+            <div class="card-label">Admin Tools</div>
+            <div class="quick-actions-grid">
+              <a class="quick-action" href="/mentorship/admin/mentors.html">
+                <div class="quick-action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div>
+                  <div class="quick-action-title">Manage Mentors</div>
+                  <div class="quick-action-desc">Review and approve applications</div>
+                </div>
+              </a>
+              <a class="quick-action" href="/mentorship/admin/matching.html">
+                <div class="quick-action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <div class="quick-action-title">Mentor Matching</div>
+                  <div class="quick-action-desc">Pair mentors with mentees</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
           <!-- Right col continues -->
           <div class="right-col">
             <div class="mini-card" style="background:rgba(201,168,76,.06);border-color:var(--gold-border)">
@@ -680,6 +708,25 @@
         avatarEl.textContent = '';
       } else {
         avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+      }
+
+      // Admin Tools card — ADMIN_EMAILS is a server-side-only secret,
+      // so the only way to know if this account is on it is to ask a
+      // function that already checks it. Reuses admin-mentors.js's
+      // existing 'list' action purely as an auth probe: 200 means this
+      // email is an admin, 401/403 means it isn't. No new endpoint.
+      try {
+        const { data: { session } } = await dbClient.auth.getSession();
+        if (session) {
+          const res = await fetch('/.netlify/functions/admin-mentors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+            body: JSON.stringify({ action: 'list' }),
+          });
+          if (res.status === 200) $('adminToolsCard').style.display = '';
+        }
+      } catch (e) {
+        console.warn('Admin check failed (non-fatal):', e);
       }
     } catch (e) {
       console.warn('Mentorship dashboard auth init failed:', e);

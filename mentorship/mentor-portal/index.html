@@ -97,6 +97,32 @@
       <div id="menteesList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
       </div>
+
+      <!-- Admin Tools — hidden by default, only revealed once the
+           server confirms the signed-in email is on ADMIN_EMAILS. -->
+      <div class="card" id="adminToolsCard" style="display:none; margin-top:24px">
+        <div class="card-label">Admin Tools</div>
+        <div class="quick-actions-grid">
+          <a class="quick-action" href="/mentorship/admin/mentors.html">
+            <div class="quick-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+              <div class="quick-action-title">Manage Mentors</div>
+              <div class="quick-action-desc">Review and approve applications</div>
+            </div>
+          </a>
+          <a class="quick-action" href="/mentorship/admin/matching.html">
+            <div class="quick-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div>
+              <div class="quick-action-title">Mentor Matching</div>
+              <div class="quick-action-desc">Pair mentors with mentees</div>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -181,6 +207,22 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      // Admin Tools card — see dashboard/index.html's identical check
+      // for why this reuses admin-mentors.js purely as an auth probe.
+      try {
+        const { data: { session } } = await dbClient.auth.getSession();
+        if (session) {
+          const res = await fetch('/.netlify/functions/admin-mentors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+            body: JSON.stringify({ action: 'list' }),
+          });
+          if (res.status === 200) $('adminToolsCard').style.display = '';
+        }
+      } catch (e) {
+        console.warn('Admin check failed (non-fatal):', e);
+      }
 
       const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
         .select('*').eq('mentor_id', currentUser.id).eq('status', 'active').order('assigned_at', { ascending: false });
