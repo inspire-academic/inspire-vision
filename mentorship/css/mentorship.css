@@ -160,7 +160,7 @@ body.auth-body {
   flex-wrap: wrap;
 }
 .page-eyebrow { color: var(--mentorship-gold); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px }
-.page-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: #f4f6f9 }
+.page-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--text, #f4f6f9) }
 .page-cta {
   padding: 11px 20px;
   border-radius: 10px;
@@ -180,9 +180,9 @@ body.auth-body {
   margin-bottom: 12px;
 }
 .list-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px }
-.list-card-title { font-size: 15px; font-weight: 800; color: #f4f6f9 }
-.list-card-desc { font-size: 13px; color: rgba(244,246,249,.62); line-height: 1.5; margin-bottom: 12px }
-.list-card-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: rgba(244,246,249,.5); flex-wrap: wrap }
+.list-card-title { font-size: 15px; font-weight: 800; color: var(--text, #f4f6f9) }
+.list-card-desc { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.62)); line-height: 1.5; margin-bottom: 12px }
+.list-card-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); flex-wrap: wrap }
 .badge {
   display: inline-block;
   padding: 3px 10px;
@@ -195,23 +195,23 @@ body.auth-body {
   color: var(--mentorship-gold);
   border: 1px solid rgba(184,92,26,.3);
 }
-.badge.badge-muted { background: rgba(255,255,255,.06); color: rgba(244,246,249,.6); border-color: rgba(255,255,255,.1) }
+.badge.badge-muted { background: var(--card-bg2, rgba(255,255,255,.06)); color: var(--text-muted, rgba(244,246,249,.6)); border-color: var(--border, rgba(255,255,255,.1)) }
 .list-card-actions { display: flex; gap: 8px; margin-top: 12px }
 .list-card-btn {
   padding: 7px 14px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
-  border: 1px solid rgba(255,255,255,.15);
-  color: rgba(244,246,249,.85);
+  border: 1px solid var(--border-md, rgba(255,255,255,.15));
+  color: var(--text-muted, rgba(244,246,249,.85));
   transition: all .18s;
 }
 .list-card-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold) }
 .list-card-btn.primary { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff }
 .list-card-btn.primary:hover { opacity: .9; color: #fff }
-.empty-state { text-align: center; padding: 48px 20px; color: rgba(244,246,249,.5) }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-soft, rgba(244,246,249,.5)) }
 .empty-state-icon { font-size: 32px; margin-bottom: 12px }
-.mini-progress-bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin: 10px 0 }
+.mini-progress-bar { height: 6px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.08)); overflow: hidden; margin: 10px 0 }
 .mini-progress-fill { height: 100%; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); border-radius: 999px; transition: width .5s ease }
 
 /* ── DASHBOARD SHELL ─────────────────────────────────────────────
@@ -251,6 +251,48 @@ body.auth-body {
       --transition: .18s cubic-bezier(.4,0,.2,1);
       --font-display: 'Fraunces', serif;
       --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+      /* Fixed — never flips with theme. For text/icons that sit on a
+         solid gold background (buttons, avatar initials, brand mark),
+         which needs to stay dark for contrast whether the surrounding
+         page is in light or dark mode. */
+      --on-gold: #0A1628;
+    }
+
+    /* ── LIGHT THEME ─────────────────────────────────────────────────
+       Added 2026-07-09 — the toggle button existed but flipped nothing
+       visually beyond its own icon; these are the actual surface/text/
+       border swaps. The sidebar and topbar stay permanently dark
+       chrome (re-pinned below) rather than flipping, matching the
+       hero's always-dark photo scrim — only the scrollable content
+       area changes with the theme. ────────────────────────────────── */
+    html[data-theme="light"] {
+      --navy:       #f7f4f0;
+      --navy-mid:   #ffffff;
+      --navy-light: #ffffff;
+      --text:       #1a1310;
+      --text-muted: rgba(26,19,16,.62);
+      --text-soft:  rgba(26,19,16,.4);
+      --border:     rgba(184,92,26,.14);
+      --border-md:  rgba(184,92,26,.24);
+      --card-bg:    #ffffff;
+      --card-bg2:   #f5f1ec;
+      --success:    #16a34a;
+    }
+    /* Sidebar and topbar keep the original dark values regardless of
+       [data-theme] — re-pinning locally overrides the light cascade
+       from above for anything nested inside them. */
+    html[data-theme="light"] .sidebar,
+    html[data-theme="light"] .topbar {
+      --navy:       #0A1628;
+      --navy-mid:   #0F2040;
+      --navy-light: #162B52;
+      --text:       #f4f6f9;
+      --text-muted: rgba(244,246,249,.62);
+      --text-soft:  rgba(244,246,249,.38);
+      --border:     rgba(255,255,255,.08);
+      --border-md:  rgba(255,255,255,.13);
+      --card-bg:    rgba(255,255,255,.05);
+      --card-bg2:   rgba(255,255,255,.08);
     }
 
     /* ── RESET ──────────────────────────────────────────────── */
@@ -314,7 +356,7 @@ body.auth-body {
       flex-shrink: 0;
       box-shadow: 0 4px 16px rgba(201,168,76,.3);
     }
-    .brand-shield svg { width: 20px; height: 20px; fill: var(--navy) }
+    .brand-shield svg { width: 20px; height: 20px; fill: var(--on-gold) }
     .brand-text-top {
       font-family: var(--font-display);
       font-size: 16px;
@@ -526,7 +568,7 @@ body.auth-body {
       display: grid; place-items: center;
       font-size: 14px;
       font-weight: 800;
-      color: var(--navy);
+      color: var(--on-gold);
       flex-shrink: 0;
       box-shadow: 0 0 0 3px rgba(201,168,76,.2);
     }
@@ -771,7 +813,7 @@ body.auth-body {
     }
     .priority-progress-bar {
       height: 6px;
-      background: rgba(255,255,255,.08);
+      background: var(--border-md);
       border-radius: 99px;
       overflow: hidden;
       margin-bottom: 6px;
@@ -840,6 +882,9 @@ body.auth-body {
       border: 2px solid var(--border-md);
       display: grid; place-items: center;
       font-size: 14px; font-weight: 800;
+      /* Fixed gradient regardless of theme (photo placeholder tile) —
+         its fallback initial needs fixed light text to stay legible. */
+      color: #f4f6f9;
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -947,7 +992,9 @@ body.auth-body {
       object-fit: cover;
       opacity: .2;
     }
-    .encouragement-content { position: relative; z-index: 1 }
+    /* Fixed light text — .encouragement-bg is a permanently-dark photo
+       card regardless of theme, same treatment as the hero. */
+    .encouragement-content { position: relative; z-index: 1; color: #f4f6f9 }
     .encouragement-label {
       display: flex; align-items: center; gap: 6px;
       font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
@@ -1008,7 +1055,7 @@ body.auth-body {
       padding: 10px;
       border-radius: 10px;
       background: var(--gold);
-      color: var(--navy);
+      color: var(--on-gold);
       font-size: 13px;
       font-weight: 800;
       transition: all var(--transition);
@@ -1040,7 +1087,7 @@ body.auth-body {
       background: rgba(74,222,128,.12);
     }
     .task-check.done svg { width: 11px; height: 11px; stroke: var(--success); stroke-width: 2.5 }
-    .task-text.done { color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(255,255,255,.25) }
+    .task-text.done { color: var(--text-muted); text-decoration: line-through; text-decoration-color: var(--text-soft) }
     .tasks-link {
       font-size: 12px; font-weight: 800; color: var(--gold);
       display: flex; align-items: center; gap: 4px;
@@ -1108,7 +1155,7 @@ body.auth-body {
       padding: 11px 20px;
       border-radius: 10px;
       background: var(--gold);
-      color: var(--navy);
+      color: var(--on-gold);
       font-size: 13px;
       font-weight: 800;
       white-space: nowrap;
