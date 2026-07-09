@@ -4,19 +4,177 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Mentor Matching</title>
+  <meta name="description" content="Pair approved mentors with mentees.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .admin-wrap { max-width: 720px; margin: 0 auto }
+    .admin-section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--mentorship-gold); margin: 28px 0 12px }
+    .admin-section-title:first-of-type { margin-top: 0 }
+    .admin-app-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+    }
+    .admin-app-name { font-weight: 700; font-size: 15px }
+    .admin-app-email { font-size: 12px; opacity: .6 }
+    .admin-btn { padding: 9px 16px; border-radius: 9px; font-size: 13px; font-weight: 700 }
+    .admin-btn-approve { background: var(--mentorship-gold); color: #fff }
+    .admin-btn-approve:hover { opacity: .9 }
+    .admin-btn-reject { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(244,246,249,.8) }
+    .admin-btn-reject:hover { border-color: rgba(239,68,68,.5); color: #fca5a5 }
+    .admin-btn:disabled { opacity: .5 }
+    .assign-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
+    .assign-row select {
+      flex: 1; min-width: 180px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.13);
+      border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #f4f6f9; font-family: inherit;
+    }
+    .assign-arrow { opacity: .4; font-size: 16px }
+  </style>
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Mentor Matching</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Admin</div>
+        <h1 class="page-title">Mentor Matching</h1>
+      </div>
+    </div>
+    <div id="content">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
+    </div>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+    let sessionToken = null;
+    let latestData = null;
+
+    async function callAdminFn(body) {
+      const res = await fetch('/.netlify/functions/admin-matching', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      return { status: res.status, data };
+    }
+
+    function render(data) {
+      latestData = data;
+      const { mentors, unassignedMentees, activeAssignments } = data;
+      const content = $('content');
+
+      const assignSection = `
+        <div class="admin-section-title">Assign a Mentee</div>
+        ${(!mentors.length || !unassignedMentees.length)
+          ? `<div class="empty-state" style="padding:24px 20px">
+               <div class="empty-state-icon">🤝</div>
+               ${!mentors.length ? 'No approved mentors yet.' : 'Every mentee currently has a mentor.'}
+             </div>`
+          : `<div class="admin-app-card">
+               <div class="assign-row">
+                 <select id="mentorSelect">${mentors.map(m => `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}</option>`).join('')}</select>
+                 <span class="assign-arrow">→</span>
+                 <select id="menteeSelect">${unassignedMentees.map(m => `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}</option>`).join('')}</select>
+                 <button class="admin-btn admin-btn-approve" id="assignBtn">Assign</button>
+               </div>
+             </div>`
+        }`;
+
+      const activeSection = `
+        <div class="admin-section-title">Active Pairings</div>
+        ${!activeAssignments.length
+          ? `<div class="empty-state" style="padding:24px 20px"><div class="empty-state-icon">📋</div>No active pairings yet.</div>`
+          : activeAssignments.map(a => `
+              <div class="admin-app-card" data-id="${a.id}">
+                <div class="assign-row" style="justify-content:space-between">
+                  <div>
+                    <div class="admin-app-name">${escapeHtml(a.mentor_name)} → ${escapeHtml(a.student_name)}</div>
+                    <div class="admin-app-email">Paired ${new Date(a.assigned_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  </div>
+                  <button class="admin-btn admin-btn-reject" data-action="end">End Pairing</button>
+                </div>
+              </div>`).join('')
+        }`;
+
+      content.innerHTML = assignSection + activeSection;
+    }
+
+    async function reload() {
+      const { status, data } = await callAdminFn({ action: 'list' });
+      if (status === 401) { window.location.href = '/mentorship/login.html'; return; }
+      if (status === 403) {
+        $('content').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>You\'re not authorized to view this page.</div>';
+        return;
+      }
+      if (status !== 200) {
+        $('content').innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div>${escapeHtml(data.error || 'Something went wrong loading matching data.')}</div>`;
+        return;
+      }
+      render(data);
+    }
+
+    (async () => {
+      const content = $('content');
+      try {
+        const db = await getDB();
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) { window.location.href = '/mentorship/login.html'; return; }
+        sessionToken = session.access_token;
+
+        await reload();
+
+        content.addEventListener('click', async (e) => {
+          const assignBtn = e.target.closest('#assignBtn');
+          if (assignBtn) {
+            const mentorId = $('mentorSelect').value;
+            const studentId = $('menteeSelect').value;
+            assignBtn.disabled = true; assignBtn.textContent = 'Assigning…';
+            const { status, data } = await callAdminFn({ action: 'assign', mentorId, studentId });
+            if (status !== 200) {
+              alert(data.error || 'Could not create this pairing — please try again.');
+              assignBtn.disabled = false; assignBtn.textContent = 'Assign';
+              return;
+            }
+            await reload();
+            return;
+          }
+          const endBtn = e.target.closest('button[data-action="end"]');
+          if (endBtn) {
+            const card = endBtn.closest('.admin-app-card');
+            const assignmentId = card.dataset.id;
+            endBtn.disabled = true; endBtn.textContent = 'Ending…';
+            const { status, data } = await callAdminFn({ action: 'end', assignmentId });
+            if (status !== 200) {
+              alert(data.error || 'Could not end this pairing — please try again.');
+              endBtn.disabled = false; endBtn.textContent = 'End Pairing';
+              return;
+            }
+            await reload();
+          }
+        });
+      } catch (e) {
+        console.warn('Matching page failed:', e);
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div>Something went wrong — please try again.</div>';
+      }
+    })();
+  </script>
 </body>
 </html>

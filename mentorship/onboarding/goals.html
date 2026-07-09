@@ -4,19 +4,128 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Set Your Goals</title>
+  <meta name="description" content="Set your first goal to start your mentorship journey.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Set Your Goals</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="auth-body">
+  <div class="auth-card onboard-card">
+    <div class="onboard-steps">
+      <span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="active"></span>
+    </div>
+    <div class="auth-eyebrow">Step 5 of 5</div>
+    <div class="auth-title">Set Your First Goal</div>
+    <div class="auth-sub">
+      One good goal is enough to start. You can add more any time from
+      your dashboard — this list is just to get you going.
+    </div>
+
+    <div class="auth-msg" id="msg"></div>
+
+    <div id="addedList" style="margin-bottom:16px"></div>
+
+    <form id="goalForm">
+      <div class="auth-field"><label for="goalTitle">Title</label><input id="goalTitle" placeholder="e.g. Read one book a month" required></div>
+      <div class="auth-field">
+        <label for="goalCategory">Category</label>
+        <select id="goalCategory">
+          <option value="spiritual">Spiritual</option>
+          <option value="intellectual">Intellectual</option>
+          <option value="physical">Physical</option>
+          <option value="social">Social</option>
+          <option value="emotional">Emotional</option>
+          <option value="character">Character</option>
+          <option value="personal" selected>Personal</option>
+        </select>
+      </div>
+      <button type="submit" class="auth-btn-secondary" id="addGoalBtn">+ Add This Goal</button>
+    </form>
+
+    <button type="button" class="auth-btn" id="finishBtn" style="margin-top:16px">Go to my dashboard</button>
+    <a href="#" class="onboard-skip" id="skipLink">Skip for now — I'll add goals later</a>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    let dbClient = null;
+    let currentUser = null;
+    const addedGoals = [];
+    const CATEGORY_LABEL = { spiritual:'Spiritual', intellectual:'Intellectual', physical:'Physical', social:'Social', emotional:'Emotional', character:'Character', personal:'Personal' };
+
+    (async () => {
+      try {
+        dbClient = await getDB();
+        const { data: { user } } = await dbClient.auth.getUser();
+        if (!user) { window.location.href = '/mentorship/login.html'; return; }
+        currentUser = user;
+      } catch (e) {
+        console.warn('Goals onboarding auth check failed:', e);
+        window.location.href = '/mentorship/login.html';
+      }
+    })();
+
+    function renderAdded() {
+      const list = document.getElementById('addedList');
+      if (!addedGoals.length) { list.innerHTML = ''; return; }
+      list.innerHTML = addedGoals.map(g => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 12px; background:rgba(255,255,255,.04); border-radius:8px; margin-bottom:6px; font-size:13px">
+          <span>${g.title}</span>
+          <span style="color:var(--mentorship-gold); font-size:11px; font-weight:700">${CATEGORY_LABEL[g.category]}</span>
+        </div>`).join('');
+    }
+
+    async function finishOnboarding() {
+      try {
+        await dbClient.auth.updateUser({ data: { onboarding_complete: true } });
+      } catch (e) {
+        console.warn('Could not mark onboarding complete:', e);
+      }
+      window.location.href = '/mentorship/dashboard/';
+    }
+
+    document.getElementById('goalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const btn = document.getElementById('addGoalBtn');
+      const msg = document.getElementById('msg');
+      btn.disabled = true; btn.textContent = 'Adding…';
+      const title = document.getElementById('goalTitle').value.trim();
+      const category = document.getElementById('goalCategory').value;
+      try {
+        const { error } = await dbClient.schema('mentorship').from('goals').insert({
+          student_id: currentUser.id,
+          title,
+          category,
+        });
+        if (error) {
+          msg.textContent = error.message || 'Could not save your goal.';
+          msg.className = 'auth-msg show error';
+          btn.disabled = false; btn.textContent = '+ Add This Goal';
+          return;
+        }
+        addedGoals.push({ title, category });
+        renderAdded();
+        document.getElementById('goalForm').reset();
+        document.getElementById('finishBtn').textContent = 'Go to my dashboard';
+        msg.className = 'auth-msg';
+        btn.disabled = false; btn.textContent = '+ Add Another Goal';
+      } catch (err) {
+        console.warn('Add goal failed:', err);
+        msg.textContent = 'Something went wrong — please try again.';
+        msg.className = 'auth-msg show error';
+        btn.disabled = false; btn.textContent = '+ Add This Goal';
+      }
+    });
+
+    document.getElementById('finishBtn').addEventListener('click', finishOnboarding);
+    document.getElementById('skipLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      finishOnboarding();
+    });
+  </script>
 </body>
 </html>

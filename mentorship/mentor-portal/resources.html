@@ -1,22 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | Mentor Resources</title>
+  <title>Inspire Mentorship | Resources</title>
+  <meta name="description" content="Guidance for mentoring well — starting sessions, spotting when a mentee needs extra support, and safeguarding.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Mentor Resources</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
-  </div>
+<body>
+<div class="app">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentor Portal</div>
+      </div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Mentoring</div>
+      <a class="nav-item" href="/mentorship/mentor-portal/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/mentor-portal/mentees.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        My Mentees
+      </a>
+      <a class="nav-item" href="/mentorship/mentor-portal/session-notes.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Session Notes
+      </a>
+      <a class="nav-item active" href="/mentorship/mentor-portal/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+    </nav>
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">Thank you.</div>
+        <div class="sidebar-cta-title">What you're<br>giving matters<br>more than you know.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">A few things worth knowing as you mentor.</div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Mentoring</div>
+          <h1 class="page-title">Resources</h1>
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-card-top"><div class="list-card-title">🤝 Starting Well</div></div>
+        <div class="list-card-desc">
+          Your first couple of sessions set the tone. Lead with curiosity, not an agenda — ask about their week,
+          what they're proud of, what's been hard. Let silence sit; young people often need a moment before they
+          open up. You don't need to have answers ready. Being consistently present matters more than being wise.
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-card-top"><div class="list-card-title">👂 Signs a Mentee Might Need Extra Support</div></div>
+        <div class="list-card-desc">
+          Watch for a sudden drop in check-in mood over several days, a mentee going quiet after being talkative,
+          or mentions of things they're struggling with at home or school that sound heavier than usual. You don't
+          have to solve it — your job is to notice, listen, and encourage them toward Prayer &amp; Support or a
+          trusted adult. If you ever believe a mentee is in immediate danger, contact our team straight away
+          rather than waiting for your next session.
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-card-top"><div class="list-card-title">💬 Conversation Starters</div></div>
+        <div class="list-card-desc">
+          "What's one thing you're proud of from this week?" · "What's been the hardest part of your week?" ·
+          "If this month went perfectly, what would be different?" · "What's something you believe about yourself
+          that you wish you didn't?" · "Who's someone you look up to, and why?"
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-card-top"><div class="list-card-title">🛡️ Safeguarding Reminders</div></div>
+        <div class="list-card-desc">
+          Keep all communication with mentees on platform channels, not personal phone numbers or social media.
+          Session Notes are private to you — use them to track anything worth remembering or flagging, not as a
+          diary. If a mentee discloses something concerning, don't promise secrecy — tell them gently that you
+          may need to loop in our team to keep them safe, then do so.
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-card-top"><div class="list-card-title">📈 Using Session Notes Well</div></div>
+        <div class="list-card-desc">
+          A quick note after each session — even two lines — makes the next one better. What did you talk about?
+          What should you follow up on? Anything you want to remember about how they're doing? Future you (and
+          your mentee) will be glad you wrote it down.
+        </div>
+        <div class="list-card-actions">
+          <a class="list-card-btn primary" href="/mentorship/mentor-portal/session-notes.html">Go to Session Notes</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
+
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    profileDropdown?.classList.toggle('show');
+  });
+  document.addEventListener('click', () => { profileDropdown?.classList.remove('show'); });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try {
+      const db = await getDB();
+      await db.auth.signOut();
+    } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+</script>
+
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+<script src="/assets/supabase.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+
+  let dbClient = null;
+  let currentUser = null;
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      const isApprovedMentor = user?.user_metadata?.mentorship_role === 'mentor' && user?.user_metadata?.mentor_status === 'approved';
+      if (!user || !isApprovedMentor) { window.location.href = '/mentorship/login.html'; return; }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name) || 'Mentor';
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
+      else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+
+    } catch (e) {
+      console.warn('Mentor portal page init failed:', e);
+      window.location.href = '/mentorship/login.html';
+    }
+  })();
+
+</script>
 </body>
 </html>

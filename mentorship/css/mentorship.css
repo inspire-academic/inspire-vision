@@ -93,3 +93,1131 @@ body.auth-body {
 .auth-msg.success { background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.3); color: #86efac }
 .auth-footer { text-align: center; font-size: 13px; color: rgba(244,246,249,.6); margin-top: 20px }
 .auth-footer a { color: var(--mentorship-gold); font-weight: 700 }
+.auth-field select {
+  width: 100%;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #f4f6f9;
+}
+.auth-field select:focus { outline: none; border-color: var(--mentorship-gold) }
+.auth-btn-secondary {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(244,246,249,.8);
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 10px;
+  transition: border-color .18s;
+}
+.auth-btn-secondary:hover { border-color: rgba(255,255,255,.35) }
+
+/* ── ONBOARDING WIZARD (join.html -> here -> dashboard) ────────────
+   Reuses .auth-card/.auth-field/.auth-btn above; adds a step
+   indicator, chip multi-select, and rating sliders. ──────────────── */
+.onboard-card { max-width: 480px }
+.onboard-steps { display: flex; gap: 6px; margin-bottom: 24px }
+.onboard-steps span { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,.12) }
+.onboard-steps span.done, .onboard-steps span.active { background: var(--mentorship-gold) }
+.onboard-skip { display: block; text-align: center; font-size: 13px; color: rgba(244,246,249,.55); margin-top: 14px }
+.onboard-skip:hover { color: rgba(244,246,249,.8) }
+.chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px }
+.chip {
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.04);
+  color: rgba(244,246,249,.8);
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.chip.selected { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff }
+.wheel-row { margin-bottom: 18px }
+.wheel-row-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px }
+.wheel-row-top span:first-child { font-weight: 700; color: rgba(244,246,249,.9) }
+.wheel-row-top span:last-child { color: var(--mentorship-gold); font-weight: 700 }
+.wheel-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--mentorship-gold);
+}
+
+/* ── SUB-PAGE SHELL (goals/check-in/mentor pages) ─────────────────
+   Added 2026-07-09 alongside the first 3 pages built beyond the
+   dashboard itself. ──────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.page-eyebrow { color: var(--mentorship-gold); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px }
+.page-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--text, #f4f6f9) }
+.page-cta {
+  padding: 11px 20px;
+  border-radius: 10px;
+  background: var(--mentorship-gold);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: opacity .18s;
+}
+.page-cta:hover { opacity: .9 }
+.list-card {
+  background: var(--card-bg, rgba(255,255,255,.05));
+  border: 1px solid var(--border, rgba(255,255,255,.08));
+  border-radius: var(--radius, 16px);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+.list-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px }
+.list-card-title { font-size: 15px; font-weight: 800; color: var(--text, #f4f6f9) }
+.list-card-desc { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.62)); line-height: 1.5; margin-bottom: 12px }
+.list-card-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); flex-wrap: wrap }
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  background: rgba(184,92,26,.15);
+  color: var(--mentorship-gold);
+  border: 1px solid rgba(184,92,26,.3);
+}
+.badge.badge-muted { background: var(--card-bg2, rgba(255,255,255,.06)); color: var(--text-muted, rgba(244,246,249,.6)); border-color: var(--border, rgba(255,255,255,.1)) }
+.list-card-actions { display: flex; gap: 8px; margin-top: 12px }
+.list-card-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border-md, rgba(255,255,255,.15));
+  color: var(--text-muted, rgba(244,246,249,.85));
+  transition: all .18s;
+}
+.list-card-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold) }
+.list-card-btn.primary { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff }
+.list-card-btn.primary:hover { opacity: .9; color: #fff }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-soft, rgba(244,246,249,.5)) }
+.empty-state-icon { font-size: 32px; margin-bottom: 12px }
+.mini-progress-bar { height: 6px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.08)); overflow: hidden; margin: 10px 0 }
+.mini-progress-fill { height: 100%; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); border-radius: 999px; transition: width .5s ease }
+
+/* ── DASHBOARD SHELL ─────────────────────────────────────────────
+   Extracted 2026-07-09 from mentorship/dashboard/index.html's inline
+   <style> block, once goals.html/check-in.html/mentor.html needed the
+   same sidebar/topbar/card shell — this is what that file's own header
+   comment meant by "Phase 4 will extract dashboard inline CSS here."
+   Any page using the dashboard shell markup (sidebar, topbar, .card,
+   dropdowns, mobile drawer) should link this file instead of
+   duplicating these rules inline. ───────────────────────────────── */
+
+    /* ── TOKENS ─────────────────────────────────────────────────────────
+       Extends tokens.css's canonical Mentorship cardinal colour
+       (--clr-mentorship, terracotta/ochre) rather than the gold this
+       dashboard originally shipped with — resolved 2026-07-09, see
+       mentorship/css/mentorship.css for the full history. ───────────── */
+    :root {
+      --navy:       var(--clr-navy, #0A1628);
+      --navy-mid:   var(--clr-navy-mid, #0F2040);
+      --navy-light: var(--clr-navy-light, #162B52);
+      --gold:       var(--clr-mentorship, #B85C1A);
+      --gold-light: var(--clr-mentorship-mid, #D97706);
+      --gold-dim:   rgba(184,92,26,.15);
+      --gold-border:rgba(184,92,26,.3);
+      --white:      #ffffff;
+      --text:       #f4f6f9;
+      --text-muted: rgba(244,246,249,.62);
+      --text-soft:  rgba(244,246,249,.38);
+      --border:     rgba(255,255,255,.08);
+      --border-md:  rgba(255,255,255,.13);
+      --card-bg:    rgba(255,255,255,.05);
+      --card-bg2:   rgba(255,255,255,.08);
+      --success:    #4ade80;
+      --sidebar-w:  248px;
+      --radius:     16px;
+      --radius-sm:  10px;
+      --transition: .18s cubic-bezier(.4,0,.2,1);
+      --font-display: 'Fraunces', serif;
+      --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+      /* Fixed — never flips with theme. For text/icons that sit on a
+         solid gold background (buttons, avatar initials, brand mark),
+         which needs to stay dark for contrast whether the surrounding
+         page is in light or dark mode. */
+      --on-gold: #0A1628;
+    }
+
+    /* ── LIGHT THEME ─────────────────────────────────────────────────
+       Added 2026-07-09 — the toggle button existed but flipped nothing
+       visually beyond its own icon; these are the actual surface/text/
+       border swaps. The sidebar and topbar stay permanently dark
+       chrome (re-pinned below) rather than flipping, matching the
+       hero's always-dark photo scrim — only the scrollable content
+       area changes with the theme. ────────────────────────────────── */
+    html[data-theme="light"] {
+      --navy:       #f7f4f0;
+      --navy-mid:   #ffffff;
+      --navy-light: #ffffff;
+      --text:       #1a1310;
+      --text-muted: rgba(26,19,16,.62);
+      --text-soft:  rgba(26,19,16,.4);
+      --border:     rgba(184,92,26,.14);
+      --border-md:  rgba(184,92,26,.24);
+      --card-bg:    #ffffff;
+      --card-bg2:   #f5f1ec;
+      --success:    #16a34a;
+    }
+    /* Sidebar, topbar, and hero keep the original dark values regardless
+       of [data-theme] — re-pinning locally overrides the light cascade
+       from above for anything nested inside them. The hero is a
+       full-bleed photo with a dark scrim for legibility (same as
+       Academic's subject hero banners), so its headline/tagline/
+       scripture-card text all need to stay light-on-dark too, not
+       just its background. */
+    html[data-theme="light"] .sidebar,
+    html[data-theme="light"] .topbar,
+    html[data-theme="light"] .hero {
+      --navy:       #0A1628;
+      --navy-mid:   #0F2040;
+      --navy-light: #162B52;
+      --text:       #f4f6f9;
+      --text-muted: rgba(244,246,249,.62);
+      --text-soft:  rgba(244,246,249,.38);
+      --border:     rgba(255,255,255,.08);
+      --border-md:  rgba(255,255,255,.13);
+      --card-bg:    rgba(255,255,255,.05);
+      --card-bg2:   rgba(255,255,255,.08);
+    }
+
+    /* ── RESET ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    html { font-size: 16px; scroll-behavior: smooth }
+    body {
+      font-family: var(--font-body);
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none }
+    button { font: inherit; cursor: pointer; border: none; background: none }
+    img { display: block; max-width: 100% }
+    ul { list-style: none }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════════════════════ */
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-w);
+      background: #0a1520;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+      transition: transform var(--transition);
+      /* Explicit redeclaration so descendants with no color of their
+         own (not just var(--text) references) resolve inside this
+         re-pinned scope — see .hero-content's comment for why this
+         is needed. */
+      color: var(--text);
+    }
+    .sidebar-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 99;
+    }
+
+    /* Brand */
+    .sidebar-brand {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .brand-shield {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(201,168,76,.3);
+    }
+    .brand-shield svg { width: 20px; height: 20px; fill: var(--on-gold) }
+    .brand-text-top {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1;
+    }
+    .brand-text-sub {
+      font-size: 9px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 800;
+      margin-top: 3px;
+    }
+
+    /* Nav */
+    .sidebar-nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px }
+    .nav-section-label {
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      padding: 14px 8px 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      position: relative;
+      cursor: pointer;
+    }
+    .nav-item svg { width: 17px; height: 17px; stroke-width: 1.8; flex-shrink: 0 }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,.06) }
+    .nav-item.active {
+      color: var(--text);
+      background: rgba(201,168,76,.12);
+      font-weight: 700;
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--gold);
+    }
+
+    /* Sidebar CTA */
+    .sidebar-cta {
+      margin: 12px 14px 16px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      min-height: 140px;
+    }
+    .sidebar-cta-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #1a2a40 0%, #0d1e30 100%);
+    }
+    .sidebar-cta-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: .35;
+    }
+    .sidebar-cta-content {
+      position: relative; z-index: 1;
+      padding: 16px;
+    }
+    .sidebar-cta-eyebrow {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .sidebar-cta-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .sidebar-cta-body {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .sidebar-cta-sig {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MAIN
+    ══════════════════════════════════════════════════════════ */
+    /* min-width:0 overrides CSS Grid's default auto-minimum on 1fr tracks (which is
+       min-content, not 0) — without it, any wide descendant forces the whole track
+       (and everything in it) wider than the viewport instead of shrinking/wrapping. */
+    .main { grid-column: 2; min-width: 0; display: flex; flex-direction: column; min-height: 100vh }
+
+    /* Top bar */
+    .topbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,21,32,.8);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      color: var(--text);
+    }
+    .topbar-menu {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .topbar-menu:hover { color: var(--text); border-color: var(--border-md) }
+    .topbar-menu svg { width: 17px; height: 17px; stroke-width: 2 }
+    .topbar-welcome { flex: 1 }
+    .topbar-greeting {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .topbar-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .topbar-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      width: 220px;
+    }
+    .topbar-search svg { width: 14px; height: 14px; color: var(--text-soft); flex-shrink: 0 }
+    .topbar-search input {
+      border: none; outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      width: 100%;
+    }
+    .topbar-search input::placeholder { color: var(--text-soft) }
+    .topbar-bell {
+      position: relative;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .topbar-bell:hover { color: var(--text) }
+    .topbar-bell svg { width: 18px; height: 18px; stroke-width: 1.8 }
+    .topbar-theme-toggle {
+      position: relative;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .topbar-theme-toggle:hover { color: var(--gold); border-color: var(--gold-border) }
+    .topbar-theme-toggle svg { width: 18px; height: 18px; stroke-width: 1.8 }
+    .topbar-theme-toggle .icon-sun { display: none }
+    html[data-theme="light"] .topbar-theme-toggle .icon-moon { display: none }
+    html[data-theme="light"] .topbar-theme-toggle .icon-sun { display: block }
+    .notif-badge {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      border: 2px solid var(--navy);
+    }
+    .topbar-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      border: 2px solid var(--gold);
+      overflow: hidden;
+      display: grid; place-items: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--on-gold);
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(201,168,76,.2);
+    }
+    .topbar-avatar img { width: 100%; height: 100%; object-fit: cover }
+    .topbar-dropdown-wrap { position: relative }
+    .topbar-dropdown {
+      display: none;
+      position: absolute; top: calc(100% + 10px); right: 0;
+      min-width: 220px;
+      background: var(--navy-light);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 32px rgba(0,0,0,.35);
+      padding: 8px;
+      z-index: 150;
+    }
+    .topbar-dropdown.show { display: block }
+    .topbar-dropdown-title {
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--text-soft); padding: 8px 10px 6px;
+    }
+    .topbar-dropdown-empty { font-size: 12px; color: var(--text-muted); padding: 6px 10px 10px }
+    .topbar-dropdown-item {
+      display: block; width: 100%; text-align: left;
+      padding: 9px 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 700; color: var(--text);
+      transition: background var(--transition);
+    }
+    .topbar-dropdown-item:hover { background: var(--card-bg2) }
+
+    /* ── CONTENT ─────────────────────────────────────────────── */
+    .content { flex: 1; padding: 0 0 32px }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      height: 320px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    .hero-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+    }
+    .hero-img-placeholder {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #0d2040 0%, #1a3a5c 40%, #0a2030 100%);
+    }
+    /* Overlay gradient */
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(10,21,32,.92) 0%,
+        rgba(10,21,32,.7) 40%,
+        rgba(10,21,32,.2) 70%,
+        transparent 100%
+      );
+    }
+    .hero-overlay-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(to top, var(--navy), transparent);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 0 32px 32px;
+      flex: 1;
+      /* Re-pinning --text on .hero (above) only affects var(--text)
+         references resolved inside it — it doesn't change a color
+         already inherited from body outside that scope. Elements with
+         no color of their own (.hero-headline) need this explicit
+         redeclaration so the re-pinned value actually applies. */
+      color: var(--text);
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 900;
+      line-height: .95;
+      letter-spacing: -.03em;
+      margin-bottom: 14px;
+    }
+    .hero-headline .gold { color: var(--gold) }
+    .hero-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 999px;
+      border: 1.5px solid var(--gold-border);
+      background: rgba(201,168,76,.08);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      transition: all var(--transition);
+    }
+    .hero-btn:hover { background: var(--gold-dim); border-color: var(--gold) }
+    .hero-btn svg { width: 16px; height: 16px; fill: var(--gold) }
+
+    /* Scripture card — top right of hero */
+    .scripture-card {
+      position: absolute;
+      top: 24px; right: 28px;
+      z-index: 3;
+      width: 220px;
+      background: rgba(10,21,32,.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      padding: 16px;
+      /* Same explicit-redeclaration fix as .hero-content — see comment
+         there. .scripture-text has no color of its own. */
+      color: var(--text);
+    }
+    .scripture-quote-mark {
+      font-family: var(--font-display);
+      font-size: 36px;
+      line-height: 1;
+      color: var(--gold);
+      opacity: .5;
+      margin-bottom: -8px;
+    }
+    .scripture-text {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -.01em;
+      margin-bottom: 8px;
+    }
+    .scripture-ref {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: .06em;
+      margin-bottom: 12px;
+    }
+    .scripture-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 12px;
+    }
+    .scripture-focus-label {
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .scripture-focus-label svg { width: 12px; height: 12px; color: var(--gold) }
+    .scripture-focus-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── DASHBOARD GRID ──────────────────────────────────────── */
+    .dashboard { padding: 24px 28px 0 }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 300px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── CARD BASE ───────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { border-color: var(--border-md) }
+    .card-label {
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    /* ── GROWTH COMPASS (radar chart) ────────────────────────── */
+    .compass-card {}
+    .compass-svg-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .compass-legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .legend-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; margin-right: 4px;
+    }
+
+    /* ── TOP PRIORITY ────────────────────────────────────────── */
+    .priority-card {}
+    .priority-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      display: grid; place-items: center;
+      margin-bottom: 12px;
+      color: var(--gold);
+    }
+    .priority-icon svg { width: 22px; height: 22px; stroke-width: 1.8 }
+    .priority-goal {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .priority-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .priority-progress-bar {
+      height: 6px;
+      background: var(--border-md);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .priority-progress-fill {
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: inherit;
+    }
+    .priority-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-soft);
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .priority-progress-meta span:last-child { color: var(--gold); font-weight: 800 }
+    .priority-link {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ── UPCOMING CHECK-IN ───────────────────────────────────── */
+    .checkin-card {}
+    .checkin-type {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+    .checkin-type svg { width: 14px; height: 14px; stroke-width: 2; color: var(--gold) }
+    .checkin-event {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+    .checkin-date {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .checkin-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .checkin-mentor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .checkin-mentor-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2a4a6a, #1a3050);
+      border: 2px solid var(--border-md);
+      display: grid; place-items: center;
+      font-size: 14px; font-weight: 800;
+      /* Fixed gradient regardless of theme (photo placeholder tile) —
+         its fallback initial needs fixed light text to stay legible. */
+      color: #f4f6f9;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .checkin-mentor-name { font-size: 13px; font-weight: 700 }
+    .checkin-mentor-role { font-size: 11px; color: var(--text-soft) }
+    .checkin-btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      transition: all var(--transition);
+      text-align: center;
+    }
+    .checkin-btn:hover { background: rgba(201,168,76,.22) }
+
+    /* ── RIGHT COLUMN (stacked cards) ────────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 10px }
+    .mini-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+    .mini-card-header {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .mini-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--gold-dim);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+    .mini-icon svg { width: 14px; height: 14px; stroke-width: 1.8 }
+    .mini-label {
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .mini-new {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(201,168,76,.14);
+      color: var(--gold);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      margin-left: 6px;
+    }
+    .mini-message {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+    .mini-author { font-size: 10px; color: var(--text-soft); font-weight: 700 }
+
+    /* Achievement mini */
+    .achievement-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .achievement-badge {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .achievement-badge svg { width: 18px; height: 18px; color: var(--gold) }
+    .streak-flame {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(249,115,22,.12);
+      border: 1px solid rgba(249,115,22,.25);
+      display: grid; place-items: center;
+      font-size: 16px;
+    }
+    .achievement-name {
+      font-size: 13px; font-weight: 800; margin-bottom: 2px;
+    }
+    .achievement-sub { font-size: 11px; color: var(--text-muted) }
+    .achievement-desc { font-size: 10px; color: var(--text-soft); margin-top: 6px; font-style: italic }
+
+    /* Encouragement mini */
+    .encouragement-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(13,27,42,.9), rgba(10,20,32,.95));
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .encouragement-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: .2;
+    }
+    /* .encouragement-bg/.encouragement-img (below) exist in CSS but
+       dashboard/index.html never actually places those divs in this
+       card — it's just a plain .mini-card with the normal flipping
+       background, no fixed text colour needed. */
+    .encouragement-content { position: relative; z-index: 1 }
+    .encouragement-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold); font-weight: 800; margin-bottom: 8px;
+    }
+    .encouragement-label svg { width: 12px; height: 12px }
+    .encouragement-text {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: -.01em;
+    }
+
+    /* ── SECOND ROW ──────────────────────────────────────────── */
+    .grid-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 300px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* Weekly check-in */
+    .mood-prompt {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .mood-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .mood-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-md);
+      background: var(--card-bg);
+      font-size: 20px;
+      display: grid; place-items: center;
+      transition: all var(--transition);
+    }
+    .mood-btn:hover { border-color: var(--gold-border); transform: scale(1.1) }
+    .mood-btn.selected {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+      box-shadow: 0 0 0 3px rgba(201,168,76,.15);
+    }
+    .mood-selected-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      min-height: 16px;
+    }
+    .mood-selected-text span { color: var(--gold); font-weight: 700 }
+    .reflection-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--gold);
+      color: var(--on-gold);
+      font-size: 13px;
+      font-weight: 800;
+      transition: all var(--transition);
+    }
+    .reflection-btn:hover { background: var(--gold-light) }
+
+    /* Today's tasks */
+    .tasks-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .task-item:last-child { border-bottom: none }
+    .task-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border-md);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+    .task-check.done {
+      border-color: var(--success);
+      background: rgba(74,222,128,.12);
+    }
+    .task-check.done svg { width: 11px; height: 11px; stroke: var(--success); stroke-width: 2.5 }
+    .task-text.done { color: var(--text-muted); text-decoration: line-through; text-decoration-color: var(--text-soft) }
+    .tasks-link {
+      font-size: 12px; font-weight: 800; color: var(--gold);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Quick actions */
+    .quick-actions-grid { display: flex; flex-direction: column; gap: 10px }
+    .quick-action {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .quick-action:last-child { border-bottom: none }
+    .quick-action:hover .quick-action-title { color: var(--gold) }
+    .quick-action-icon {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: var(--card-bg2);
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+    .quick-action-icon svg { width: 16px; height: 16px; stroke-width: 1.8 }
+    .quick-action-title { font-size: 12px; font-weight: 700; margin-bottom: 2px; transition: color var(--transition) }
+    .quick-action-desc { font-size: 11px; color: var(--text-soft) }
+
+    /* ── FOOTER BAR ──────────────────────────────────────────── */
+    .footer-bar {
+      margin: 24px 28px 0;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(201,168,76,.08), rgba(201,168,76,.04));
+      border: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .footer-bar-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+    .footer-bar-icon svg { width: 20px; height: 20px; stroke-width: 1.8 }
+    .footer-bar-text { flex: 1 }
+    .footer-bar-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .footer-bar-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .footer-bar-btn {
+      padding: 11px 20px;
+      border-radius: 10px;
+      background: var(--gold);
+      color: var(--on-gold);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .footer-bar-btn:hover { background: var(--gold-light) }
+    .footer-bar-btn svg { width: 15px; height: 15px; stroke-width: 2.5 }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 1200px) {
+      .grid-row, .grid-row-2 { grid-template-columns: 1fr 1fr 300px }
+      .right-col { grid-column: 3; grid-row: 1 / 3 }
+    }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr }
+      /* .main was still explicitly grid-column:2 from the desktop 2-column layout —
+         with only 1 explicit column here, that forced an unconstrained implicit
+         column 2 sized to content, which is what was pushing the whole page wider
+         than the viewport (visible as horizontal scroll at phone widths). */
+      .main { grid-column: 1 }
+      /* Sidebar becomes a slide-in drawer instead of vanishing entirely —
+         the hamburger button now actually opens something. */
+      .sidebar { transform: translateX(-100%) }
+      .sidebar.mobile-open { transform: translateX(0) }
+      .sidebar-backdrop.show { display: block }
+      .grid-row, .grid-row-2 { grid-template-columns: 1fr 1fr }
+      .right-col { grid-column: 1 / -1 }
+      .scripture-card { display: none }
+    }
+    @media (max-width: 600px) {
+      .grid-row, .grid-row-2 { grid-template-columns: 1fr }
+      .dashboard { padding: 16px }
+      .topbar { padding: 0 16px }
+      .topbar-search { display: none }
+      /* footer-bar's CTA button (white-space:nowrap by design on desktop) doesn't fit
+         alongside the title/subtitle text at phone widths — stack instead of forcing scroll */
+      .footer-bar { flex-wrap: wrap; margin: 24px 16px 0; row-gap: 14px }
+      .footer-bar-btn { width: 100%; justify-content: center }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0ms !important }
+    }

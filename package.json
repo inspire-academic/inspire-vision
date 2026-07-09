@@ -1,0 +1,9 @@
+{
+  "name": "inspire-vision",
+  "version": "1.0.0",
+  "description": "Inspire Vision platform — mentorship, health, and faith cardinals",
+  "dependencies": {
+    "resend": "^3.5.0",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
