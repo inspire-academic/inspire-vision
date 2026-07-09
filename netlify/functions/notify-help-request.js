@@ -8,8 +8,6 @@
 //   HELP_REQUEST_NOTIFY_EMAIL — where these alerts should land
 const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const CATEGORY_LABEL = {
   prayer: 'Prayer request',
   general: 'Support request',
@@ -22,10 +20,13 @@ exports.handler = async (event) => {
   }
 
   const notifyEmail = process.env.HELP_REQUEST_NOTIFY_EMAIL;
-  if (!notifyEmail) {
+  if (!notifyEmail || !process.env.RESEND_API_KEY) {
     // Don't fail the request the mentee made — just log it. The row is
     // already saved in the database regardless of whether this fires.
-    console.warn('HELP_REQUEST_NOTIFY_EMAIL not set — skipping notification email.');
+    // The Resend client is only constructed below, once we know a key
+    // exists — its constructor throws on a missing key, which previously
+    // crashed the whole function at module load (every invocation 502'd).
+    console.warn('RESEND_API_KEY or HELP_REQUEST_NOTIFY_EMAIL not set — skipping notification email.');
     return { statusCode: 200, body: JSON.stringify({ sent: false, reason: 'not configured' }) };
   }
 
@@ -35,6 +36,7 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing message' }) };
     }
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const label = CATEGORY_LABEL[category] || 'Support request';
     const urgent = category === 'urgent';
 
