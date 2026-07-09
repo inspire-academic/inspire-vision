@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Mentorship | Dashboard</title>
+  <meta name="description" content="Your personal mentorship dashboard — track your journey, connect with your mentor, and grow into who God created you to be.">
+  <meta name="theme-color" content="#0d1b2a">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- tokens.css first, always (its own architecture comment says so) — the :root block
+       below extends it rather than duplicating it. global.css doesn't exist in this repo
+       yet; tokens.css + styles.css are the current equivalent. Swap if global.css lands. -->
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────────────
+       Extends tokens.css's canonical Mentorship cardinal colour
+       (--clr-mentorship, terracotta/ochre) rather than the gold this
+       dashboard originally shipped with — resolved 2026-07-09, see
+       mentorship/css/mentorship.css for the full history. ───────────── */
+    :root {
+      --navy:       var(--clr-navy, #0A1628);
+      --navy-mid:   var(--clr-navy-mid, #0F2040);
+      --navy-light: var(--clr-navy-light, #162B52);
+      --gold:       var(--clr-mentorship, #B85C1A);
+      --gold-light: var(--clr-mentorship-mid, #D97706);
+      --gold-dim:   rgba(184,92,26,.15);
+      --gold-border:rgba(184,92,26,.3);
+      --white:      #ffffff;
+      --text:       #f4f6f9;
+      --text-muted: rgba(244,246,249,.62);
+      --text-soft:  rgba(244,246,249,.38);
+      --border:     rgba(255,255,255,.08);
+      --border-md:  rgba(255,255,255,.13);
+      --card-bg:    rgba(255,255,255,.05);
+      --card-bg2:   rgba(255,255,255,.08);
+      --success:    #4ade80;
+      --sidebar-w:  248px;
+      --radius:     16px;
+      --radius-sm:  10px;
+      --transition: .18s cubic-bezier(.4,0,.2,1);
+      --font-display: 'Fraunces', serif;
+      --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    /* ── RESET ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    html { font-size: 16px; scroll-behavior: smooth }
+    body {
+      font-family: var(--font-body);
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none }
+    button { font: inherit; cursor: pointer; border: none; background: none }
+    img { display: block; max-width: 100% }
+    ul { list-style: none }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      min-height: 100vh;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════════════════════ */
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-w);
+      background: #0a1520;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+      transition: transform var(--transition);
+    }
+    .sidebar-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 99;
+    }
+
+    /* Brand */
+    .sidebar-brand {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .brand-shield {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(201,168,76,.3);
+    }
+    .brand-shield svg { width: 20px; height: 20px; fill: var(--navy) }
+    .brand-text-top {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1;
+    }
+    .brand-text-sub {
+      font-size: 9px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 800;
+      margin-top: 3px;
+    }
+
+    /* Nav */
+    .sidebar-nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px }
+    .nav-section-label {
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      padding: 14px 8px 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      position: relative;
+      cursor: pointer;
+    }
+    .nav-item svg { width: 17px; height: 17px; stroke-width: 1.8; flex-shrink: 0 }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,.06) }
+    .nav-item.active {
+      color: var(--text);
+      background: rgba(201,168,76,.12);
+      font-weight: 700;
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--gold);
+    }
+
+    /* Sidebar CTA */
+    .sidebar-cta {
+      margin: 12px 14px 16px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      min-height: 140px;
+    }
+    .sidebar-cta-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #1a2a40 0%, #0d1e30 100%);
+    }
+    .sidebar-cta-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: .35;
+    }
+    .sidebar-cta-content {
+      position: relative; z-index: 1;
+      padding: 16px;
+    }
+    .sidebar-cta-eyebrow {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .sidebar-cta-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .sidebar-cta-body {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .sidebar-cta-sig {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MAIN
+    ══════════════════════════════════════════════════════════ */
+    /* min-width:0 overrides CSS Grid's default auto-minimum on 1fr tracks (which is
+       min-content, not 0) — without it, any wide descendant forces the whole track
+       (and everything in it) wider than the viewport instead of shrinking/wrapping. */
+    .main { grid-column: 2; min-width: 0; display: flex; flex-direction: column; min-height: 100vh }
+
+    /* Top bar */
+    .topbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,21,32,.8);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-menu {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .topbar-menu:hover { color: var(--text); border-color: var(--border-md) }
+    .topbar-menu svg { width: 17px; height: 17px; stroke-width: 2 }
+    .topbar-welcome { flex: 1 }
+    .topbar-greeting {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .topbar-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .topbar-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      width: 220px;
+    }
+    .topbar-search svg { width: 14px; height: 14px; color: var(--text-soft); flex-shrink: 0 }
+    .topbar-search input {
+      border: none; outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      width: 100%;
+    }
+    .topbar-search input::placeholder { color: var(--text-soft) }
+    .topbar-bell {
+      position: relative;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .topbar-bell:hover { color: var(--text) }
+    .topbar-bell svg { width: 18px; height: 18px; stroke-width: 1.8 }
+    .topbar-theme-toggle {
+      position: relative;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .topbar-theme-toggle:hover { color: var(--gold); border-color: var(--gold-border) }
+    .topbar-theme-toggle svg { width: 18px; height: 18px; stroke-width: 1.8 }
+    .topbar-theme-toggle .icon-sun { display: none }
+    html[data-theme="light"] .topbar-theme-toggle .icon-moon { display: none }
+    html[data-theme="light"] .topbar-theme-toggle .icon-sun { display: block }
+    .notif-badge {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      border: 2px solid var(--navy);
+    }
+    .topbar-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      border: 2px solid var(--gold);
+      overflow: hidden;
+      display: grid; place-items: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--navy);
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(201,168,76,.2);
+    }
+    .topbar-avatar img { width: 100%; height: 100%; object-fit: cover }
+    .topbar-dropdown-wrap { position: relative }
+    .topbar-dropdown {
+      display: none;
+      position: absolute; top: calc(100% + 10px); right: 0;
+      min-width: 220px;
+      background: var(--navy-light);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 32px rgba(0,0,0,.35);
+      padding: 8px;
+      z-index: 150;
+    }
+    .topbar-dropdown.show { display: block }
+    .topbar-dropdown-title {
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--text-soft); padding: 8px 10px 6px;
+    }
+    .topbar-dropdown-empty { font-size: 12px; color: var(--text-muted); padding: 6px 10px 10px }
+    .topbar-dropdown-item {
+      display: block; width: 100%; text-align: left;
+      padding: 9px 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 700; color: var(--text);
+      transition: background var(--transition);
+    }
+    .topbar-dropdown-item:hover { background: var(--card-bg2) }
+
+    /* ── CONTENT ─────────────────────────────────────────────── */
+    .content { flex: 1; padding: 0 0 32px }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      height: 320px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    .hero-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+    }
+    .hero-img-placeholder {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #0d2040 0%, #1a3a5c 40%, #0a2030 100%);
+    }
+    /* Overlay gradient */
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(10,21,32,.92) 0%,
+        rgba(10,21,32,.7) 40%,
+        rgba(10,21,32,.2) 70%,
+        transparent 100%
+      );
+    }
+    .hero-overlay-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(to top, var(--navy), transparent);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 0 32px 32px;
+      flex: 1;
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 900;
+      line-height: .95;
+      letter-spacing: -.03em;
+      margin-bottom: 14px;
+    }
+    .hero-headline .gold { color: var(--gold) }
+    .hero-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 999px;
+      border: 1.5px solid var(--gold-border);
+      background: rgba(201,168,76,.08);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      transition: all var(--transition);
+    }
+    .hero-btn:hover { background: var(--gold-dim); border-color: var(--gold) }
+    .hero-btn svg { width: 16px; height: 16px; fill: var(--gold) }
+
+    /* Scripture card — top right of hero */
+    .scripture-card {
+      position: absolute;
+      top: 24px; right: 28px;
+      z-index: 3;
+      width: 220px;
+      background: rgba(10,21,32,.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .scripture-quote-mark {
+      font-family: var(--font-display);
+      font-size: 36px;
+      line-height: 1;
+      color: var(--gold);
+      opacity: .5;
+      margin-bottom: -8px;
+    }
+    .scripture-text {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -.01em;
+      margin-bottom: 8px;
+    }
+    .scripture-ref {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: .06em;
+      margin-bottom: 12px;
+    }
+    .scripture-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 12px;
+    }
+    .scripture-focus-label {
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .scripture-focus-label svg { width: 12px; height: 12px; color: var(--gold) }
+    .scripture-focus-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── DASHBOARD GRID ──────────────────────────────────────── */
+    .dashboard { padding: 24px 28px 0 }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 300px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── CARD BASE ───────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { border-color: var(--border-md) }
+    .card-label {
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    /* ── GROWTH COMPASS (radar chart) ────────────────────────── */
+    .compass-card {}
+    .compass-svg-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .compass-legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .legend-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; margin-right: 4px;
+    }
+
+    /* ── TOP PRIORITY ────────────────────────────────────────── */
+    .priority-card {}
+    .priority-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      display: grid; place-items: center;
+      margin-bottom: 12px;
+      color: var(--gold);
+    }
+    .priority-icon svg { width: 22px; height: 22px; stroke-width: 1.8 }
+    .priority-goal {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .priority-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .priority-progress-bar {
+      height: 6px;
+      background: rgba(255,255,255,.08);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .priority-progress-fill {
+      height: 100%;
+      width: 72%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: inherit;
+    }
+    .priority-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-soft);
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .priority-progress-meta span:last-child { color: var(--gold); font-weight: 800 }
+    .priority-link {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ── UPCOMING CHECK-IN ───────────────────────────────────── */
+    .checkin-card {}
+    .checkin-type {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+    .checkin-type svg { width: 14px; height: 14px; stroke-width: 2; color: var(--gold) }
+    .checkin-event {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+    .checkin-date {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .checkin-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .checkin-mentor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .checkin-mentor-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2a4a6a, #1a3050);
+      border: 2px solid var(--border-md);
+      display: grid; place-items: center;
+      font-size: 14px; font-weight: 800;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .checkin-mentor-name { font-size: 13px; font-weight: 700 }
+    .checkin-mentor-role { font-size: 11px; color: var(--text-soft) }
+    .checkin-btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      transition: all var(--transition);
+      text-align: center;
+    }
+    .checkin-btn:hover { background: rgba(201,168,76,.22) }
+
+    /* ── RIGHT COLUMN (stacked cards) ────────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 10px }
+    .mini-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+    .mini-card-header {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .mini-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--gold-dim);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+    .mini-icon svg { width: 14px; height: 14px; stroke-width: 1.8 }
+    .mini-label {
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .mini-new {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(201,168,76,.14);
+      color: var(--gold);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      margin-left: 6px;
+    }
+    .mini-message {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+    .mini-author { font-size: 10px; color: var(--text-soft); font-weight: 700 }
+
+    /* Achievement mini */
+    .achievement-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .achievement-badge {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .achievement-badge svg { width: 18px; height: 18px; color: var(--gold) }
+    .streak-flame {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(249,115,22,.12);
+      border: 1px solid rgba(249,115,22,.25);
+      display: grid; place-items: center;
+      font-size: 16px;
+    }
+    .achievement-name {
+      font-size: 13px; font-weight: 800; margin-bottom: 2px;
+    }
+    .achievement-sub { font-size: 11px; color: var(--text-muted) }
+    .achievement-desc { font-size: 10px; color: var(--text-soft); margin-top: 6px; font-style: italic }
+
+    /* Encouragement mini */
+    .encouragement-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(13,27,42,.9), rgba(10,20,32,.95));
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .encouragement-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: .2;
+    }
+    .encouragement-content { position: relative; z-index: 1 }
+    .encouragement-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold); font-weight: 800; margin-bottom: 8px;
+    }
+    .encouragement-label svg { width: 12px; height: 12px }
+    .encouragement-text {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: -.01em;
+    }
+
+    /* ── SECOND ROW ──────────────────────────────────────────── */
+    .grid-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 300px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* Weekly check-in */
+    .mood-prompt {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .mood-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .mood-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-md);
+      background: var(--card-bg);
+      font-size: 20px;
+      display: grid; place-items: center;
+      transition: all var(--transition);
+    }
+    .mood-btn:hover { border-color: var(--gold-border); transform: scale(1.1) }
+    .mood-btn.selected {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+      box-shadow: 0 0 0 3px rgba(201,168,76,.15);
+    }
+    .mood-selected-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      min-height: 16px;
+    }
+    .mood-selected-text span { color: var(--gold); font-weight: 700 }
+    .reflection-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 13px;
+      font-weight: 800;
+      transition: all var(--transition);
+    }
+    .reflection-btn:hover { background: var(--gold-light) }
+
+    /* Today's tasks */
+    .tasks-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .task-item:last-child { border-bottom: none }
+    .task-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border-md);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+    .task-check.done {
+      border-color: var(--success);
+      background: rgba(74,222,128,.12);
+    }
+    .task-check.done svg { width: 11px; height: 11px; stroke: var(--success); stroke-width: 2.5 }
+    .task-text.done { color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(255,255,255,.25) }
+    .tasks-link {
+      font-size: 12px; font-weight: 800; color: var(--gold);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Quick actions */
+    .quick-actions-grid { display: flex; flex-direction: column; gap: 10px }
+    .quick-action {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .quick-action:last-child { border-bottom: none }
+    .quick-action:hover .quick-action-title { color: var(--gold) }
+    .quick-action-icon {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: var(--card-bg2);
+      border: 1px solid var(--border-md);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+    .quick-action-icon svg { width: 16px; height: 16px; stroke-width: 1.8 }
+    .quick-action-title { font-size: 12px; font-weight: 700; margin-bottom: 2px; transition: color var(--transition) }
+    .quick-action-desc { font-size: 11px; color: var(--text-soft) }
+
+    /* ── FOOTER BAR ──────────────────────────────────────────── */
+    .footer-bar {
+      margin: 24px 28px 0;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(201,168,76,.08), rgba(201,168,76,.04));
+      border: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .footer-bar-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+    .footer-bar-icon svg { width: 20px; height: 20px; stroke-width: 1.8 }
+    .footer-bar-text { flex: 1 }
+    .footer-bar-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .footer-bar-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .footer-bar-btn {
+      padding: 11px 20px;
+      border-radius: 10px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .footer-bar-btn:hover { background: var(--gold-light) }
+    .footer-bar-btn svg { width: 15px; height: 15px; stroke-width: 2.5 }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 1200px) {
+      .grid-row, .grid-row-2 { grid-template-columns: 1fr 1fr 300px }
+      .right-col { grid-column: 3; grid-row: 1 / 3 }
+    }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr }
+      /* .main was still explicitly grid-column:2 from the desktop 2-column layout —
+         with only 1 explicit column here, that forced an unconstrained implicit
+         column 2 sized to content, which is what was pushing the whole page wider
+         than the viewport (visible as horizontal scroll at phone widths). */
+      .main { grid-column: 1 }
+      /* Sidebar becomes a slide-in drawer instead of vanishing entirely —
+         the hamburger button now actually opens something. */
+      .sidebar { transform: translateX(-100%) }
+      .sidebar.mobile-open { transform: translateX(0) }
+      .sidebar-backdrop.show { display: block }
+      .grid-row, .grid-row-2 { grid-template-columns: 1fr 1fr }
+      .right-col { grid-column: 1 / -1 }
+      .scripture-card { display: none }
+    }
+    @media (max-width: 600px) {
+      .grid-row, .grid-row-2 { grid-template-columns: 1fr }
+      .dashboard { padding: 16px }
+      .topbar { padding: 0 16px }
+      .topbar-search { display: none }
+      /* footer-bar's CTA button (white-space:nowrap by design on desktop) doesn't fit
+         alongside the title/subtitle text at phone widths — stack instead of forcing scroll */
+      .footer-bar { flex-wrap: wrap; margin: 24px 16px 0; row-gap: 14px }
+      .footer-bar-btn { width: 100%; justify-content: center }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0ms !important }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <!-- Shield / cross icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentorship</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">My Growth</div>
+      <a class="nav-item active" href="/mentorship/dashboard/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M9 18h9"/></svg>
+        My Journey
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/goals.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Goals & Plan
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/growth-compass.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Growth Compass
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Check-Ins
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/journal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Journal
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        Challenges
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/></svg>
+        Achievements
+      </a>
+
+      <div class="nav-section-label">Support & Connect</div>
+      <a class="nav-item" href="/mentorship/dashboard/mentor.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Mentor
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2.1-2.5 4"/><path d="M12 17h.01"/></svg>
+        Ask for Help
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/prayer-support.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        Prayer & Support
+      </a>
+      <a class="nav-item" href="/mentorship/stories.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Community
+      </a>
+    </nav>
+
+    <!-- CTA card -->
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">You were made for more.</div>
+        <div class="sidebar-cta-title">We walk with you.<br>You become who<br>God created.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">You're not just preparing for the future. You're building it. We're proud of you.</div>
+      </div>
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="topbarSearch" placeholder="Search anything…" aria-label="Search">
+      </div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Hero -->
+      <section class="hero">
+        <!-- Gradient fallback stays behind the img in case it's ever swapped for a missing file -->
+        <div class="hero-img-placeholder"></div>
+        <img src="/assets/images/mentorship/hero/hero-bg.webp"
+             alt="" class="hero-img"
+             loading="eager"
+             fetchpriority="high"
+             onload="this.style.opacity=1"
+             onerror="this.style.display='none'"
+             style="opacity:0;transition:opacity .4s ease">
+        <div class="hero-overlay"></div>
+        <div class="hero-overlay-bottom"></div>
+
+        <div class="hero-content">
+          <div class="hero-headline">
+            FAITH.<br>
+            CHARACTER.<br>
+            PURPOSE.<br>
+            <span class="gold">IMPACT.</span>
+          </div>
+          <p class="hero-tagline">This is your journey. We're here to walk it with you.</p>
+          <a class="hero-btn" href="/mentorship/onboarding/welcome.html">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Watch Your Welcome Message
+          </a>
+        </div>
+
+        <!-- Scripture / Focus card -->
+        <div class="scripture-card">
+          <div class="scripture-quote-mark">"</div>
+          <p class="scripture-text">I can do all things through Christ who strengthens me.</p>
+          <div class="scripture-ref">Philippians 4:13</div>
+          <div class="scripture-divider"></div>
+          <div class="scripture-focus-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+            Today's Focus
+          </div>
+          <div class="scripture-focus-text">
+            Discipline over motivation.<br>
+            Progress over perfection.<br>
+            Purpose over popularity.
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard -->
+      <div class="dashboard">
+
+        <!-- Row 1 -->
+        <div class="grid-row">
+
+          <!-- Growth Compass -->
+          <div class="card compass-card">
+            <div class="card-label">Your Growth Compass</div>
+            <div class="card-title">Overall Balance</div>
+            <div class="compass-svg-wrap">
+              <svg width="180" height="160" viewBox="0 0 180 160">
+                <defs>
+                  <style>.axis-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; fill: rgba(244,246,249,.5); font-weight: 600; }</style>
+                </defs>
+                <!-- Grid rings -->
+                <polygon points="90,20 140,47 140,113 90,140 40,113 40,47" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <polygon points="90,35 127,55 127,105 90,125 53,105 53,55" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <polygon points="90,50 114,63 114,97 90,110 66,97 66,63" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <polygon points="90,65 101,71 101,89 90,95 79,89 79,71" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <!-- Axis lines -->
+                <line x1="90" y1="20" x2="90" y2="140" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <line x1="40" y1="47" x2="140" y2="113" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <line x1="140" y1="47" x2="40" y2="113" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+                <!-- Target area (dashed) -->
+                <polygon points="90,28 132,52 132,108 90,132 48,108 48,52" fill="none" stroke="rgba(201,168,76,.25)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <!-- Current area -->
+                <polygon id="compassPolygon" points="90,38 124,62 122,102 90,118 60,100 58,60" fill="rgba(201,168,76,.15)" stroke="var(--gold)" stroke-width="2"/>
+                <!-- Axis labels -->
+                <text x="90" y="14" class="axis-label" text-anchor="middle">Spiritual</text>
+                <text x="152" y="48" class="axis-label" text-anchor="start">Intellectual</text>
+                <text x="152" y="116" class="axis-label" text-anchor="start">Physical</text>
+                <text x="90" y="152" class="axis-label" text-anchor="middle">Social</text>
+                <!-- was a duplicate "Social" label in the supplied file — this axis is Emotional -->
+                <text x="28" y="116" class="axis-label" text-anchor="end">Emotional</text>
+                <text x="28" y="48" class="axis-label" text-anchor="end">Character</text>
+              </svg>
+            </div>
+            <div class="compass-legend">
+              <span><span class="legend-dot" style="background:var(--gold)"></span>Current</span>
+              <span><span class="legend-dot" style="background:rgba(201,168,76,.3);border:1px dashed var(--gold)"></span>Target</span>
+            </div>
+          </div>
+
+          <!-- Top Priority -->
+          <div class="card priority-card">
+            <div class="card-label">Top Priority</div>
+            <div class="card-title">90-Day Goal</div>
+            <div class="priority-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <div class="priority-goal" id="priorityGoalTitle">—</div>
+            <div class="priority-desc" id="priorityGoalDesc">Loading…</div>
+            <div class="priority-progress-bar">
+              <div class="priority-progress-fill" id="priorityProgressFill" style="width:0%"></div>
+            </div>
+            <div class="priority-progress-meta">
+              <span id="priorityGoalDate">—</span>
+              <span id="priorityGoalPct">—</span>
+            </div>
+            <a class="priority-link" id="priorityGoalLink" href="/mentorship/dashboard/goals.html">
+              Review Plan
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+
+          <!-- Upcoming Check-in -->
+          <div class="card checkin-card">
+            <div class="card-label">Upcoming Check-In</div>
+            <div class="checkin-type">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Mentor Session
+            </div>
+            <div class="checkin-event">Mentor Session</div>
+            <div class="checkin-date" id="sessionDate">—</div>
+            <div class="checkin-time" id="sessionTime">—</div>
+            <div id="sessionWithLabel" style="font-size:11px;color:var(--text-soft);margin-bottom:10px">with</div>
+            <div class="checkin-mentor" id="sessionMentorRow">
+              <div class="checkin-mentor-avatar" id="sessionMentorAvatar">?</div>
+              <div>
+                <div class="checkin-mentor-name" id="sessionMentorName">No mentor assigned yet</div>
+                <div class="checkin-mentor-role">Senior Mentor</div>
+              </div>
+            </div>
+            <button class="checkin-btn" id="checkinBtn">View Session</button>
+          </div>
+
+          <!-- Right stacked column -->
+          <div class="right-col">
+            <!-- Mentor message -->
+            <div class="mini-card">
+              <div class="mini-card-header">
+                <div class="mini-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div>
+                  <div class="mini-label">Mentor Message <span class="mini-new">2 new</span></div>
+                </div>
+              </div>
+              <div class="mini-message">"Proud of the effort you're putting in. Keep building brick by brick."</div>
+              <div class="mini-author">— Mr. David</div>
+            </div>
+
+            <!-- Recent achievement -->
+            <div class="mini-card">
+              <div class="achievement-header" style="margin-bottom:8px">
+                <div>
+                  <div class="mini-label">Recent Achievement</div>
+                  <div class="achievement-name">Consistency Streak</div>
+                  <div class="achievement-sub">14 days in a row</div>
+                </div>
+                <div class="streak-flame">🔥</div>
+              </div>
+              <div class="achievement-desc">Keep going! Small steps, big future.</div>
+            </div>
+
+            <!-- Daily encouragement -->
+            <div class="mini-card" style="position:relative;overflow:hidden;min-height:100px">
+              <div class="encouragement-content">
+                <div class="encouragement-label">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  Daily Encouragement
+                </div>
+                <div class="encouragement-text">
+                  You are not behind.<br>
+                  You are becoming.<br>
+                  You are showing up.<br>
+                  God is with you.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="grid-row-2">
+
+          <!-- Weekly Check-in -->
+          <div class="card">
+            <div class="card-label">Weekly Check-In</div>
+            <div class="card-title">How are you doing this week?</div>
+            <div class="mood-prompt">Select how you feel right now:</div>
+            <div class="mood-row">
+              <button class="mood-btn" data-mood="struggling" aria-label="Struggling">😢</button>
+              <button class="mood-btn" data-mood="hard" aria-label="Finding it hard">😕</button>
+              <button class="mood-btn" data-mood="ok" aria-label="Okay">😐</button>
+              <button class="mood-btn" data-mood="good" aria-label="Doing great">😊</button>
+              <button class="mood-btn" data-mood="great" aria-label="Excellent">😄</button>
+            </div>
+            <div class="mood-selected-text" id="moodSelectedText" style="visibility:hidden">You selected: <span></span></div>
+            <button class="reflection-btn" id="reflectionBtn">Add Reflection</button>
+          </div>
+
+          <!-- Today's Tasks -->
+          <div class="card">
+            <div class="card-label">Today's Tasks</div>
+            <ul class="tasks-list" id="tasksList">
+              <li class="task-item"><span class="task-text">Loading…</span></li>
+            </ul>
+            <a class="tasks-link" href="/mentorship/dashboard/check-in.html">
+              View All Tasks
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="card">
+            <div class="card-label">Quick Actions</div>
+            <div class="quick-actions-grid">
+              <a class="quick-action" href="/mentorship/resources.html">
+                <div class="quick-action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2.1-2.5 4"/><path d="M12 17h.01"/></svg>
+                </div>
+                <div>
+                  <div class="quick-action-title">Ask for Help</div>
+                  <div class="quick-action-desc">Get support from your mentor or team</div>
+                </div>
+              </a>
+              <a class="quick-action" href="/mentorship/dashboard/prayer-support.html">
+                <div class="quick-action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                </div>
+                <div>
+                  <div class="quick-action-title">Prayer Request</div>
+                  <div class="quick-action-desc">Share your prayer needs</div>
+                </div>
+              </a>
+              <a class="quick-action" href="/mentorship/resources.html">
+                <div class="quick-action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+                </div>
+                <div>
+                  <div class="quick-action-title">Resource Library</div>
+                  <div class="quick-action-desc">Books, videos, guides and more</div>
+                </div>
+              </a>
+              <a class="quick-action" href="/mentorship/journey.html">
+                <div class="quick-action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                </div>
+                <div>
+                  <div class="quick-action-title">Join a Challenge</div>
+                  <div class="quick-action-desc">Step up and grow</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right col continues -->
+          <div class="right-col">
+            <div class="mini-card" style="background:rgba(201,168,76,.06);border-color:var(--gold-border)">
+              <div class="mini-label" style="color:var(--gold)">Community</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:6px">3 peers completed goals this week</div>
+              <div style="font-size:11px;color:var(--text-muted);line-height:1.5">Your pod is moving. Keep up the momentum — your breakthrough inspires theirs.</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /dashboard -->
+
+      <!-- Footer bar -->
+      <div class="footer-bar">
+        <div class="footer-bar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="footer-bar-text">
+          <div class="footer-bar-title">Inspire Mentorship is more than a programme.</div>
+          <div class="footer-bar-sub">It's a movement of young people becoming all God created them to be.</div>
+        </div>
+        <a class="footer-bar-btn" href="/mentorship/journey.html">
+          Explore Your Journey
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+  // ── NAV ACTIVE + MOBILE DRAWER ──────────────────────────────
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      closeDrawer();
+    });
+  });
+
+  // ── NOTIFICATION + PROFILE DROPDOWNS ─────────────────────────
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifDropdown?.classList.toggle('show');
+    profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    profileDropdown?.classList.toggle('show');
+    notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => {
+    notifDropdown?.classList.remove('show');
+    profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try {
+      const db = await getDB();
+      await db.auth.signOut();
+    } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+
+  // ── SEARCH — routes to the resources page until a real search index exists ──
+  document.getElementById('topbarSearch')?.addEventListener('keydown', (e) => {
+    const q = e.target.value.trim();
+    if (e.key === 'Enter' && q) {
+      window.location.href = '/mentorship/resources.html?q=' + encodeURIComponent(q);
+    }
+  });
+</script>
+
+<!-- ── THEME TOGGLE ─────────────────────────────────────────────
+     Own localStorage key ("iv-theme") so this doesn't collide with
+     inspireacademic.org's "ia-theme". Note: this dashboard's CSS is a
+     fixed navy/gold palette with no [data-theme="light"] overrides yet —
+     the toggle flips the attribute and persists the choice, but there's
+     no distinct light visual theme defined for this page yet. Building
+     one wasn't in this phase's scope; do that before this toggle does
+     anything visually beyond the icon swap. -->
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+
+<!-- ── SUPABASE AUTH + LIVE DATA ─────────────────────────────────
+     Reads from the mentorship.* schema (supabase/mentorship_schema.sql).
+     TWO manual steps this depends on, neither of which this script can
+     do on its own:
+       1. Run supabase/mentorship_schema.sql in the Supabase SQL Editor.
+       2. Add "mentorship" to Project Settings -> API -> Exposed Schemas
+          (PostgREST only serves schemas explicitly listed there — same
+          requirement "vision" already needed for vision_schema.sql).
+     Until both are done, every query below fails gracefully into the
+     same empty-state copy a real new user with no data yet would see —
+     it does not error out or leave stale hardcoded content on screen. -->
+<script src="/assets/supabase.js"></script>
+<script>
+  let currentUser = null;
+  let dbClient = null;
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+  function renderPriorityGoal(goals) {
+    const priority = goals.find(g => g.is_priority) || goals[0];
+    if (!priority) {
+      $('priorityGoalTitle').textContent = 'No goal set yet';
+      $('priorityGoalDesc').textContent = 'Add a 90-day goal to start tracking your growth.';
+      $('priorityGoalDate').textContent = 'No target date';
+      $('priorityGoalPct').textContent = '0%';
+      $('priorityProgressFill').style.width = '0%';
+      return;
+    }
+    $('priorityGoalTitle').textContent = priority.title;
+    $('priorityGoalDesc').textContent = priority.description || '';
+    $('priorityGoalDate').textContent = priority.target_date
+      ? 'Target Date: ' + new Date(priority.target_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : 'No target date set';
+    const pct = Math.min(Math.max(priority.progress_pct || 0, 0), 100);
+    $('priorityGoalPct').textContent = pct + '%';
+    $('priorityProgressFill').style.width = pct + '%';
+  }
+
+  function renderGrowthCompass(goals) {
+    // Linear-interpolates each axis point between the chart's centre and its
+    // known 100%-vertex — exact regardless of whether axes are precisely 60° apart.
+    const AXES = [
+      { key: 'spiritual',    outer: [90, 20] },
+      { key: 'intellectual', outer: [140, 47] },
+      { key: 'physical',     outer: [140, 113] },
+      { key: 'social',       outer: [90, 140] },
+      { key: 'emotional',    outer: [40, 113] },
+      { key: 'character',    outer: [40, 47] },
+    ];
+    const center = [90, 80];
+    const byCategory = {};
+    goals.forEach(g => {
+      const cat = (g.category || 'personal').toLowerCase();
+      (byCategory[cat] = byCategory[cat] || []).push(g.progress_pct || 0);
+    });
+    const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+    const points = AXES.map(axis => {
+      const pct = avg(byCategory[axis.key] || []) / 100;
+      const x = center[0] + (axis.outer[0] - center[0]) * pct;
+      const y = center[1] + (axis.outer[1] - center[1]) * pct;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    $('compassPolygon')?.setAttribute('points', points);
+  }
+
+  function renderSession(sessions) {
+    const s = sessions[0];
+    if (!s) {
+      $('sessionDate').textContent = 'No upcoming session';
+      $('sessionTime').textContent = '';
+      $('sessionWithLabel').style.display = 'none';
+      $('sessionMentorRow').style.display = 'none';
+      const btn = $('checkinBtn');
+      btn.textContent = 'Browse Mentors';
+      btn.onclick = () => window.location.href = '/mentorship/mentors.html';
+      return;
+    }
+    const dt = new Date(s.scheduled_at);
+    $('sessionDate').textContent = dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const endDt = new Date(dt.getTime() + (s.duration_minutes || 60) * 60000);
+    const fmtTime = d => d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' });
+    $('sessionTime').textContent = fmtTime(dt) + ' – ' + fmtTime(endDt);
+    const mentorName = s.mentor_name || 'Your Mentor';
+    $('sessionMentorName').textContent = mentorName;
+    $('sessionMentorAvatar').textContent = mentorName[0]?.toUpperCase() || '?';
+    const btn = $('checkinBtn');
+    btn.textContent = 'View Session';
+    btn.onclick = () => window.location.href = '/mentorship/dashboard/mentor.html';
+  }
+
+  function renderTasks(tasks) {
+    const list = $('tasksList');
+    if (!tasks.length) {
+      list.innerHTML = '<li class="task-item"><span class="task-text">No tasks yet — add one from Check-Ins.</span></li>';
+      return;
+    }
+    list.innerHTML = tasks.map(t => `
+      <li class="task-item" data-id="${t.id}">
+        <div class="task-check ${t.is_done ? 'done' : ''}">${t.is_done ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+        <span class="task-text ${t.is_done ? 'done' : ''}">${escapeHtml(t.title)}</span>
+      </li>`).join('');
+    list.querySelectorAll('.task-item[data-id]').forEach(item => {
+      item.addEventListener('click', async () => {
+        const id = item.dataset.id;
+        const check = item.querySelector('.task-check');
+        const text = item.querySelector('.task-text');
+        const nowDone = !check.classList.contains('done');
+        check.classList.toggle('done', nowDone);
+        text.classList.toggle('done', nowDone);
+        check.innerHTML = nowDone ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        if (!dbClient || !currentUser) return;
+        const { error } = await dbClient.schema('mentorship').from('tasks')
+          .update({ is_done: nowDone }).eq('id', id).eq('student_id', currentUser.id);
+        if (error) console.warn('Task update failed:', error);
+      });
+    });
+  }
+
+  const MOOD_TEXT = {
+    struggling: 'Finding it tough right now 💙',
+    hard:       "It's been challenging 🌧️",
+    ok:         'Getting through it 🌤️',
+    good:       'Doing Great! 🎉',
+    great:      'Feeling Excellent! 🌟',
+  };
+  let selectedMood = null;
+  function selectMood(mood, { persist } = { persist: false }) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('selected', b.dataset.mood === mood));
+    selectedMood = mood;
+    const el = $('moodSelectedText');
+    if (el) {
+      el.style.visibility = 'visible';
+      el.querySelector('span').textContent = MOOD_TEXT[mood] || '';
+    }
+  }
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectMood(btn.dataset.mood));
+  });
+  $('reflectionBtn')?.addEventListener('click', async () => {
+    if (!selectedMood) { alert("Pick how you're feeling first."); return; }
+    if (!currentUser || !dbClient) { alert('Sign in to save your check-in.'); return; }
+    const btn = $('reflectionBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    const { error } = await dbClient.schema('mentorship').from('check_ins')
+      .insert({ student_id: currentUser.id, mood: selectedMood });
+    btn.disabled = false;
+    btn.textContent = error ? 'Try again' : 'Saved ✓';
+    if (error) console.warn('Check-in save failed:', error);
+    else setTimeout(() => { btn.textContent = 'Add Reflection'; }, 2000);
+  });
+
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      if (!user) {
+        $('topbarGreeting').textContent = 'Welcome 👋';
+        return;
+      }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name)
+        || firstWord(user.user_metadata?.name)
+        || 'Friend'; // never the email — matches inspireacademic.org's display-name rule
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) {
+        avatarEl.style.backgroundImage = `url('${avatarUrl}')`;
+        avatarEl.style.backgroundSize = 'cover';
+        avatarEl.textContent = '';
+      } else {
+        avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+      }
+    } catch (e) {
+      console.warn('Mentorship dashboard auth init failed:', e);
+      $('topbarGreeting').textContent = 'Welcome 👋';
+      return;
+    }
+
+    // Data cards — isolated try/catch so a missing/unexposed mentorship
+    // schema degrades to empty states instead of breaking auth above.
+    try {
+      const [{ data: goals, error: goalsErr }, { data: sessions, error: sessErr },
+             { data: tasks, error: taskErr }, { data: checkIns, error: ciErr }] = await Promise.all([
+        dbClient.schema('mentorship').from('goals').select('*').eq('student_id', currentUser.id).eq('status', 'active').order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('sessions').select('*').eq('student_id', currentUser.id).eq('status', 'scheduled').gte('scheduled_at', new Date().toISOString()).order('scheduled_at', { ascending: true }).limit(1),
+        dbClient.schema('mentorship').from('tasks').select('*').eq('student_id', currentUser.id).order('order_index', { ascending: true }),
+        dbClient.schema('mentorship').from('check_ins').select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false }).limit(1),
+      ]);
+      if (goalsErr || sessErr || taskErr || ciErr) {
+        console.warn('mentorship schema not reachable yet (needs the SQL run + schema exposed in Supabase settings):',
+          goalsErr || sessErr || taskErr || ciErr);
+      }
+      renderPriorityGoal(goals || []);
+      renderGrowthCompass(goals || []);
+      renderSession(sessions || []);
+      renderTasks(tasks || []);
+      if (checkIns && checkIns[0]) selectMood(checkIns[0].mood);
+    } catch (e) {
+      console.warn('Mentorship data fetch failed:', e);
+      renderPriorityGoal([]);
+      renderGrowthCompass([]);
+      renderSession([]);
+      renderTasks([]);
+    }
+  })();
+</script>
+</body>
+</html>

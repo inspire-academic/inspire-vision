@@ -1,0 +1,21 @@
+/* Mentorship & Formation — Cardinal Module CSS
+   Extends: /assets/css/tokens.css
+   Do not redefine global tokens here.
+   Phase 4 will extract dashboard inline CSS here. */
+
+/* ── RESOLVED 2026-07-09 ───────────────────────────────────────────
+   The dashboard originally shipped with its own navy/gold palette
+   (matching Academic's site-wide brand) instead of this cardinal's
+   canonical colour in tokens.css (--clr-mentorship, terracotta/ochre).
+   Eric's call: use tokens.css's original scheme, not the dashboard's.
+
+   These aliases exist for any Mentorship page that wants a
+   module-level name instead of reaching for --clr-mentorship directly.
+   The dashboard itself (mentorship/dashboard/index.html) now extends
+   the canonical tokens straight in its own :root block.
+   ──────────────────────────────────────────────────────────────── */
+:root {
+  --mentorship-gold:    var(--clr-mentorship, #B85C1A);
+  --mentorship-navy:    var(--clr-navy, #0A1628);
+  --mentorship-accent:  var(--clr-mentorship-mid, #D97706);
+}
