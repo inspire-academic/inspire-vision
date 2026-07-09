@@ -1,0 +1,26 @@
+/* Mentorship & Formation — Cardinal Module CSS
+   Extends: /assets/css/tokens.css
+   Do not redefine global tokens here.
+   Phase 4 will extract dashboard inline CSS here. */
+
+/* ── FLAG: colour conflict, not resolved here ─────────────────────
+   tokens.css already assigns this cardinal a colour: --clr-mentorship
+   (#B85C1A, terracotta/ochre) — see tokens.css's own header comment:
+   "RULE: No other stylesheet defines these values."
+
+   The values below are NOT that colour. They're lifted directly from
+   mentorship-dashboard.html's own internal <style> block (navy/gold,
+   matching Academic's site-wide brand rather than Vision's per-cardinal
+   palette), because that's what's actually rendered on the dashboard
+   right now. Overriding them to the canonical terracotta here would
+   make this file lie about what the page looks like.
+
+   This is a real design-system question for a human to resolve — not
+   guessed at or silently picked here. Until then, both palettes exist
+   in the codebase for this cardinal.
+   ──────────────────────────────────────────────────────────────── */
+:root {
+  --mentorship-gold:    #c9a84c;
+  --mentorship-navy:    #0d1b2a;
+  --mentorship-accent:  #e8c96a;
+}
