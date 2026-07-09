@@ -337,6 +337,11 @@ body.auth-body {
       z-index: 100;
       overflow-y: auto;
       transition: transform var(--transition);
+      /* Explicit redeclaration so descendants with no color of their
+         own (not just var(--text) references) resolve inside this
+         re-pinned scope — see .hero-content's comment for why this
+         is needed. */
+      color: var(--text);
     }
     .sidebar-backdrop {
       display: none;
@@ -488,6 +493,7 @@ body.auth-body {
       position: sticky;
       top: 0;
       z-index: 50;
+      color: var(--text);
     }
     .topbar-menu {
       width: 36px; height: 36px;
@@ -646,6 +652,12 @@ body.auth-body {
       z-index: 2;
       padding: 0 32px 32px;
       flex: 1;
+      /* Re-pinning --text on .hero (above) only affects var(--text)
+         references resolved inside it — it doesn't change a color
+         already inherited from body outside that scope. Elements with
+         no color of their own (.hero-headline) need this explicit
+         redeclaration so the re-pinned value actually applies. */
+      color: var(--text);
     }
     .hero-headline {
       font-family: var(--font-display);
@@ -689,6 +701,9 @@ body.auth-body {
       border: 1px solid var(--border-md);
       border-radius: var(--radius);
       padding: 16px;
+      /* Same explicit-redeclaration fix as .hero-content — see comment
+         there. .scripture-text has no color of its own. */
+      color: var(--text);
     }
     .scripture-quote-mark {
       font-family: var(--font-display);
