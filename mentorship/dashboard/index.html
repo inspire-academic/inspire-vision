@@ -83,6 +83,13 @@
       flex-direction: column;
       z-index: 100;
       overflow-y: auto;
+      transition: transform var(--transition);
+    }
+    .sidebar-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 99;
     }
 
     /* Brand */
@@ -318,6 +325,31 @@
       box-shadow: 0 0 0 3px rgba(201,168,76,.2);
     }
     .topbar-avatar img { width: 100%; height: 100%; object-fit: cover }
+    .topbar-dropdown-wrap { position: relative }
+    .topbar-dropdown {
+      display: none;
+      position: absolute; top: calc(100% + 10px); right: 0;
+      min-width: 220px;
+      background: var(--navy-light);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 32px rgba(0,0,0,.35);
+      padding: 8px;
+      z-index: 150;
+    }
+    .topbar-dropdown.show { display: block }
+    .topbar-dropdown-title {
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--text-soft); padding: 8px 10px 6px;
+    }
+    .topbar-dropdown-empty { font-size: 12px; color: var(--text-muted); padding: 6px 10px 10px }
+    .topbar-dropdown-item {
+      display: block; width: 100%; text-align: left;
+      padding: 9px 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 700; color: var(--text);
+      transition: background var(--transition);
+    }
+    .topbar-dropdown-item:hover { background: var(--card-bg2) }
 
     /* ── CONTENT ─────────────────────────────────────────────── */
     .content { flex: 1; padding: 0 0 32px }
@@ -892,7 +924,11 @@
          column 2 sized to content, which is what was pushing the whole page wider
          than the viewport (visible as horizontal scroll at phone widths). */
       .main { grid-column: 1 }
-      .sidebar { display: none }
+      /* Sidebar becomes a slide-in drawer instead of vanishing entirely —
+         the hamburger button now actually opens something. */
+      .sidebar { transform: translateX(-100%) }
+      .sidebar.mobile-open { transform: translateX(0) }
+      .sidebar-backdrop.show { display: block }
       .grid-row, .grid-row-2 { grid-template-columns: 1fr 1fr }
       .right-col { grid-column: 1 / -1 }
       .scripture-card { display: none }
@@ -916,7 +952,8 @@
 <div class="app">
 
   <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
-  <aside class="sidebar">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
     <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
       <div class="brand-shield">
         <!-- Shield / cross icon -->
@@ -1004,7 +1041,7 @@
 
     <!-- Top bar -->
     <header class="topbar">
-      <button class="topbar-menu" aria-label="Menu">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       </button>
       <div class="topbar-welcome">
@@ -1013,29 +1050,38 @@
       </div>
       <div class="topbar-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Search anything…" aria-label="Search">
+        <input type="text" id="topbarSearch" placeholder="Search anything…" aria-label="Search">
       </div>
-      <button class="topbar-bell" aria-label="Notifications">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="notif-badge"></span>
-      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
       <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <div class="topbar-avatar" id="topbarAvatar">·</div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
     </header>
 
     <div class="content">
 
       <!-- Hero -->
       <section class="hero">
-        <!-- Gradient fallback stays behind the img — no real photo exists at the hero path yet,
-             so this keeps the hero from going blank until one is added. -->
+        <!-- Gradient fallback stays behind the img in case it's ever swapped for a missing file -->
         <div class="hero-img-placeholder"></div>
-        <!-- PLACEHOLDER: replace with real photography
-             Recommended: warm golden-hour tone, young person looking toward horizon, 1600x900px WebP -->
-        <img src="/assets/images/mentorship/hero/hero-bg.jpg"
+        <img src="/assets/images/mentorship/hero/hero-bg.webp"
              alt="" class="hero-img"
              loading="eager"
              fetchpriority="high"
@@ -1053,10 +1099,10 @@
             <span class="gold">IMPACT.</span>
           </div>
           <p class="hero-tagline">This is your journey. We're here to walk it with you.</p>
-          <button class="hero-btn">
+          <a class="hero-btn" href="/mentorship/onboarding/welcome.html">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             Watch Your Welcome Message
-          </button>
+          </a>
         </div>
 
         <!-- Scripture / Focus card -->
@@ -1104,13 +1150,14 @@
                 <!-- Target area (dashed) -->
                 <polygon points="90,28 132,52 132,108 90,132 48,108 48,52" fill="none" stroke="rgba(201,168,76,.25)" stroke-width="1.5" stroke-dasharray="4 3"/>
                 <!-- Current area -->
-                <polygon points="90,38 124,62 122,102 90,118 60,100 58,60" fill="rgba(201,168,76,.15)" stroke="var(--gold)" stroke-width="2"/>
+                <polygon id="compassPolygon" points="90,38 124,62 122,102 90,118 60,100 58,60" fill="rgba(201,168,76,.15)" stroke="var(--gold)" stroke-width="2"/>
                 <!-- Axis labels -->
                 <text x="90" y="14" class="axis-label" text-anchor="middle">Spiritual</text>
                 <text x="152" y="48" class="axis-label" text-anchor="start">Intellectual</text>
                 <text x="152" y="116" class="axis-label" text-anchor="start">Physical</text>
                 <text x="90" y="152" class="axis-label" text-anchor="middle">Social</text>
-                <text x="28" y="116" class="axis-label" text-anchor="end">Social</text>
+                <!-- was a duplicate "Social" label in the supplied file — this axis is Emotional -->
+                <text x="28" y="116" class="axis-label" text-anchor="end">Emotional</text>
                 <text x="28" y="48" class="axis-label" text-anchor="end">Character</text>
               </svg>
             </div>
@@ -1127,16 +1174,16 @@
             <div class="priority-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             </div>
-            <div class="priority-goal">Excel in Mathematics</div>
-            <div class="priority-desc">Improve problem solving and prepare for advanced topics.</div>
+            <div class="priority-goal" id="priorityGoalTitle">—</div>
+            <div class="priority-desc" id="priorityGoalDesc">Loading…</div>
             <div class="priority-progress-bar">
-              <div class="priority-progress-fill"></div>
+              <div class="priority-progress-fill" id="priorityProgressFill" style="width:0%"></div>
             </div>
             <div class="priority-progress-meta">
-              <span>Target Date: 30 Aug 2025</span>
-              <span>72%</span>
+              <span id="priorityGoalDate">—</span>
+              <span id="priorityGoalPct">—</span>
             </div>
-            <a class="priority-link" href="/mentorship/dashboard/goals.html">
+            <a class="priority-link" id="priorityGoalLink" href="/mentorship/dashboard/goals.html">
               Review Plan
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
@@ -1150,17 +1197,17 @@
               Mentor Session
             </div>
             <div class="checkin-event">Mentor Session</div>
-            <div class="checkin-date">Saturday, 17 May 2025</div>
-            <div class="checkin-time">10:00 AM – 11:00 AM</div>
-            <div style="font-size:11px;color:var(--text-soft);margin-bottom:10px">with</div>
-            <div class="checkin-mentor">
-              <div class="checkin-mentor-avatar">D</div>
+            <div class="checkin-date" id="sessionDate">—</div>
+            <div class="checkin-time" id="sessionTime">—</div>
+            <div id="sessionWithLabel" style="font-size:11px;color:var(--text-soft);margin-bottom:10px">with</div>
+            <div class="checkin-mentor" id="sessionMentorRow">
+              <div class="checkin-mentor-avatar" id="sessionMentorAvatar">?</div>
               <div>
-                <div class="checkin-mentor-name">Mr. David Johnson</div>
+                <div class="checkin-mentor-name" id="sessionMentorName">No mentor assigned yet</div>
                 <div class="checkin-mentor-role">Senior Mentor</div>
               </div>
             </div>
-            <button class="checkin-btn">View Session</button>
+            <button class="checkin-btn" id="checkinBtn">View Session</button>
           </div>
 
           <!-- Right stacked column -->
@@ -1222,37 +1269,18 @@
               <button class="mood-btn" data-mood="struggling" aria-label="Struggling">😢</button>
               <button class="mood-btn" data-mood="hard" aria-label="Finding it hard">😕</button>
               <button class="mood-btn" data-mood="ok" aria-label="Okay">😐</button>
-              <button class="mood-btn selected" data-mood="good" aria-label="Doing great">😊</button>
+              <button class="mood-btn" data-mood="good" aria-label="Doing great">😊</button>
               <button class="mood-btn" data-mood="great" aria-label="Excellent">😄</button>
             </div>
-            <div class="mood-selected-text">You selected: <span>Doing Great! 🎉</span></div>
-            <button class="reflection-btn">Add Reflection</button>
+            <div class="mood-selected-text" id="moodSelectedText" style="visibility:hidden">You selected: <span></span></div>
+            <button class="reflection-btn" id="reflectionBtn">Add Reflection</button>
           </div>
 
           <!-- Today's Tasks -->
           <div class="card">
             <div class="card-label">Today's Tasks</div>
-            <ul class="tasks-list">
-              <li class="task-item">
-                <div class="task-check"></div>
-                <span class="task-text">Complete Math practice set</span>
-              </li>
-              <li class="task-item">
-                <div class="task-check done">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <span class="task-text done">Read for 20 minutes</span>
-              </li>
-              <li class="task-item">
-                <div class="task-check done">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <span class="task-text done">Work on personal project</span>
-              </li>
-              <li class="task-item">
-                <div class="task-check"></div>
-                <span class="task-text">Evening prayer & reflection</span>
-              </li>
+            <ul class="tasks-list" id="tasksList">
+              <li class="task-item"><span class="task-text">Loading…</span></li>
             </ul>
             <a class="tasks-link" href="/mentorship/dashboard/check-in.html">
               View All Tasks
@@ -1264,7 +1292,7 @@
           <div class="card">
             <div class="card-label">Quick Actions</div>
             <div class="quick-actions-grid">
-              <div class="quick-action">
+              <a class="quick-action" href="/mentorship/resources.html">
                 <div class="quick-action-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2.1-2.5 4"/><path d="M12 17h.01"/></svg>
                 </div>
@@ -1272,8 +1300,8 @@
                   <div class="quick-action-title">Ask for Help</div>
                   <div class="quick-action-desc">Get support from your mentor or team</div>
                 </div>
-              </div>
-              <div class="quick-action">
+              </a>
+              <a class="quick-action" href="/mentorship/dashboard/prayer-support.html">
                 <div class="quick-action-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
                 </div>
@@ -1281,8 +1309,8 @@
                   <div class="quick-action-title">Prayer Request</div>
                   <div class="quick-action-desc">Share your prayer needs</div>
                 </div>
-              </div>
-              <div class="quick-action">
+              </a>
+              <a class="quick-action" href="/mentorship/resources.html">
                 <div class="quick-action-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
                 </div>
@@ -1290,8 +1318,8 @@
                   <div class="quick-action-title">Resource Library</div>
                   <div class="quick-action-desc">Books, videos, guides and more</div>
                 </div>
-              </div>
-              <div class="quick-action">
+              </a>
+              <a class="quick-action" href="/mentorship/journey.html">
                 <div class="quick-action-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
                 </div>
@@ -1299,7 +1327,7 @@
                   <div class="quick-action-title">Join a Challenge</div>
                   <div class="quick-action-desc">Step up and grow</div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -1324,10 +1352,10 @@
           <div class="footer-bar-title">Inspire Mentorship is more than a programme.</div>
           <div class="footer-bar-sub">It's a movement of young people becoming all God created them to be.</div>
         </div>
-        <button class="footer-bar-btn">
+        <a class="footer-bar-btn" href="/mentorship/journey.html">
           Explore Your Journey
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </button>
+        </a>
       </div>
 
     </div><!-- /content -->
@@ -1335,45 +1363,54 @@
 </div>
 
 <script>
-  // ── MOOD SELECTOR ─────────────────────────────────────────
-  const moods = {
-    struggling: 'Finding it tough right now 💙',
-    hard:       'It\'s been challenging 🌧️',
-    ok:         'Getting through it 🌤️',
-    good:       'Doing Great! 🎉',
-    great:      'Feeling Excellent! 🌟'
-  };
-  const moodDisplay = document.querySelector('.mood-selected-text span');
-  document.querySelectorAll('.mood-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      if (moodDisplay) moodDisplay.textContent = moods[btn.dataset.mood] || '';
-    });
+  // ── NAV ACTIVE + MOBILE DRAWER ──────────────────────────────
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
   });
-
-  // ── TASK TOGGLES ─────────────────────────────────────────
-  document.querySelectorAll('.task-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const check = item.querySelector('.task-check');
-      const text  = item.querySelector('.task-text');
-      const done  = check.classList.toggle('done');
-      if (done) {
-        check.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>`;
-        text.classList.add('done');
-      } else {
-        check.innerHTML = '';
-        text.classList.remove('done');
-      }
-    });
-  });
-
-  // ── NAV ACTIVE ────────────────────────────────────────────
+  backdropEl?.addEventListener('click', closeDrawer);
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
+      closeDrawer();
     });
+  });
+
+  // ── NOTIFICATION + PROFILE DROPDOWNS ─────────────────────────
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifDropdown?.classList.toggle('show');
+    profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    profileDropdown?.classList.toggle('show');
+    notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => {
+    notifDropdown?.classList.remove('show');
+    profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try {
+      const db = await getDB();
+      await db.auth.signOut();
+    } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+
+  // ── SEARCH — routes to the resources page until a real search index exists ──
+  document.getElementById('topbarSearch')?.addEventListener('keydown', (e) => {
+    const q = e.target.value.trim();
+    if (e.key === 'Enter' && q) {
+      window.location.href = '/mentorship/resources.html?q=' + encodeURIComponent(q);
+    }
   });
 </script>
 
@@ -1399,46 +1436,215 @@
   })();
 </script>
 
-<!-- ── SUPABASE AUTH — name + avatar only ───────────────────────
-     Everything else on this dashboard (goals, sessions, tasks, mentor
-     info, check-ins) stays hardcoded until the mentorship schema exists.
-     assets/supabase.js (repo root) already provides window.getDB(). -->
+<!-- ── SUPABASE AUTH + LIVE DATA ─────────────────────────────────
+     Reads from the mentorship.* schema (supabase/mentorship_schema.sql).
+     TWO manual steps this depends on, neither of which this script can
+     do on its own:
+       1. Run supabase/mentorship_schema.sql in the Supabase SQL Editor.
+       2. Add "mentorship" to Project Settings -> API -> Exposed Schemas
+          (PostgREST only serves schemas explicitly listed there — same
+          requirement "vision" already needed for vision_schema.sql).
+     Until both are done, every query below fails gracefully into the
+     same empty-state copy a real new user with no data yet would see —
+     it does not error out or leave stale hardcoded content on screen. -->
 <script src="/assets/supabase.js"></script>
 <script>
+  let currentUser = null;
+  let dbClient = null;
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+  function renderPriorityGoal(goals) {
+    const priority = goals.find(g => g.is_priority) || goals[0];
+    if (!priority) {
+      $('priorityGoalTitle').textContent = 'No goal set yet';
+      $('priorityGoalDesc').textContent = 'Add a 90-day goal to start tracking your growth.';
+      $('priorityGoalDate').textContent = 'No target date';
+      $('priorityGoalPct').textContent = '0%';
+      $('priorityProgressFill').style.width = '0%';
+      return;
+    }
+    $('priorityGoalTitle').textContent = priority.title;
+    $('priorityGoalDesc').textContent = priority.description || '';
+    $('priorityGoalDate').textContent = priority.target_date
+      ? 'Target Date: ' + new Date(priority.target_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : 'No target date set';
+    const pct = Math.min(Math.max(priority.progress_pct || 0, 0), 100);
+    $('priorityGoalPct').textContent = pct + '%';
+    $('priorityProgressFill').style.width = pct + '%';
+  }
+
+  function renderGrowthCompass(goals) {
+    // Linear-interpolates each axis point between the chart's centre and its
+    // known 100%-vertex — exact regardless of whether axes are precisely 60° apart.
+    const AXES = [
+      { key: 'spiritual',    outer: [90, 20] },
+      { key: 'intellectual', outer: [140, 47] },
+      { key: 'physical',     outer: [140, 113] },
+      { key: 'social',       outer: [90, 140] },
+      { key: 'emotional',    outer: [40, 113] },
+      { key: 'character',    outer: [40, 47] },
+    ];
+    const center = [90, 80];
+    const byCategory = {};
+    goals.forEach(g => {
+      const cat = (g.category || 'personal').toLowerCase();
+      (byCategory[cat] = byCategory[cat] || []).push(g.progress_pct || 0);
+    });
+    const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+    const points = AXES.map(axis => {
+      const pct = avg(byCategory[axis.key] || []) / 100;
+      const x = center[0] + (axis.outer[0] - center[0]) * pct;
+      const y = center[1] + (axis.outer[1] - center[1]) * pct;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    $('compassPolygon')?.setAttribute('points', points);
+  }
+
+  function renderSession(sessions) {
+    const s = sessions[0];
+    if (!s) {
+      $('sessionDate').textContent = 'No upcoming session';
+      $('sessionTime').textContent = '';
+      $('sessionWithLabel').style.display = 'none';
+      $('sessionMentorRow').style.display = 'none';
+      const btn = $('checkinBtn');
+      btn.textContent = 'Browse Mentors';
+      btn.onclick = () => window.location.href = '/mentorship/mentors.html';
+      return;
+    }
+    const dt = new Date(s.scheduled_at);
+    $('sessionDate').textContent = dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const endDt = new Date(dt.getTime() + (s.duration_minutes || 60) * 60000);
+    const fmtTime = d => d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' });
+    $('sessionTime').textContent = fmtTime(dt) + ' – ' + fmtTime(endDt);
+    const mentorName = s.mentor_name || 'Your Mentor';
+    $('sessionMentorName').textContent = mentorName;
+    $('sessionMentorAvatar').textContent = mentorName[0]?.toUpperCase() || '?';
+    const btn = $('checkinBtn');
+    btn.textContent = 'View Session';
+    btn.onclick = () => window.location.href = '/mentorship/dashboard/mentor.html';
+  }
+
+  function renderTasks(tasks) {
+    const list = $('tasksList');
+    if (!tasks.length) {
+      list.innerHTML = '<li class="task-item"><span class="task-text">No tasks yet — add one from Check-Ins.</span></li>';
+      return;
+    }
+    list.innerHTML = tasks.map(t => `
+      <li class="task-item" data-id="${t.id}">
+        <div class="task-check ${t.is_done ? 'done' : ''}">${t.is_done ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+        <span class="task-text ${t.is_done ? 'done' : ''}">${escapeHtml(t.title)}</span>
+      </li>`).join('');
+    list.querySelectorAll('.task-item[data-id]').forEach(item => {
+      item.addEventListener('click', async () => {
+        const id = item.dataset.id;
+        const check = item.querySelector('.task-check');
+        const text = item.querySelector('.task-text');
+        const nowDone = !check.classList.contains('done');
+        check.classList.toggle('done', nowDone);
+        text.classList.toggle('done', nowDone);
+        check.innerHTML = nowDone ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        if (!dbClient || !currentUser) return;
+        const { error } = await dbClient.schema('mentorship').from('tasks')
+          .update({ is_done: nowDone }).eq('id', id).eq('student_id', currentUser.id);
+        if (error) console.warn('Task update failed:', error);
+      });
+    });
+  }
+
+  const MOOD_TEXT = {
+    struggling: 'Finding it tough right now 💙',
+    hard:       "It's been challenging 🌧️",
+    ok:         'Getting through it 🌤️',
+    good:       'Doing Great! 🎉',
+    great:      'Feeling Excellent! 🌟',
+  };
+  let selectedMood = null;
+  function selectMood(mood, { persist } = { persist: false }) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('selected', b.dataset.mood === mood));
+    selectedMood = mood;
+    const el = $('moodSelectedText');
+    if (el) {
+      el.style.visibility = 'visible';
+      el.querySelector('span').textContent = MOOD_TEXT[mood] || '';
+    }
+  }
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectMood(btn.dataset.mood));
+  });
+  $('reflectionBtn')?.addEventListener('click', async () => {
+    if (!selectedMood) { alert("Pick how you're feeling first."); return; }
+    if (!currentUser || !dbClient) { alert('Sign in to save your check-in.'); return; }
+    const btn = $('reflectionBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    const { error } = await dbClient.schema('mentorship').from('check_ins')
+      .insert({ student_id: currentUser.id, mood: selectedMood });
+    btn.disabled = false;
+    btn.textContent = error ? 'Try again' : 'Saved ✓';
+    if (error) console.warn('Check-in save failed:', error);
+    else setTimeout(() => { btn.textContent = 'Add Reflection'; }, 2000);
+  });
+
   (async () => {
-    const greetingEl = document.getElementById('topbarGreeting');
-    const avatarEl = document.getElementById('topbarAvatar');
     try {
-      const db = await getDB();
-      const { data: { user } } = await db.auth.getUser();
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
       if (!user) {
-        if (greetingEl) greetingEl.textContent = 'Welcome 👋';
+        $('topbarGreeting').textContent = 'Welcome 👋';
         return;
       }
+      currentUser = user;
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
       const firstName = firstWord(user.user_metadata?.full_name)
         || firstWord(user.user_metadata?.name)
         || 'Friend'; // never the email — matches inspireacademic.org's display-name rule
-      if (greetingEl) greetingEl.textContent = `Welcome back, ${firstName} 👋`;
-      if (avatarEl) {
-        const avatarUrl = user.user_metadata?.avatar_url;
-        if (avatarUrl) {
-          avatarEl.style.backgroundImage = `url('${avatarUrl}')`;
-          avatarEl.style.backgroundSize = 'cover';
-          avatarEl.textContent = '';
-        } else {
-          avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
-        }
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) {
+        avatarEl.style.backgroundImage = `url('${avatarUrl}')`;
+        avatarEl.style.backgroundSize = 'cover';
+        avatarEl.textContent = '';
+      } else {
+        avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
       }
     } catch (e) {
       console.warn('Mentorship dashboard auth init failed:', e);
-      if (greetingEl) greetingEl.textContent = 'Welcome 👋';
+      $('topbarGreeting').textContent = 'Welcome 👋';
+      return;
+    }
+
+    // Data cards — isolated try/catch so a missing/unexposed mentorship
+    // schema degrades to empty states instead of breaking auth above.
+    try {
+      const [{ data: goals, error: goalsErr }, { data: sessions, error: sessErr },
+             { data: tasks, error: taskErr }, { data: checkIns, error: ciErr }] = await Promise.all([
+        dbClient.schema('mentorship').from('goals').select('*').eq('student_id', currentUser.id).eq('status', 'active').order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('sessions').select('*').eq('student_id', currentUser.id).eq('status', 'scheduled').gte('scheduled_at', new Date().toISOString()).order('scheduled_at', { ascending: true }).limit(1),
+        dbClient.schema('mentorship').from('tasks').select('*').eq('student_id', currentUser.id).order('order_index', { ascending: true }),
+        dbClient.schema('mentorship').from('check_ins').select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false }).limit(1),
+      ]);
+      if (goalsErr || sessErr || taskErr || ciErr) {
+        console.warn('mentorship schema not reachable yet (needs the SQL run + schema exposed in Supabase settings):',
+          goalsErr || sessErr || taskErr || ciErr);
+      }
+      renderPriorityGoal(goals || []);
+      renderGrowthCompass(goals || []);
+      renderSession(sessions || []);
+      renderTasks(tasks || []);
+      if (checkIns && checkIns[0]) selectMood(checkIns[0].mood);
+    } catch (e) {
+      console.warn('Mentorship data fetch failed:', e);
+      renderPriorityGoal([]);
+      renderGrowthCompass([]);
+      renderSession([]);
+      renderTasks([]);
     }
   })();
-
-  // TODO Phase 4: pull from mentorship.goals table (Priority Goal card, Growth Compass)
-  // TODO Phase 4: pull from mentorship.sessions table (Upcoming Check-In card, My Mentor)
-  // TODO Phase 4: pull from mentorship.tasks table (Today's Tasks card)
 </script>
 </body>
 </html>
