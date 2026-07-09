@@ -4,19 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Manage Mentors</title>
+  <meta name="description" content="Review and approve mentor applications.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .admin-wrap { max-width: 720px; margin: 0 auto }
+    .admin-app-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+    }
+    .admin-app-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px }
+    .admin-app-name { font-weight: 700; font-size: 15px }
+    .admin-app-email { font-size: 12px; opacity: .6 }
+    .admin-app-motivation { font-size: 13px; opacity: .8; line-height: 1.5; margin-bottom: 14px; white-space: pre-wrap }
+    .admin-app-actions { display: flex; gap: 10px }
+    .admin-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700 }
+    .admin-btn-approve { background: var(--mentorship-gold); color: #fff }
+    .admin-btn-approve:hover { opacity: .9 }
+    .admin-btn-reject { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(244,246,249,.8) }
+    .admin-btn-reject:hover { border-color: rgba(239,68,68,.5); color: #fca5a5 }
+    .admin-btn:disabled { opacity: .5 }
+  </style>
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Manage Mentors</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Admin</div>
+        <h1 class="page-title">Manage Mentors</h1>
+      </div>
+    </div>
+    <div id="content">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
+    </div>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    function renderPending(pending) {
+      const content = $('content');
+      if (!pending.length) {
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎉</div>No pending mentor applications right now.</div>';
+        return;
+      }
+      content.innerHTML = pending.map(m => {
+        const date = new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        return `
+          <div class="admin-app-card" data-id="${m.id}">
+            <div class="admin-app-top">
+              <div>
+                <div class="admin-app-name">${escapeHtml(m.full_name || 'No name given')}</div>
+                <div class="admin-app-email">${escapeHtml(m.email)} · applied ${date}</div>
+              </div>
+            </div>
+            ${m.motivation ? `<div class="admin-app-motivation">${escapeHtml(m.motivation)}</div>` : ''}
+            <div class="admin-app-actions">
+              <button class="admin-btn admin-btn-approve" data-action="approve">Approve</button>
+              <button class="admin-btn admin-btn-reject" data-action="reject">Reject</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function callAdminFn(token, body) {
+      const res = await fetch('/.netlify/functions/admin-mentors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      return { status: res.status, data };
+    }
+
+    (async () => {
+      const content = $('content');
+      try {
+        const db = await getDB();
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) { window.location.href = '/mentorship/login.html'; return; }
+
+        const { status, data } = await callAdminFn(session.access_token, { action: 'list' });
+        if (status === 401) { window.location.href = '/mentorship/login.html'; return; }
+        if (status === 403) {
+          content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>You\'re not authorized to view this page.</div>';
+          return;
+        }
+        if (status !== 200) {
+          content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div>${escapeHtml(data.error || 'Something went wrong loading applications.')}</div>`;
+          return;
+        }
+        renderPending(data.pending || []);
+
+        content.addEventListener('click', async (e) => {
+          const btn = e.target.closest('button[data-action]');
+          if (!btn) return;
+          const card = btn.closest('.admin-app-card');
+          const userId = card.dataset.id;
+          const action = btn.dataset.action;
+          card.querySelectorAll('button').forEach(b => b.disabled = true);
+          btn.textContent = action === 'approve' ? 'Approving…' : 'Rejecting…';
+          const { status: s2, data: d2 } = await callAdminFn(session.access_token, { action, userId });
+          if (s2 !== 200) {
+            alert(d2.error || 'Could not update this application — please try again.');
+            card.querySelectorAll('button').forEach(b => b.disabled = false);
+            btn.textContent = action === 'approve' ? 'Approve' : 'Reject';
+            return;
+          }
+          card.remove();
+          if (!content.querySelector('.admin-app-card')) {
+            content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎉</div>No pending mentor applications right now.</div>';
+          }
+        });
+      } catch (e) {
+        console.warn('Admin mentors page failed:', e);
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div>Something went wrong — please try again.</div>';
+      }
+    })();
+  </script>
 </body>
 </html>

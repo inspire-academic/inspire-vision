@@ -4,19 +4,97 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Your Strengths</title>
+  <meta name="description" content="Pick the strengths that best describe you.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Your Strengths</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="auth-body">
+  <div class="auth-card onboard-card">
+    <div class="onboard-steps">
+      <span class="done"></span><span class="done"></span><span class="active"></span><span></span><span></span>
+    </div>
+    <div class="auth-eyebrow">Step 3 of 5</div>
+    <div class="auth-title">Your Strengths</div>
+    <div class="auth-sub">Pick up to 5 that feel most like you — there's no wrong answer.</div>
+
+    <div class="auth-msg" id="msg"></div>
+
+    <div class="chip-grid" id="chipGrid">
+      <button type="button" class="chip" data-value="leadership">Leadership</button>
+      <button type="button" class="chip" data-value="creativity">Creativity</button>
+      <button type="button" class="chip" data-value="discipline">Discipline</button>
+      <button type="button" class="chip" data-value="empathy">Empathy</button>
+      <button type="button" class="chip" data-value="problem_solving">Problem-solving</button>
+      <button type="button" class="chip" data-value="communication">Communication</button>
+      <button type="button" class="chip" data-value="resilience">Resilience</button>
+      <button type="button" class="chip" data-value="faith">Faith</button>
+      <button type="button" class="chip" data-value="curiosity">Curiosity</button>
+      <button type="button" class="chip" data-value="teamwork">Teamwork</button>
+      <button type="button" class="chip" data-value="determination">Determination</button>
+      <button type="button" class="chip" data-value="kindness">Kindness</button>
+    </div>
+
+    <button type="button" class="auth-btn" id="submitBtn">Continue</button>
+    <a href="/mentorship/onboarding/life-wheel.html" class="onboard-skip">Skip this step</a>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    let dbClient = null;
+    const selected = new Set();
+    const MAX = 5;
+
+    (async () => {
+      try {
+        dbClient = await getDB();
+        const { data: { user } } = await dbClient.auth.getUser();
+        if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      } catch (e) {
+        console.warn('Strengths auth check failed:', e);
+        window.location.href = '/mentorship/login.html';
+      }
+    })();
+
+    document.getElementById('chipGrid').addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      const value = chip.dataset.value;
+      if (selected.has(value)) {
+        selected.delete(value);
+        chip.classList.remove('selected');
+      } else {
+        if (selected.size >= MAX) return;
+        selected.add(value);
+        chip.classList.add('selected');
+      }
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitBtn');
+      const msg = document.getElementById('msg');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        const { error } = await dbClient.auth.updateUser({
+          data: { strengths: Array.from(selected) },
+        });
+        if (error) {
+          msg.textContent = error.message || 'Could not save — please try again.';
+          msg.className = 'auth-msg show error';
+          btn.disabled = false; btn.textContent = 'Continue';
+          return;
+        }
+        window.location.href = '/mentorship/onboarding/life-wheel.html';
+      } catch (err) {
+        console.warn('Strengths save failed:', err);
+        msg.textContent = 'Something went wrong — please try again.';
+        msg.className = 'auth-msg show error';
+        btn.disabled = false; btn.textContent = 'Continue';
+      }
+    });
+  </script>
 </body>
 </html>

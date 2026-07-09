@@ -4,19 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Welcome</title>
+  <meta name="description" content="Welcome to Inspire Mentorship — let's get to know you before your first session.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Welcome</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="auth-body">
+  <div class="auth-card onboard-card" style="text-align:center">
+    <div class="onboard-steps">
+      <span class="active"></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="auth-eyebrow">Inspire Mentorship</div>
+    <div class="auth-title" id="welcomeTitle">Welcome</div>
+    <div class="auth-sub">
+      Before your first session, we'd love to get to know you a little —
+      it takes about two minutes and helps your mentor understand where
+      you're starting from. You can skip any step.
+    </div>
+    <a href="/mentorship/onboarding/know-me.html" class="auth-btn" style="display:block; text-decoration:none; box-sizing:border-box">Let's begin</a>
+    <a href="/mentorship/dashboard/" class="onboard-skip">Skip — take me to my dashboard</a>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    (async () => {
+      try {
+        const db = await getDB();
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) { window.location.href = '/mentorship/login.html'; return; }
+        const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+        const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name);
+        if (firstName) document.getElementById('welcomeTitle').textContent = `Welcome, ${firstName}`;
+      } catch (e) {
+        console.warn('Welcome page auth check failed:', e);
+        window.location.href = '/mentorship/login.html';
+      }
+    })();
+  </script>
 </body>
 </html>

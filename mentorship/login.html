@@ -67,6 +67,10 @@
         window.location.href = '/mentorship/mentor-portal/';
         return;
       }
+      if (!user.user_metadata?.onboarding_complete) {
+        window.location.href = '/mentorship/onboarding/welcome.html';
+        return;
+      }
       window.location.href = '/mentorship/dashboard/';
     }
 

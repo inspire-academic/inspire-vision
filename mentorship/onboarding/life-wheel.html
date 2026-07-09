@@ -4,19 +4,105 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Life Wheel</title>
+  <meta name="description" content="Rate where you're starting from across six areas of life.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Life Wheel</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="auth-body">
+  <div class="auth-card onboard-card">
+    <div class="onboard-steps">
+      <span class="done"></span><span class="done"></span><span class="done"></span><span class="active"></span><span></span>
+    </div>
+    <div class="auth-eyebrow">Step 4 of 5</div>
+    <div class="auth-title">Life Wheel</div>
+    <div class="auth-sub">
+      Rate how you feel about each area right now, out of 10. This is just
+      a starting point — your Growth Compass will track your real progress
+      from here as you work on your goals.
+    </div>
+
+    <div class="auth-msg" id="msg"></div>
+
+    <div id="wheelRows">
+      <div class="wheel-row" data-key="spiritual">
+        <div class="wheel-row-top"><span>Spiritual</span><span class="val">5</span></div>
+        <input type="range" min="1" max="10" value="5">
+      </div>
+      <div class="wheel-row" data-key="intellectual">
+        <div class="wheel-row-top"><span>Intellectual</span><span class="val">5</span></div>
+        <input type="range" min="1" max="10" value="5">
+      </div>
+      <div class="wheel-row" data-key="physical">
+        <div class="wheel-row-top"><span>Physical</span><span class="val">5</span></div>
+        <input type="range" min="1" max="10" value="5">
+      </div>
+      <div class="wheel-row" data-key="social">
+        <div class="wheel-row-top"><span>Social</span><span class="val">5</span></div>
+        <input type="range" min="1" max="10" value="5">
+      </div>
+      <div class="wheel-row" data-key="emotional">
+        <div class="wheel-row-top"><span>Emotional</span><span class="val">5</span></div>
+        <input type="range" min="1" max="10" value="5">
+      </div>
+      <div class="wheel-row" data-key="character">
+        <div class="wheel-row-top"><span>Character</span><span class="val">5</span></div>
+        <input type="range" min="1" max="10" value="5">
+      </div>
+    </div>
+
+    <button type="button" class="auth-btn" id="submitBtn">Continue</button>
+    <a href="/mentorship/onboarding/goals.html" class="onboard-skip">Skip this step</a>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    let dbClient = null;
+
+    (async () => {
+      try {
+        dbClient = await getDB();
+        const { data: { user } } = await dbClient.auth.getUser();
+        if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      } catch (e) {
+        console.warn('Life Wheel auth check failed:', e);
+        window.location.href = '/mentorship/login.html';
+      }
+    })();
+
+    document.querySelectorAll('.wheel-row input[type="range"]').forEach(input => {
+      input.addEventListener('input', () => {
+        input.closest('.wheel-row').querySelector('.val').textContent = input.value;
+      });
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitBtn');
+      const msg = document.getElementById('msg');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const lifeWheel = {};
+      document.querySelectorAll('.wheel-row').forEach(row => {
+        lifeWheel[row.dataset.key] = Number(row.querySelector('input').value);
+      });
+      try {
+        const { error } = await dbClient.auth.updateUser({ data: { life_wheel: lifeWheel } });
+        if (error) {
+          msg.textContent = error.message || 'Could not save — please try again.';
+          msg.className = 'auth-msg show error';
+          btn.disabled = false; btn.textContent = 'Continue';
+          return;
+        }
+        window.location.href = '/mentorship/onboarding/goals.html';
+      } catch (err) {
+        console.warn('Life Wheel save failed:', err);
+        msg.textContent = 'Something went wrong — please try again.';
+        msg.className = 'auth-msg show error';
+        btn.disabled = false; btn.textContent = 'Continue';
+      }
+    });
+  </script>
 </body>
 </html>

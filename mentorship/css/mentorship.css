@@ -118,6 +118,36 @@ body.auth-body {
 }
 .auth-btn-secondary:hover { border-color: rgba(255,255,255,.35) }
 
+/* ── ONBOARDING WIZARD (join.html -> here -> dashboard) ────────────
+   Reuses .auth-card/.auth-field/.auth-btn above; adds a step
+   indicator, chip multi-select, and rating sliders. ──────────────── */
+.onboard-card { max-width: 480px }
+.onboard-steps { display: flex; gap: 6px; margin-bottom: 24px }
+.onboard-steps span { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,.12) }
+.onboard-steps span.done, .onboard-steps span.active { background: var(--mentorship-gold) }
+.onboard-skip { display: block; text-align: center; font-size: 13px; color: rgba(244,246,249,.55); margin-top: 14px }
+.onboard-skip:hover { color: rgba(244,246,249,.8) }
+.chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px }
+.chip {
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.04);
+  color: rgba(244,246,249,.8);
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.chip.selected { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff }
+.wheel-row { margin-bottom: 18px }
+.wheel-row-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px }
+.wheel-row-top span:first-child { font-weight: 700; color: rgba(244,246,249,.9) }
+.wheel-row-top span:last-child { color: var(--mentorship-gold); font-weight: 700 }
+.wheel-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--mentorship-gold);
+}
+
 /* ── SUB-PAGE SHELL (goals/check-in/mentor pages) ─────────────────
    Added 2026-07-09 alongside the first 3 pages built beyond the
    dashboard itself. ──────────────────────────────────────────── */
