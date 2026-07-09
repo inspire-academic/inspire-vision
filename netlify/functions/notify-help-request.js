@@ -41,7 +41,10 @@ exports.handler = async (event) => {
     const urgent = category === 'urgent';
 
     const { data, error } = await resend.emails.send({
-      from: 'Inspire Mentorship <noreply@inspirevision.org>',
+      // Resend's plan only covers one verified sending domain, already
+      // used by inspireacademic.org — using it here until inspirevision.org
+      // gets its own verified domain (plan upgrade or a freed-up slot).
+      from: 'Inspire Mentorship <noreply@inspireacademic.org>',
       to: notifyEmail,
       subject: `${urgent ? '🚨 URGENT — ' : ''}${label} from ${studentName || studentEmail || 'a mentee'}`,
       html: `
