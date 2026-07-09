@@ -13,6 +13,16 @@
 -- Create mentorship schema
 CREATE SCHEMA IF NOT EXISTS mentorship;
 
+-- Creating a schema only grants access to its owner by default — the
+-- Data API's anon/authenticated Postgres roles need explicit grants too,
+-- even with RLS policies in place. Without this, every request 401s with
+-- "permission denied for schema mentorship" (Postgres error 42501)
+-- regardless of RLS or of "mentorship" being marked exposed in
+-- Project Settings -> API -> Data API. RLS still governs row-level
+-- access on top of this — this just lets the roles attempt the request.
+GRANT USAGE ON SCHEMA mentorship TO anon, authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA mentorship GRANT ALL ON TABLES TO anon, authenticated;
+
 -- ============================================
 -- 1. GOALS
 -- Powers the "90-Day Goal" priority card and the Growth Compass
@@ -113,6 +123,13 @@ CREATE POLICY "Students manage own check-ins"
   ON mentorship.check_ins FOR ALL
   USING (auth.uid() = student_id)
   WITH CHECK (auth.uid() = student_id);
+
+
+-- ============================================
+-- Grant on the tables just created (the ALTER DEFAULT PRIVILEGES near
+-- the top only covers tables created *after* it, not these four).
+-- ============================================
+GRANT ALL ON ALL TABLES IN SCHEMA mentorship TO anon, authenticated;
 
 
 -- ============================================
