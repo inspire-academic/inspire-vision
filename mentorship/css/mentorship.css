@@ -278,11 +278,16 @@ body.auth-body {
       --card-bg2:   #f5f1ec;
       --success:    #16a34a;
     }
-    /* Sidebar and topbar keep the original dark values regardless of
-       [data-theme] — re-pinning locally overrides the light cascade
-       from above for anything nested inside them. */
+    /* Sidebar, topbar, and hero keep the original dark values regardless
+       of [data-theme] — re-pinning locally overrides the light cascade
+       from above for anything nested inside them. The hero is a
+       full-bleed photo with a dark scrim for legibility (same as
+       Academic's subject hero banners), so its headline/tagline/
+       scripture-card text all need to stay light-on-dark too, not
+       just its background. */
     html[data-theme="light"] .sidebar,
-    html[data-theme="light"] .topbar {
+    html[data-theme="light"] .topbar,
+    html[data-theme="light"] .hero {
       --navy:       #0A1628;
       --navy-mid:   #0F2040;
       --navy-light: #162B52;
