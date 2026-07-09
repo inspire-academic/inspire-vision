@@ -1012,9 +1012,11 @@ body.auth-body {
       object-fit: cover;
       opacity: .2;
     }
-    /* Fixed light text — .encouragement-bg is a permanently-dark photo
-       card regardless of theme, same treatment as the hero. */
-    .encouragement-content { position: relative; z-index: 1; color: #f4f6f9 }
+    /* .encouragement-bg/.encouragement-img (below) exist in CSS but
+       dashboard/index.html never actually places those divs in this
+       card — it's just a plain .mini-card with the normal flipping
+       background, no fixed text colour needed. */
+    .encouragement-content { position: relative; z-index: 1 }
     .encouragement-label {
       display: flex; align-items: center; gap: 6px;
       font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
