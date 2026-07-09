@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Mentorship | Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <div class="auth-eyebrow">Inspire Mentorship</div>
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Sign in to continue your journey.</div>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <form id="loginForm">
+      <div class="auth-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="auth-btn" id="submitBtn">Sign In</button>
+    </form>
+
+    <div class="auth-footer">
+      New here? <a href="/mentorship/join.html">Become a mentee</a> or <a href="/mentorship/mentors.html">apply to mentor</a>
+    </div>
+  </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('authMsg');
+    const btn = document.getElementById('submitBtn');
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.className = 'auth-msg show ' + type;
+    }
+
+    // Already signed in? Skip the form.
+    (async () => {
+      try {
+        const db = await getDB();
+        const { data: { user } } = await db.auth.getUser();
+        if (user) redirectForRole(user);
+      } catch (e) { /* not signed in — stay on the form */ }
+    })();
+
+    function redirectForRole(user) {
+      const role = user.user_metadata?.mentorship_role;
+      const mentorStatus = user.user_metadata?.mentor_status;
+      if (role === 'mentor') {
+        if (mentorStatus === 'pending_review') {
+          showMsg("Your mentor application is still under review — we'll email you once it's approved.", 'success');
+          return;
+        }
+        window.location.href = '/mentorship/mentor-portal/';
+        return;
+      }
+      window.location.href = '/mentorship/dashboard/';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+      msg.className = 'auth-msg';
+      try {
+        const db = await getDB();
+        const { data, error } = await db.auth.signInWithPassword({
+          email: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value,
+        });
+        if (error) {
+          showMsg(error.message || 'Could not sign in — check your email and password.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
+          return;
+        }
+        redirectForRole(data.user);
+      } catch (e) {
+        console.warn('Login failed:', e);
+        showMsg('Something went wrong — please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>
