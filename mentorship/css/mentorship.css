@@ -3,24 +3,19 @@
    Do not redefine global tokens here.
    Phase 4 will extract dashboard inline CSS here. */
 
-/* ── FLAG: colour conflict, not resolved here ─────────────────────
-   tokens.css already assigns this cardinal a colour: --clr-mentorship
-   (#B85C1A, terracotta/ochre) — see tokens.css's own header comment:
-   "RULE: No other stylesheet defines these values."
+/* ── RESOLVED 2026-07-09 ───────────────────────────────────────────
+   The dashboard originally shipped with its own navy/gold palette
+   (matching Academic's site-wide brand) instead of this cardinal's
+   canonical colour in tokens.css (--clr-mentorship, terracotta/ochre).
+   Eric's call: use tokens.css's original scheme, not the dashboard's.
 
-   The values below are NOT that colour. They're lifted directly from
-   mentorship-dashboard.html's own internal <style> block (navy/gold,
-   matching Academic's site-wide brand rather than Vision's per-cardinal
-   palette), because that's what's actually rendered on the dashboard
-   right now. Overriding them to the canonical terracotta here would
-   make this file lie about what the page looks like.
-
-   This is a real design-system question for a human to resolve — not
-   guessed at or silently picked here. Until then, both palettes exist
-   in the codebase for this cardinal.
+   These aliases exist for any Mentorship page that wants a
+   module-level name instead of reaching for --clr-mentorship directly.
+   The dashboard itself (mentorship/dashboard/index.html) now extends
+   the canonical tokens straight in its own :root block.
    ──────────────────────────────────────────────────────────────── */
 :root {
-  --mentorship-gold:    #c9a84c;
-  --mentorship-navy:    #0d1b2a;
-  --mentorship-accent:  #e8c96a;
+  --mentorship-gold:    var(--clr-mentorship, #B85C1A);
+  --mentorship-navy:    var(--clr-navy, #0A1628);
+  --mentorship-accent:  var(--clr-mentorship-mid, #D97706);
 }

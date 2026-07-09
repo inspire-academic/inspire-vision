@@ -31,24 +31,25 @@ domain/repo, inspireacademic.org):
 | Health & Wellbeing™ | Not yet built — homepage links to `coming-soon.html` |
 | Faith & Spiritual Formation™ | Partially built — `pages/inspire-faith.html`, `admin/faith-admin.html` exist; homepage nav/footer still link to `coming-soon.html` |
 
-## KNOWN DESIGN-SYSTEM CONFLICT — read before touching Mentorship colours
+## DESIGN-SYSTEM COLOUR — resolved 2026-07-09
 
-`assets/css/tokens.css` is this platform's stated single source of
-truth for colour tokens and already assigns Mentorship its cardinal
-colour: `--clr-mentorship: #B85C1A` (terracotta/ochre).
+`assets/css/tokens.css` is this platform's single source of truth for
+colour tokens and assigns Mentorship its cardinal colour:
+`--clr-mentorship: #B85C1A` (terracotta/ochre), with
+`--clr-mentorship-mid: #D97706` as the bright/active variant.
 
 The Mentorship dashboard (`mentorship/dashboard/index.html`) was
-supplied as a separate, pre-built file with its own internal navy/gold
-palette (`#0d1b2a` / `#c9a84c`) — matching Academic's site-wide brand,
-not Vision's per-cardinal colour assignment. `mentorship/css/mentorship.css`
-currently defines `--mentorship-gold` / `--mentorship-navy` /
-`--mentorship-accent` matching the dashboard's actual on-screen colours
-(navy/gold), NOT the canonical `--clr-mentorship` terracotta — see that
-file's header comment for the full explanation.
-
-**This is unresolved.** Before building more Mentorship pages, get a
-human decision on which palette is correct for this cardinal going
-forward, then make tokens.css and mentorship.css agree.
+originally supplied with its own internal navy/gold palette
+(`#0d1b2a` / `#c9a84c`) — matching Academic's site-wide brand, not
+Vision's per-cardinal colour assignment. **Eric's call: use the
+canonical tokens.css scheme, not the dashboard's original colours.**
+The dashboard's own `:root` block now extends `var(--clr-mentorship)` /
+`var(--clr-navy)` etc. directly (with literal-value fallbacks in case
+tokens.css fails to load), and `mentorship/css/mentorship.css`'s
+`--mentorship-gold` / `--mentorship-navy` / `--mentorship-accent`
+aliases do the same. All 29 stub pages' inline colours were updated to
+match. If you're building new Mentorship UI, use `var(--clr-mentorship)`
+(or the `--mentorship-*` aliases) — don't reintroduce the old gold.
 
 ## TARGET FILE STRUCTURE — Mentorship module
 

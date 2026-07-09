@@ -10,16 +10,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- tokens.css first, always (its own architecture comment says so) — the :root block
+       below extends it rather than duplicating it. global.css doesn't exist in this repo
+       yet; tokens.css + styles.css are the current equivalent. Swap if global.css lands. -->
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
-    /* ── TOKENS ─────────────────────────────────────────────── */
+    /* ── TOKENS ─────────────────────────────────────────────────────────
+       Extends tokens.css's canonical Mentorship cardinal colour
+       (--clr-mentorship, terracotta/ochre) rather than the gold this
+       dashboard originally shipped with — resolved 2026-07-09, see
+       mentorship/css/mentorship.css for the full history. ───────────── */
     :root {
-      --navy:       #0d1b2a;
-      --navy-mid:   #152336;
-      --navy-light: #1e3048;
-      --gold:       #c9a84c;
-      --gold-light: #e8c96a;
-      --gold-dim:   rgba(201,168,76,.15);
-      --gold-border:rgba(201,168,76,.3);
+      --navy:       var(--clr-navy, #0A1628);
+      --navy-mid:   var(--clr-navy-mid, #0F2040);
+      --navy-light: var(--clr-navy-light, #162B52);
+      --gold:       var(--clr-mentorship, #B85C1A);
+      --gold-light: var(--clr-mentorship-mid, #D97706);
+      --gold-dim:   rgba(184,92,26,.15);
+      --gold-border:rgba(184,92,26,.3);
       --white:      #ffffff;
       --text:       #f4f6f9;
       --text-muted: rgba(244,246,249,.62);
@@ -901,11 +911,6 @@
       *, *::before, *::after { transition-duration: 0ms !important }
     }
   </style>
-  <!-- global.css doesn't exist in this repo yet — tokens.css + styles.css are the current
-       equivalent (single-source tokens + legacy/base bridge). Swap this if global.css lands. -->
-  <link rel="stylesheet" href="/assets/css/tokens.css">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
 <body>
 <div class="app">
