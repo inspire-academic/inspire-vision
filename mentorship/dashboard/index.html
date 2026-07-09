@@ -1593,7 +1593,7 @@
       dbClient = await getDB();
       const { data: { user } } = await dbClient.auth.getUser();
       if (!user) {
-        $('topbarGreeting').textContent = 'Welcome 👋';
+        window.location.href = '/mentorship/login.html';
         return;
       }
       currentUser = user;
