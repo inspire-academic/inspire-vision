@@ -12,6 +12,15 @@
   <style>
     body { background: var(--navy); color: var(--white); }
 
+    /* ── IMAGES — edit these to swap homepage photography ── */
+    :root {
+      --img-hero-banner: url('assets/images/home/hero-banner.png');
+      --img-cardinal-academic: url('assets/images/home/cardinal-academic.png');
+      --img-cardinal-mentorship: url('assets/images/home/cardinal-mentorship.png');
+      --img-cardinal-health: url('assets/images/home/cardinal-health.png');
+      --img-cardinal-faith: url('assets/images/home/cardinal-faith.png');
+    }
+
     /* ── HERO ── */
     .hero {
       position: relative;
@@ -25,7 +34,7 @@
     .hero-bg {
       position: absolute;
       inset: 0;
-      background-image: url('IV_Banner.png');
+      background-image: var(--img-hero-banner);
       background-size: cover;
       background-position: center top;
       z-index: 0;
@@ -152,6 +161,10 @@
       transition: transform 0.7s ease;
     }
     .cardinal:hover .cardinal-bg { transform: scale(1.06); }
+    .cardinal-1 .cardinal-bg { background-image: var(--img-cardinal-academic); }
+    .cardinal-2 .cardinal-bg { background-image: var(--img-cardinal-mentorship); }
+    .cardinal-3 .cardinal-bg { background-image: var(--img-cardinal-health); }
+    .cardinal-4 .cardinal-bg { background-image: var(--img-cardinal-faith); }
     .cardinal-overlay { position: absolute; inset: 0; }
     .cardinal-1 .cardinal-overlay { background: linear-gradient(to top, rgba(10,22,40,0.96) 0%, rgba(10,22,40,0.45) 60%, rgba(10,22,40,0.15) 100%); }
     .cardinal-2 .cardinal-overlay { background: linear-gradient(to top, rgba(15,35,20,0.96) 0%, rgba(15,35,20,0.45) 60%, rgba(15,35,20,0.15) 100%); }
@@ -229,6 +242,12 @@
       transition: transform 0.6s ease;
     }
     .journey-card:hover .journey-card-img { transform: scale(1.05); }
+    .journey-card:nth-child(1) .journey-card-img { background-image: var(--img-cardinal-academic); }
+    .journey-card:nth-child(2) .journey-card-img { background-image: var(--img-cardinal-mentorship); }
+    /* TODO: replace with dedicated mentor/guide image when available */
+    .journey-card:nth-child(3) .journey-card-img { background-image: var(--img-cardinal-faith); }
+    /* TODO: replace with dedicated support/mission image when available */
+    .journey-card:nth-child(4) .journey-card-img { background-image: var(--img-cardinal-health); }
     .journey-card-overlay {
       position: absolute;
       inset: 0;
@@ -379,7 +398,7 @@
     .story-card-img {
       position: absolute;
       inset: 0;
-      background-image: url('IV_mentorship.png');
+      background-image: var(--img-cardinal-mentorship);
       background-size: cover;
       background-position: center;
       transition: transform 0.5s;
@@ -455,7 +474,7 @@
     .mission-banner-bg {
       position: absolute;
       inset: 0;
-      background-image: url('IV_Banner.png');
+      background-image: var(--img-hero-banner);
       background-size: cover;
       background-position: center 60%;
       z-index: 0;
@@ -687,7 +706,7 @@
   <!-- FOUR CARDINALS — full bleed -->
   <section class="cardinals" id="pillars">
     <a href="academic.html" class="cardinal cardinal-1" style="text-decoration:none;display:block;">
-      <div class="cardinal-bg" style="background-image: url('IV_Academic_1.png');"></div>
+      <div class="cardinal-bg"></div>
       <div class="cardinal-overlay"></div>
       <div class="cardinal-content">
         <div class="cardinal-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
@@ -698,7 +717,7 @@
       </div>
     </a>
     <a href="/mentorship/dashboard/" class="cardinal cardinal-2" style="text-decoration:none;display:block;">
-      <div class="cardinal-bg" style="background-image: url('IV_mentorship.png');"></div>
+      <div class="cardinal-bg"></div>
       <div class="cardinal-overlay"></div>
       <div class="cardinal-content">
         <div class="cardinal-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2"/><path d="M2 21v-2a5 5 0 0110 0v2"/><path d="M17 15c2 0 5 1 5 3v1"/></svg></div>
@@ -709,7 +728,7 @@
       </div>
     </a>
     <a href="coming-soon.html" class="cardinal cardinal-3" style="text-decoration:none;display:block;">
-      <div class="cardinal-bg" style="background-image: url('IV_Health.png');"></div>
+      <div class="cardinal-bg"></div>
       <div class="cardinal-overlay"></div>
       <div class="cardinal-content">
         <div class="cardinal-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
@@ -720,7 +739,7 @@
       </div>
     </a>
     <a href="coming-soon.html" class="cardinal cardinal-4" style="text-decoration:none;display:block;">
-      <div class="cardinal-bg" style="background-image: url('IV_Faith.png');"></div>
+      <div class="cardinal-bg"></div>
       <div class="cardinal-overlay"></div>
       <div class="cardinal-content">
         <div class="cardinal-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg></div>
@@ -741,7 +760,7 @@
       </div>
       <div class="journey-grid">
         <a href="academic.html" class="journey-card">
-          <div class="journey-card-img" style="background-image: url('IV_Academic_1.png');"></div>
+          <div class="journey-card-img"></div>
           <div class="journey-card-overlay"></div>
           <div class="journey-card-content">
             <div class="journey-card-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
@@ -751,7 +770,7 @@
           </div>
         </a>
         <a href="/mentorship/parents.html" class="journey-card">
-          <div class="journey-card-img" style="background-image: url('IV_mentorship.png');"></div>
+          <div class="journey-card-img"></div>
           <div class="journey-card-overlay"></div>
           <div class="journey-card-content">
             <div class="journey-card-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M2 21v-2a5 5 0 0110 0v2"/><circle cx="17" cy="9" r="2"/><path d="M17 15c2 0 5 1 5 3v1"/></svg></div>
@@ -761,8 +780,7 @@
           </div>
         </a>
         <a href="/mentorship/mentors.html" class="journey-card">
-          <!-- TODO: replace with dedicated mentor/guide image when available -->
-          <div class="journey-card-img" style="background-image: url('IV_Faith.png');"></div>
+          <div class="journey-card-img"></div>
           <div class="journey-card-overlay"></div>
           <div class="journey-card-content">
             <div class="journey-card-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
@@ -772,8 +790,7 @@
           </div>
         </a>
         <a href="#support" class="journey-card">
-          <!-- TODO: replace with dedicated support/mission image when available -->
-          <div class="journey-card-img" style="background-image: url('IV_Health.png');"></div>
+          <div class="journey-card-img"></div>
           <div class="journey-card-overlay"></div>
           <div class="journey-card-content">
             <div class="journey-card-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>

@@ -12,6 +12,11 @@
   <style>
     body { background: var(--white); color: var(--navy); }
 
+    /* ── IMAGES — edit these to swap Academic page photography ── */
+    :root {
+      --img-cardinal-academic: url('assets/images/home/cardinal-academic.png');
+    }
+
     /* HERO */
     .hero {
       position: relative;
@@ -25,7 +30,7 @@
     .hero-bg {
       position: absolute;
       inset: 0;
-      background-image: url('IV_Academic_1.png');
+      background-image: var(--img-cardinal-academic);
       background-size: cover;
       background-position: center 20%;
       z-index: 0;
@@ -311,7 +316,7 @@
     .cta-bg {
       position: absolute;
       inset: 0;
-      background-image: url('IV_Academic_1.png');
+      background-image: var(--img-cardinal-academic);
       background-size: cover;
       background-position: center 70%;
       z-index: 0;
@@ -388,7 +393,7 @@
 
         <!-- Inspire Science -->
         <a href="https://inspireacademic.org" class="program-card" target="_blank">
-          <img src="Inspire_Science.png" alt="Inspire Science">
+          <img src="assets/images/academic/inspire-science.png" alt="Inspire Science">
           <div class="program-card-body">
             <div class="program-card-icon">
               <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
@@ -401,7 +406,7 @@
 
         <!-- Year Six -->
         <a href="https://inspireacademic.org/year6-dashboard.html" class="program-card" target="_blank">
-          <img src="Year6_Scinece_Bridg.png" alt="Year Six Science Bridging Programme">
+          <img src="assets/images/academic/year6-science-bridging.png" alt="Year Six Science Bridging Programme">
           <div class="program-card-body">
             <div class="program-card-icon">
               <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -414,7 +419,7 @@
 
         <!-- Protégé -->
         <a href="https://inspireacademic.org" class="program-card" target="_blank">
-          <img src="Protoge_1.png" alt="Protégé">
+          <img src="assets/images/academic/protege.png" alt="Protégé">
           <div class="program-card-body">
             <div class="program-card-icon">
               <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
@@ -427,7 +432,7 @@
 
         <!-- Innovation Labs — Africa -->
         <a href="Inspire_Innovation_Labs_Africa_Blueprint_V7.html" class="program-card" target="_blank">
-          <img src="Innovation_Labs_Africa.png" alt="Innovation Labs — Africa" style="object-position: center top;">
+          <img src="assets/images/academic/innovation-labs-africa.png" alt="Innovation Labs — Africa" style="object-position: center top;">
           <div class="program-card-body">
             <div class="program-card-icon">
               <svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="10"/><path d="M2 12h20M12 2c-3 4-3 16 0 20M12 2c3 4 3 16 0 20"/></svg>
@@ -458,7 +463,7 @@
       <div class="featured-card-wrap">
         <a href="coming-soon.html" class="featured-card" ondblclick="window.location.href='coming-soon.html'">
           <div class="featured-card-img">
-            <img src="Inspire_Labs.png" alt="Inspire Labs">
+            <img src="assets/images/academic/inspire-labs.png" alt="Inspire Labs">
           </div>
           <div class="featured-card-body">
             <div class="featured-card-icon">
