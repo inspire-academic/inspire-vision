@@ -19,6 +19,12 @@
       --img-cardinal-mentorship: url('assets/images/home/cardinal-mentorship.png');
       --img-cardinal-health: url('assets/images/home/cardinal-health.png');
       --img-cardinal-faith: url('assets/images/home/cardinal-faith.png');
+      /* Smaller, compressed JPEGs for phones — same photography, ~96% less data */
+      --img-hero-banner-mobile: url('assets/images/home/hero-banner-montage2-mobile.jpg');
+      --img-cardinal-academic-mobile: url('assets/images/home/cardinal-academic-mobile.jpg');
+      --img-cardinal-mentorship-mobile: url('assets/images/home/cardinal-mentorship-mobile.jpg');
+      --img-cardinal-health-mobile: url('assets/images/home/cardinal-health-mobile.jpg');
+      --img-cardinal-faith-mobile: url('assets/images/home/cardinal-faith-mobile.jpg');
     }
 
     /* ── HERO ── */
@@ -613,8 +619,21 @@
       .footer-brand { grid-column: 1 / -1; }
     }
     @media (max-width: 768px) {
-      .hero-content { padding: 0 1.5rem; }
+      /* Swap in compressed, phone-sized photography instead of the desktop originals */
+      .hero-bg { background-image: var(--img-hero-banner-mobile); }
+      .cardinal-1 .cardinal-bg { background-image: var(--img-cardinal-academic-mobile); }
+      .cardinal-2 .cardinal-bg { background-image: var(--img-cardinal-mentorship-mobile); }
+      .cardinal-3 .cardinal-bg { background-image: var(--img-cardinal-health-mobile); }
+      .cardinal-4 .cardinal-bg { background-image: var(--img-cardinal-faith-mobile); }
+
+      .hero { height: auto; min-height: 0; padding-top: 72px; }
+      .hero-content { padding: 3.5rem 1.5rem; margin-top: 0; }
+      .hero h1 { font-size: clamp(2.1rem, 8vw, 2.6rem); }
+      .hero-desc { font-size: 0.95rem; margin-bottom: 2rem; }
+      .hero-overlay { background: linear-gradient(180deg, rgba(10,22,40,0.55) 0%, rgba(10,22,40,0.80) 55%, rgba(10,22,40,0.94) 100%); }
+
       .cardinals { grid-template-columns: 1fr; }
+      .cardinal, .cardinal-content { min-height: 420px; }
       .journey-section, .values-strip, .bottom-section, .mission-banner { padding-left: 1.5rem; padding-right: 1.5rem; }
       .journey-grid { grid-template-columns: 1fr; }
       .values-inner { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
@@ -622,6 +641,10 @@
       .bottom-inner { grid-template-columns: 1fr; }
       .footer-inner { grid-template-columns: repeat(2, 1fr); }
       .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 420px) {
+      .hero h1 { font-size: clamp(1.85rem, 9vw, 2.2rem); }
+      .footer-inner { grid-template-columns: 1fr; }
     }
   </style>
 </head>
