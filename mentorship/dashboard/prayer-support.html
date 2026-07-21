@@ -301,12 +301,15 @@
         return;
       }
       // Best-effort notification — the record above is already saved
-      // regardless of whether this succeeds.
+      // regardless of whether this succeeds. The function now requires
+      // the caller's own session token (V-02 fix) and derives name/email
+      // from it server-side, so we no longer send them from the client.
       try {
+        const { data: { session } } = await dbClient.auth.getSession();
         await fetch('/.netlify/functions/notify-help-request', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ category, message, studentEmail: currentUser.email, studentName: currentUser.user_metadata?.full_name || '' }),
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token || ''}` },
+          body: JSON.stringify({ category, message }),
         });
       } catch (notifyErr) {
         console.warn('Notification call failed (request was still saved):', notifyErr);

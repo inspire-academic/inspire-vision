@@ -6,7 +6,24 @@
 //   RESEND_API_KEY          — reuse Academic's if you have one, or grab a
 //                              new one from resend.com
 //   HELP_REQUEST_NOTIFY_EMAIL — where these alerts should land
+//
+// V-02 fix (docs/assurance/mentorship/PHASE_2_CONTROLLED_PRODUCTION_ROUND_TRIP.md):
+// this endpoint previously had no auth check at all — any caller, logged in
+// or not, could POST arbitrary category/message/name/email and trigger a
+// real email. It now requires the caller's own valid Supabase session
+// (same bearer-token verification admin-mentors.js/admin-matching.js use,
+// minus the admin allowlist — any authenticated user may submit a help
+// request, that's the whole point of the feature), and derives
+// studentName/studentEmail from the verified token server-side instead of
+// trusting the request body, so the alert email can no longer be spoofed
+// to look like it came from someone else.
 const { Resend } = require('resend');
+const { createClient } = require('@supabase/supabase-js');
+
+const SUPABASE_URL = 'https://ygtsrdwoikqnrbexjrtl.supabase.co';
+// Same public anon/publishable key already hardcoded client-side in
+// assets/supabase.js — safe to embed here too, it's designed to be public.
+const SUPABASE_ANON_KEY = 'sb_publishable_XxmrO4J18iyQ1Srub73BhQ_FBhd8mXR';
 
 const CATEGORY_LABEL = {
   prayer: 'Prayer request',
@@ -17,6 +34,17 @@ const CATEGORY_LABEL = {
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
+  const authHeader = event.headers.authorization || event.headers.Authorization || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '');
+  if (!token) {
+    return { statusCode: 401, body: JSON.stringify({ error: 'Missing Authorization header' }) };
+  }
+  const anon = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { data: { user }, error: authErr } = await anon.auth.getUser(token);
+  if (authErr || !user) {
+    return { statusCode: 401, body: JSON.stringify({ error: 'Invalid or expired session' }) };
   }
 
   const notifyEmail = process.env.HELP_REQUEST_NOTIFY_EMAIL;
@@ -31,10 +59,12 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { category, message, studentEmail, studentName } = JSON.parse(event.body || '{}');
+    const { category, message } = JSON.parse(event.body || '{}');
     if (!message) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing message' }) };
     }
+    const studentEmail = user.email;
+    const studentName = user.user_metadata?.full_name || '';
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const label = CATEGORY_LABEL[category] || 'Support request';
