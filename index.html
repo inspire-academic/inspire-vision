@@ -395,7 +395,9 @@
       position: relative;
       border-radius: 10px;
       overflow: hidden;
-      min-height: 460px;
+      width: min(100%, 400px);
+      aspect-ratio: 2 / 3;
+      margin: 0 auto;
       background: #050b16;
       cursor: pointer;
     }
@@ -421,7 +423,7 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 1.75rem;
+      padding: 0.5rem;
       box-sizing: border-box;
       filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
       transition: transform 0.6s;
@@ -460,7 +462,7 @@
     .flyer-nav.prev { left: 0.85rem; }
     .flyer-nav.next { right: 0.85rem; }
     .flyer-nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
-    .flyer-dots { display: flex; gap: 0.4rem; margin-top: 1.1rem; }
+    .flyer-dots { display: flex; justify-content: center; gap: 0.4rem; margin-top: 1.1rem; width: min(100%, 400px); margin-left: auto; margin-right: auto; }
     .flyer-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.22); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
     .flyer-dot.active { background: var(--gold); }
 
@@ -1087,8 +1089,9 @@
       carousel.querySelector('.flyer-nav.prev').addEventListener('click', (e) => { e.stopPropagation(); prev(); startAutoplay(); });
       carousel.querySelector('.flyer-nav.next').addEventListener('click', (e) => { e.stopPropagation(); next(); startAutoplay(); });
       dots.forEach(d => d.addEventListener('click', (e) => { e.stopPropagation(); goTo(+d.dataset.index); startAutoplay(); }));
-      carousel.addEventListener('mouseenter', stopAutoplay);
-      carousel.addEventListener('mouseleave', startAutoplay);
+      // Deliberately no pause-on-hover: this should loop continuously on its
+      // own, not stall the moment a visitor's cursor happens to rest over it.
+      // It only pauses while the lightbox is actually open (below).
 
       // Lightbox — tapping/clicking a flyer enlarges it full-size
       const lightbox = document.getElementById('flyer-lightbox');
