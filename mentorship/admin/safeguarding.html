@@ -3,20 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | Safeguarding</title>
+  <title>Inspire Mentorship | Safeguarding Queue</title>
+  <meta name="description" content="Review Ask for Help and Prayer & Support submissions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .admin-wrap { max-width: 760px; margin: 0 auto }
+    .sg-filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .sg-filter-btn {
+      padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: rgba(244,246,249,.75);
+      cursor: pointer;
+    }
+    .sg-filter-btn.active { background: var(--mentorship-gold); color: #fff; border-color: var(--mentorship-gold); }
+    .sg-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+    }
+    .sg-card.urgent { border-color: rgba(239,68,68,.5); }
+    .sg-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px }
+    .sg-name { font-weight: 700; font-size: 15px }
+    .sg-email { font-size: 12px; opacity: .6 }
+    .sg-badges { display: flex; gap: 6px; flex-shrink: 0; }
+    .sg-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+    .sg-badge-urgent { background: rgba(239,68,68,.18); color: #fca5a5; }
+    .sg-badge-prayer { background: rgba(168,133,26,.18); color: var(--mentorship-gold); }
+    .sg-badge-general { background: rgba(255,255,255,.08); color: rgba(244,246,249,.7); }
+    .sg-badge-status-new { background: rgba(59,130,246,.18); color: #93c5fd; }
+    .sg-badge-status-seen { background: rgba(255,255,255,.08); color: rgba(244,246,249,.6); }
+    .sg-badge-status-resolved { background: rgba(34,197,94,.15); color: #86efac; }
+    .sg-message { font-size: 13px; opacity: .85; line-height: 1.55; margin-bottom: 14px; white-space: pre-wrap }
+    .sg-meta { font-size: 12px; opacity: .5; margin-bottom: 14px; }
+    .sg-actions { display: flex; gap: 10px }
+    .sg-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(244,246,249,.8); cursor: pointer; }
+    .sg-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
+    .sg-btn:disabled { opacity: .5; cursor: default; }
+  </style>
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Safeguarding</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Admin · Safeguarding</div>
+        <h1 class="page-title">Ask for Help / Prayer & Support</h1>
+      </div>
+    </div>
+    <div class="sg-filters" id="filters">
+      <button class="sg-filter-btn active" data-filter="all">All</button>
+      <button class="sg-filter-btn" data-filter="new">New</button>
+      <button class="sg-filter-btn" data-filter="seen">Seen</button>
+      <button class="sg-filter-btn" data-filter="resolved">Resolved</button>
+    </div>
+    <div id="content">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
+    </div>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+    const CATEGORY_BADGE = { urgent: 'sg-badge-urgent', prayer: 'sg-badge-prayer', general: 'sg-badge-general' };
+    const CATEGORY_LABEL = { urgent: 'Urgent', prayer: 'Prayer', general: 'Support' };
+
+    let allRequests = [];
+    let currentFilter = 'all';
+    let session = null;
+
+    function renderRequests() {
+      const content = $('content');
+      const rows = currentFilter === 'all' ? allRequests : allRequests.filter(r => r.status === currentFilter);
+      if (!rows.length) {
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎉</div>Nothing here right now.</div>';
+        return;
+      }
+      content.innerHTML = rows.map(r => {
+        const date = new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+        const name = r.student?.full_name || 'No name on record';
+        const email = r.student?.email || 'unknown';
+        const nextActions = { new: ['seen', 'resolved'], seen: ['resolved'], resolved: [] }[r.status] || [];
+        const actionLabel = { seen: 'Mark Seen', resolved: 'Mark Resolved' };
+        return `
+          <div class="sg-card ${r.category === 'urgent' ? 'urgent' : ''}" data-id="${r.id}">
+            <div class="sg-top">
+              <div>
+                <div class="sg-name">${escapeHtml(name)}</div>
+                <div class="sg-email">${escapeHtml(email)}</div>
+              </div>
+              <div class="sg-badges">
+                <span class="sg-badge ${CATEGORY_BADGE[r.category] || 'sg-badge-general'}">${CATEGORY_LABEL[r.category] || 'Support'}</span>
+                <span class="sg-badge sg-badge-status-${r.status}">${r.status}</span>
+              </div>
+            </div>
+            <div class="sg-message">${escapeHtml(r.message)}</div>
+            <div class="sg-meta">${date}</div>
+            ${nextActions.length ? `<div class="sg-actions">${nextActions.map(a => `<button class="sg-btn" data-action="${a}">${actionLabel[a]}</button>`).join('')}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    async function callAdminFn(body) {
+      const res = await fetch('/.netlify/functions/admin-help-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      return { status: res.status, data };
+    }
+
+    $('filters').addEventListener('click', (e) => {
+      const btn = e.target.closest('.sg-filter-btn');
+      if (!btn) return;
+      $('filters').querySelectorAll('.sg-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderRequests();
+    });
+
+    (async () => {
+      const content = $('content');
+      try {
+        const db = await getDB();
+        const { data: { session: s } } = await db.auth.getSession();
+        if (!s) { window.location.href = '/mentorship/login.html'; return; }
+        session = s;
+
+        const { status, data } = await callAdminFn({ action: 'list' });
+        if (status === 401) { window.location.href = '/mentorship/login.html'; return; }
+        if (status === 403) {
+          content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>You\'re not authorized to view this page.</div>';
+          return;
+        }
+        if (status !== 200) {
+          content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div>${escapeHtml(data.error || 'Something went wrong loading requests.')}</div>`;
+          return;
+        }
+        allRequests = data.requests || [];
+        renderRequests();
+
+        content.addEventListener('click', async (e) => {
+          const btn = e.target.closest('button[data-action]');
+          if (!btn) return;
+          const card = btn.closest('.sg-card');
+          const requestId = card.dataset.id;
+          const newStatus = btn.dataset.action;
+          card.querySelectorAll('button').forEach(b => b.disabled = true);
+          const { status: s2, data: d2 } = await callAdminFn({ action: 'update-status', requestId, status: newStatus });
+          if (s2 !== 200) {
+            alert(d2.error || 'Could not update this request — please try again.');
+            card.querySelectorAll('button').forEach(b => b.disabled = false);
+            return;
+          }
+          const row = allRequests.find(r => r.id === requestId);
+          if (row) row.status = newStatus;
+          renderRequests();
+        });
+      } catch (e) {
+        console.warn('Safeguarding page failed:', e);
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div>Something went wrong — please try again.</div>';
+      }
+    })();
+  </script>
 </body>
 </html>
