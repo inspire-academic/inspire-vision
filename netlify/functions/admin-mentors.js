@@ -73,16 +73,32 @@ exports.handler = async (event) => {
       if (fetchErr || !existing?.user) {
         return { statusCode: 404, body: JSON.stringify({ error: 'Mentor application not found' }) };
       }
+      const newStatus = action === 'approve' ? 'approved' : 'rejected';
       // updateUserById replaces user_metadata wholesale — merge in the
       // existing fields so approving someone doesn't wipe their name,
-      // email, or application answers.
+      // email, or application answers. This metadata copy is kept purely
+      // so the client can read its own status for the login redirect —
+      // it is NOT the authoritative record any more (see mentor_approvals
+      // below), because a user can freely rewrite their own metadata.
       const { error: updateErr } = await admin.auth.admin.updateUserById(userId, {
         user_metadata: {
           ...existing.user.user_metadata,
-          mentor_status: action === 'approve' ? 'approved' : 'rejected',
+          mentor_status: newStatus,
         },
       });
       if (updateErr) return { statusCode: 500, body: JSON.stringify({ error: updateErr.message }) };
+
+      // Authoritative record (docs/assurance/mentorship/FOLLOWUP-mentor-status-spoofable-picker.md):
+      // admin-matching.js's mentor picker must read this, not user_metadata,
+      // since only this table is unreachable by the account owner themselves.
+      const { error: approvalErr } = await admin.schema('mentorship').from('mentor_approvals').upsert({
+        mentor_id: userId,
+        status: newStatus,
+        reviewed_by: auth.user.id,
+        reviewed_at: new Date().toISOString(),
+      });
+      if (approvalErr) return { statusCode: 500, body: JSON.stringify({ error: approvalErr.message }) };
+
       return { statusCode: 200, body: JSON.stringify({ ok: true }) };
     }
 
