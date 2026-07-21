@@ -162,6 +162,17 @@
         <button class="auth-btn" id="submitCheckinBtn">Save Check-In</button>
       </div>
 
+      <div class="card" style="margin-bottom:24px; max-width:520px">
+        <div class="card-title" style="margin-bottom:2px">Add a task</div>
+        <div class="mood-prompt">Something to follow up on before your next check-in?</div>
+        <div class="auth-field" style="margin-top:12px">
+          <label for="taskTitle">Task</label>
+          <input type="text" id="taskTitle" placeholder="e.g. Finish the reading my mentor suggested">
+        </div>
+        <div class="auth-msg" id="taskMsg"></div>
+        <button class="auth-btn" id="addTaskBtn">Add Task</button>
+      </div>
+
       <div class="page-eyebrow" style="margin-bottom:12px">History</div>
       <div id="checkinsList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading your check-ins…</div>
@@ -316,6 +327,37 @@
       msg.textContent = 'Something went wrong — please try again.';
       msg.className = 'auth-msg show error';
       btn.disabled = false; btn.textContent = 'Save Check-In';
+    }
+  });
+
+  $('addTaskBtn')?.addEventListener('click', async () => {
+    const msg = $('taskMsg');
+    const title = $('taskTitle').value.trim();
+    if (!title) { msg.textContent = 'Write a task first.'; msg.className = 'auth-msg show error'; return; }
+    if (!currentUser) return;
+    const btn = $('addTaskBtn');
+    btn.disabled = true; btn.textContent = 'Adding…';
+    try {
+      const { error } = await dbClient.schema('mentorship').from('tasks').insert({
+        student_id: currentUser.id,
+        title,
+      });
+      if (error) {
+        msg.textContent = error.message || 'Could not add this task.';
+        msg.className = 'auth-msg show error';
+        btn.disabled = false; btn.textContent = 'Add Task';
+        return;
+      }
+      msg.textContent = 'Added ✓ — see it on your Dashboard.';
+      msg.className = 'auth-msg show success';
+      $('taskTitle').value = '';
+      btn.disabled = false; btn.textContent = 'Add Task';
+      setTimeout(() => { msg.className = 'auth-msg'; }, 2500);
+    } catch (err) {
+      console.warn('Add task failed:', err);
+      msg.textContent = 'Something went wrong — please try again.';
+      msg.className = 'auth-msg show error';
+      btn.disabled = false; btn.textContent = 'Add Task';
     }
   });
 
