@@ -8,6 +8,19 @@
 -- needed a real mentor<->mentee pairing mechanism, which didn't exist
 -- anywhere before this. Kept as a separate file for the same reason
 -- as v2: no IF NOT EXISTS on the earlier CREATE TABLEs.
+--
+-- Made idempotent 2026-07-12 (Slice 0 staging bootstrap): a submission
+-- with multiple ;-separated statements runs as one implicit
+-- transaction — if anything later in the file errors, Postgres rolls
+-- back statements that already succeeded earlier in the same
+-- submission, including CREATE TABLE. Without IF NOT EXISTS/DROP...IF
+-- EXISTS guards, a retry after any such failure would then fail
+-- immediately on "already exists" for whatever had survived. This
+-- version uses CREATE TABLE IF NOT EXISTS (never drops a table, so it
+-- can never destroy real data — safe even if mistakenly pointed at a
+-- database that already has these tables populated) plus DROP POLICY
+-- IF EXISTS / CREATE INDEX IF NOT EXISTS for everything else, the same
+-- pattern already used in mentorship_schema_v3_fix_session_notes_rls.sql.
 -- ============================================
 
 -- ============================================
@@ -26,7 +39,7 @@
 -- enough for mentor-portal and the mentee side to show who's paired
 -- with whom.
 -- ============================================
-CREATE TABLE mentorship.mentor_assignments (
+CREATE TABLE IF NOT EXISTS mentorship.mentor_assignments (
   id            uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   mentor_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   student_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -38,16 +51,18 @@ CREATE TABLE mentorship.mentor_assignments (
 );
 
 -- One active mentor per student at a time.
-CREATE UNIQUE INDEX mentor_assignments_one_active_per_student
+CREATE UNIQUE INDEX IF NOT EXISTS mentor_assignments_one_active_per_student
   ON mentorship.mentor_assignments (student_id)
   WHERE status = 'active';
 
 ALTER TABLE mentorship.mentor_assignments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Mentors see their own assignments" ON mentorship.mentor_assignments;
 CREATE POLICY "Mentors see their own assignments"
   ON mentorship.mentor_assignments FOR SELECT
   USING (auth.uid() = mentor_id);
 
+DROP POLICY IF EXISTS "Students see their own assignments" ON mentorship.mentor_assignments;
 CREATE POLICY "Students see their own assignments"
   ON mentorship.mentor_assignments FOR SELECT
   USING (auth.uid() = student_id);
@@ -65,7 +80,7 @@ CREATE POLICY "Students see their own assignments"
 -- back, which is different from goals/check-ins/journal where the
 -- mentee is always the owner of their own data.
 -- ============================================
-CREATE TABLE mentorship.session_notes (
+CREATE TABLE IF NOT EXISTS mentorship.session_notes (
   id            uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   mentor_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   student_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -75,6 +90,7 @@ CREATE TABLE mentorship.session_notes (
 
 ALTER TABLE mentorship.session_notes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Mentors manage their own session notes" ON mentorship.session_notes;
 CREATE POLICY "Mentors manage their own session notes"
   ON mentorship.session_notes FOR ALL
   USING (auth.uid() = mentor_id)
