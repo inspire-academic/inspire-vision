@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | Dashboard</title>
-  <meta name="description" content="Your mentor dashboard — see who you're walking alongside.">
+  <title>Inspire Mentorship | Sessions</title>
+  <meta name="description" content="Schedule and log mentor sessions — your mentee sees this summary.">
   <meta name="theme-color" content="#0A1628">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
     </a>
     <nav class="sidebar-nav">
       <div class="nav-section-label">Mentoring</div>
-      <a class="nav-item active" href="/mentorship/mentor-portal/">
+      <a class="nav-item" href="/mentorship/mentor-portal/">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
         Dashboard
       </a>
@@ -39,7 +39,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         My Mentees
       </a>
-      <a class="nav-item" href="/mentorship/mentor-portal/sessions.html">
+      <a class="nav-item active" href="/mentorship/mentor-portal/sessions.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><rect x="5" y="9.5" width="14" height="11" rx="1"/><path d="M9 13h6M9 16h6"/></svg>
         Sessions
       </a>
@@ -68,7 +68,7 @@
       </button>
       <div class="topbar-welcome">
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
-        <div class="topbar-sub">Thank you for showing up for someone this week.</div>
+        <div class="topbar-sub">Your mentee sees the date, time, and notes you save here.</div>
       </div>
       <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -87,45 +87,45 @@
 
       <div class="page-header">
         <div>
-          <div class="page-eyebrow">Mentor Portal</div>
-          <h1 class="page-title">Dashboard</h1>
+          <div class="page-eyebrow">Mentoring</div>
+          <h1 class="page-title">Sessions</h1>
         </div>
       </div>
 
-      <div class="card" style="max-width:220px; margin-bottom:24px">
-        <div class="card-label">Active Mentees</div>
-        <div class="card-title" id="menteeCount" style="font-size:32px">—</div>
-      </div>
-
-      <div class="page-eyebrow" style="margin-bottom:12px">Your Mentees</div>
-      <div id="menteesList">
-        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
-      </div>
-
-      <!-- Admin Tools — hidden by default, only revealed once the
-           server confirms the signed-in email is on ADMIN_EMAILS. -->
-      <div class="card" id="adminToolsCard" style="display:none; margin-top:24px">
-        <div class="card-label">Admin Tools</div>
-        <div class="quick-actions-grid">
-          <a class="quick-action" href="/mentorship/admin/mentors.html">
-            <div class="quick-action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            </div>
-            <div>
-              <div class="quick-action-title">Manage Mentors</div>
-              <div class="quick-action-desc">Review and approve applications</div>
-            </div>
-          </a>
-          <a class="quick-action" href="/mentorship/admin/matching.html">
-            <div class="quick-action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div>
-              <div class="quick-action-title">Mentor Matching</div>
-              <div class="quick-action-desc">Pair mentors with mentees</div>
-            </div>
-          </a>
+      <div class="card" style="max-width:520px; margin-bottom:24px">
+        <div class="card-title" style="margin-bottom:4px">Log or schedule a session</div>
+        <div class="list-card-meta" style="margin-bottom:14px">Visible to this mentee — different from your private Session Notes.</div>
+        <div class="auth-field">
+          <label for="menteeSelect">Mentee</label>
+          <select id="menteeSelect"></select>
         </div>
+        <div class="auth-field">
+          <label for="sessionDate">Date &amp; time</label>
+          <input type="datetime-local" id="sessionDate">
+        </div>
+        <div class="auth-field">
+          <label for="sessionDuration">Duration (minutes)</label>
+          <input type="number" id="sessionDuration" value="60" min="15" step="15">
+        </div>
+        <div class="auth-field">
+          <label for="sessionStatus">Status</label>
+          <select id="sessionStatus">
+            <option value="scheduled">Scheduled (upcoming)</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="auth-field">
+          <label for="sessionNotes">Notes for your mentee (optional)</label>
+          <textarea id="sessionNotes" placeholder="A short summary of what you covered or plan to cover — your mentee will see this." style="min-height:80px"></textarea>
+        </div>
+        <div class="auth-msg" id="sessionFormMsg"></div>
+        <button class="auth-btn" id="saveSessionBtn">Save Session</button>
+      </div>
+
+      <div class="page-eyebrow" style="margin-bottom:12px">Session History</div>
+      <div id="sessionsList">
+        <div class="empty-state"><div class="empty-state-icon">📅</div>Select a mentee to see sessions.</div>
       </div>
     </div>
   </main>
@@ -174,25 +174,70 @@
 <script>
   const $ = id => document.getElementById(id);
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  let mentees = [];
 
-  function renderMentees(rows) {
-    $('menteeCount').textContent = rows.length;
-    const list = $('menteesList');
+  function renderSessions(rows) {
+    const list = $('sessionsList');
     if (!rows.length) {
-      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div>No mentees assigned yet — check back once our team pairs you with someone.</div>';
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div>No sessions logged yet for this mentee.</div>';
       return;
     }
-    list.innerHTML = rows.map(r => `
-      <div class="list-card">
-        <div class="list-card-top">
-          <div class="list-card-title">${escapeHtml(r.student_name)}</div>
-        </div>
-        <div class="list-card-meta">Paired ${new Date(r.assigned_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
-        <div class="list-card-actions">
-          <a class="list-card-btn primary" href="/mentorship/mentor-portal/session-notes.html?student=${r.student_id}">Add Session Note</a>
-        </div>
-      </div>`).join('');
+    list.innerHTML = rows.map(s => {
+      const dt = new Date(s.scheduled_at);
+      const statusLabel = { scheduled: 'Scheduled', completed: 'Completed', cancelled: 'Cancelled' }[s.status] || s.status;
+      return `
+        <div class="list-card">
+          <div class="list-card-top">
+            <div class="list-card-title">${dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
+            <span class="badge badge-muted">${statusLabel}</span>
+          </div>
+          <div class="list-card-meta">${dt.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' })} · ${s.duration_minutes || 60} min</div>
+          ${s.notes ? `<div class="list-card-desc" style="margin-top:8px">${escapeHtml(s.notes)}</div>` : ''}
+        </div>`;
+    }).join('');
   }
+
+  async function loadSessions(studentId) {
+    $('sessionsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>';
+    const { data, error } = await dbClient.schema('mentorship').from('sessions')
+      .select('*').eq('mentor_id', currentUser.id).eq('student_id', studentId).order('scheduled_at', { ascending: false });
+    if (error) { console.warn('Load sessions failed:', error); renderSessions([]); return; }
+    renderSessions(data || []);
+  }
+
+  $('menteeSelect').addEventListener('change', () => loadSessions($('menteeSelect').value));
+
+  $('saveSessionBtn').addEventListener('click', async () => {
+    const studentId = $('menteeSelect').value;
+    const dateVal = $('sessionDate').value;
+    const msg = $('sessionFormMsg');
+    if (!studentId) { msg.textContent = 'No mentee assigned yet.'; msg.className = 'auth-msg show error'; return; }
+    if (!dateVal) { msg.textContent = 'Pick a date and time.'; msg.className = 'auth-msg show error'; return; }
+    const mentee = mentees.find(m => m.student_id === studentId);
+    const btn = $('saveSessionBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const { error } = await dbClient.schema('mentorship').from('sessions').insert({
+      mentor_id: currentUser.id,
+      student_id: studentId,
+      mentor_name: currentUser.user_metadata?.full_name || currentUser.email,
+      scheduled_at: new Date(dateVal).toISOString(),
+      duration_minutes: Number($('sessionDuration').value) || 60,
+      status: $('sessionStatus').value,
+      notes: $('sessionNotes').value.trim() || null,
+    });
+    if (error) {
+      msg.textContent = error.message || 'Could not save this session.';
+      msg.className = 'auth-msg show error';
+      btn.disabled = false; btn.textContent = 'Save Session';
+      return;
+    }
+    $('sessionDate').value = '';
+    $('sessionNotes').value = '';
+    $('sessionStatus').value = 'scheduled';
+    msg.className = 'auth-msg';
+    btn.disabled = false; btn.textContent = 'Save Session';
+    await loadSessions(studentId);
+  });
 
   let dbClient = null;
   let currentUser = null;
@@ -212,33 +257,28 @@
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
 
-      // Admin Tools card — see dashboard/index.html's identical check
-      // for why this reuses admin-mentors.js purely as an auth probe.
-      try {
-        const { data: { session } } = await dbClient.auth.getSession();
-        if (session) {
-          const res = await fetch('/.netlify/functions/admin-mentors', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-            body: JSON.stringify({ action: 'list' }),
-          });
-          if (res.status === 200) $('adminToolsCard').style.display = '';
-        }
-      } catch (e) {
-        console.warn('Admin check failed (non-fatal):', e);
-      }
-
       const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
         .select('*').eq('mentor_id', currentUser.id).eq('status', 'active').order('assigned_at', { ascending: false });
-      if (error) { console.warn('Load mentees failed:', error); renderMentees([]); return; }
-      renderMentees(data || []);
+      if (error) { console.warn('Load mentees failed:', error); }
+      mentees = data || [];
+      const select = $('menteeSelect');
+      if (!mentees.length) {
+        select.innerHTML = '<option value="">No mentees assigned yet</option>';
+        $('sessionsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div>No mentees assigned yet — check back once our team pairs you with someone.</div>';
+        $('saveSessionBtn').disabled = true;
+      } else {
+        select.innerHTML = mentees.map(m => `<option value="${m.student_id}">${escapeHtml(m.student_name)}</option>`).join('');
+        const params = new URLSearchParams(window.location.search);
+        const preselect = params.get('student');
+        if (preselect && mentees.some(m => m.student_id === preselect)) select.value = preselect;
+        await loadSessions(select.value);
+      }
 
     } catch (e) {
       console.warn('Mentor portal page init failed:', e);
       window.location.href = '/mentorship/login.html';
     }
   })();
-
 </script>
 </body>
 </html>

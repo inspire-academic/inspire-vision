@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | Dashboard</title>
-  <meta name="description" content="Your mentor dashboard — see who you're walking alongside.">
+  <title>Inspire Mentorship | Mentee Progress</title>
+  <meta name="description" content="Your mentee's goals, journal, check-ins, and help requests.">
   <meta name="theme-color" content="#0A1628">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,17 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .mp-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .mp-tab {
+      padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: rgba(244,246,249,.75);
+      cursor: pointer;
+    }
+    .mp-tab.active { background: var(--mentorship-gold); color: #fff; border-color: var(--mentorship-gold); }
+    .mp-section { display: none; }
+    .mp-section.active { display: block; }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -31,11 +42,11 @@
     </a>
     <nav class="sidebar-nav">
       <div class="nav-section-label">Mentoring</div>
-      <a class="nav-item active" href="/mentorship/mentor-portal/">
+      <a class="nav-item" href="/mentorship/mentor-portal/">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
         Dashboard
       </a>
-      <a class="nav-item" href="/mentorship/mentor-portal/mentees.html">
+      <a class="nav-item active" href="/mentorship/mentor-portal/mentees.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         My Mentees
       </a>
@@ -67,8 +78,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       </button>
       <div class="topbar-welcome">
-        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
-        <div class="topbar-sub">Thank you for showing up for someone this week.</div>
+        <div class="topbar-greeting" id="topbarGreeting">Mentee Progress</div>
+        <div class="topbar-sub">Read-only — what your mentee has shared through their own dashboard.</div>
       </div>
       <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -87,45 +98,29 @@
 
       <div class="page-header">
         <div>
-          <div class="page-eyebrow">Mentor Portal</div>
-          <h1 class="page-title">Dashboard</h1>
+          <div class="page-eyebrow">My Mentees</div>
+          <h1 class="page-title" id="menteeName">Progress</h1>
         </div>
       </div>
 
-      <div class="card" style="max-width:220px; margin-bottom:24px">
-        <div class="card-label">Active Mentees</div>
-        <div class="card-title" id="menteeCount" style="font-size:32px">—</div>
+      <div class="mp-tabs" id="tabs">
+        <button class="mp-tab active" data-tab="goals">Goals</button>
+        <button class="mp-tab" data-tab="checkins">Check-Ins</button>
+        <button class="mp-tab" data-tab="journal">Journal</button>
+        <button class="mp-tab" data-tab="help">Help Requests</button>
       </div>
 
-      <div class="page-eyebrow" style="margin-bottom:12px">Your Mentees</div>
-      <div id="menteesList">
-        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
+      <div class="mp-section active" id="section-goals">
+        <div id="goalsList"><div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div></div>
       </div>
-
-      <!-- Admin Tools — hidden by default, only revealed once the
-           server confirms the signed-in email is on ADMIN_EMAILS. -->
-      <div class="card" id="adminToolsCard" style="display:none; margin-top:24px">
-        <div class="card-label">Admin Tools</div>
-        <div class="quick-actions-grid">
-          <a class="quick-action" href="/mentorship/admin/mentors.html">
-            <div class="quick-action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            </div>
-            <div>
-              <div class="quick-action-title">Manage Mentors</div>
-              <div class="quick-action-desc">Review and approve applications</div>
-            </div>
-          </a>
-          <a class="quick-action" href="/mentorship/admin/matching.html">
-            <div class="quick-action-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div>
-              <div class="quick-action-title">Mentor Matching</div>
-              <div class="quick-action-desc">Pair mentors with mentees</div>
-            </div>
-          </a>
-        </div>
+      <div class="mp-section" id="section-checkins">
+        <div id="checkinsList"><div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div></div>
+      </div>
+      <div class="mp-section" id="section-journal">
+        <div id="journalList"><div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div></div>
+      </div>
+      <div class="mp-section" id="section-help">
+        <div id="helpList"><div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div></div>
       </div>
     </div>
   </main>
@@ -155,6 +150,15 @@
     } catch (e) { console.warn('Sign out failed:', e); }
     window.location.href = 'https://www.inspirevision.org';
   });
+
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.mp-tab');
+    if (!btn) return;
+    document.querySelectorAll('.mp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.mp-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('section-' + btn.dataset.tab).classList.add('active');
+  });
 </script>
 
 <script>
@@ -174,71 +178,111 @@
 <script>
   const $ = id => document.getElementById(id);
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const fmtDate = d => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const MOOD_LABEL = { struggling: '😢 Finding it tough', hard: "😕 It's been challenging", ok: '😐 Getting through it', good: '😊 Doing great', great: '😄 Feeling excellent' };
+  const CATEGORY_LABEL = { urgent: 'Urgent', prayer: 'Prayer', general: 'Support' };
 
-  function renderMentees(rows) {
-    $('menteeCount').textContent = rows.length;
-    const list = $('menteesList');
-    if (!rows.length) {
-      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div>No mentees assigned yet — check back once our team pairs you with someone.</div>';
-      return;
-    }
-    list.innerHTML = rows.map(r => `
+  function renderGoals(rows) {
+    const el = $('goalsList');
+    if (!rows.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div>No goals set yet.</div>'; return; }
+    el.innerHTML = rows.map(g => `
       <div class="list-card">
         <div class="list-card-top">
-          <div class="list-card-title">${escapeHtml(r.student_name)}</div>
+          <div class="list-card-title">${escapeHtml(g.title || 'Untitled goal')}</div>
+          <span class="badge badge-muted">${g.status || 'active'}</span>
         </div>
-        <div class="list-card-meta">Paired ${new Date(r.assigned_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
-        <div class="list-card-actions">
-          <a class="list-card-btn primary" href="/mentorship/mentor-portal/session-notes.html?student=${r.student_id}">Add Session Note</a>
-        </div>
+        ${g.description ? `<div class="list-card-desc">${escapeHtml(g.description)}</div>` : ''}
+        <div class="list-card-meta">Set ${fmtDate(g.created_at)}</div>
       </div>`).join('');
   }
 
-  let dbClient = null;
-  let currentUser = null;
+  function renderCheckins(rows) {
+    const el = $('checkinsList');
+    if (!rows.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div>No check-ins yet.</div>'; return; }
+    el.innerHTML = rows.map(r => `
+      <div class="list-card">
+        <div class="list-card-top">
+          <div class="list-card-title">${MOOD_LABEL[r.mood] || r.mood}</div>
+          <span class="badge badge-muted">${fmtDate(r.created_at)}</span>
+        </div>
+        ${r.reflection ? `<div class="list-card-desc">${escapeHtml(r.reflection)}</div>` : ''}
+      </div>`).join('');
+  }
+
+  function renderJournal(rows) {
+    const el = $('journalList');
+    if (!rows.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📔</div>No journal entries yet.</div>'; return; }
+    el.innerHTML = rows.map(j => `
+      <div class="list-card">
+        <div class="list-card-top">
+          <div class="list-card-title">${escapeHtml(j.title || 'Untitled entry')}</div>
+          <span class="badge badge-muted">${fmtDate(j.created_at)}</span>
+        </div>
+        <div class="list-card-desc">${escapeHtml(j.body)}</div>
+      </div>`).join('');
+  }
+
+  function renderHelp(rows) {
+    const el = $('helpList');
+    if (!rows.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤲</div>No help requests.</div>'; return; }
+    el.innerHTML = rows.map(h => `
+      <div class="list-card">
+        <div class="list-card-top">
+          <div class="list-card-title">${CATEGORY_LABEL[h.category] || 'Support'}</div>
+          <span class="badge badge-muted">${h.status}</span>
+        </div>
+        <div class="list-card-desc">${escapeHtml(h.message)}</div>
+        <div class="list-card-meta">${fmtDate(h.created_at)}</div>
+      </div>`).join('');
+  }
+
   (async () => {
     try {
-      dbClient = await getDB();
+      const dbClient = await getDB();
       const { data: { user } } = await dbClient.auth.getUser();
       const isApprovedMentor = user?.user_metadata?.mentorship_role === 'mentor' && user?.user_metadata?.mentor_status === 'approved';
       if (!user || !isApprovedMentor) { window.location.href = '/mentorship/login.html'; return; }
-      currentUser = user;
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
       const firstName = firstWord(user.user_metadata?.full_name) || 'Mentor';
-      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
       $('profileDropdownName').textContent = firstName;
       const avatarEl = $('topbarAvatar');
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
 
-      // Admin Tools card — see dashboard/index.html's identical check
-      // for why this reuses admin-mentors.js purely as an auth probe.
-      try {
-        const { data: { session } } = await dbClient.auth.getSession();
-        if (session) {
-          const res = await fetch('/.netlify/functions/admin-mentors', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-            body: JSON.stringify({ action: 'list' }),
-          });
-          if (res.status === 200) $('adminToolsCard').style.display = '';
-        }
-      } catch (e) {
-        console.warn('Admin check failed (non-fatal):', e);
+      const params = new URLSearchParams(window.location.search);
+      const studentId = params.get('student');
+      if (!studentId) { window.location.href = '/mentorship/mentor-portal/mentees.html'; return; }
+
+      // Confirm this is actually one of the mentor's active mentees before
+      // showing anything — RLS already enforces this at the query level
+      // (see mentorship_schema_v4_round_trip.sql), this is just so the page
+      // can show the mentee's name and a clear "not your mentee" message
+      // instead of silently rendering four empty lists.
+      const { data: assignment } = await dbClient.schema('mentorship').from('mentor_assignments')
+        .select('*').eq('mentor_id', user.id).eq('student_id', studentId).eq('status', 'active').maybeSingle();
+      if (!assignment) {
+        $('menteeName').textContent = 'Not your mentee';
+        document.querySelector('.content').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>This mentee isn\'t currently assigned to you.</div>';
+        return;
       }
+      $('menteeName').textContent = assignment.student_name || 'Mentee Progress';
 
-      const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
-        .select('*').eq('mentor_id', currentUser.id).eq('status', 'active').order('assigned_at', { ascending: false });
-      if (error) { console.warn('Load mentees failed:', error); renderMentees([]); return; }
-      renderMentees(data || []);
-
+      const [goals, checkins, journal, help] = await Promise.all([
+        dbClient.schema('mentorship').from('goals').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('check_ins').select('*').eq('student_id', studentId).order('created_at', { ascending: false }).limit(30),
+        dbClient.schema('mentorship').from('journal_entries').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('help_requests').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
+      ]);
+      renderGoals(goals.data || []);
+      renderCheckins(checkins.data || []);
+      renderJournal(journal.data || []);
+      renderHelp(help.data || []);
     } catch (e) {
-      console.warn('Mentor portal page init failed:', e);
-      window.location.href = '/mentorship/login.html';
+      console.warn('Mentee progress page failed:', e);
+      window.location.href = '/mentorship/mentor-portal/mentees.html';
     }
   })();
-
 </script>
 </body>
 </html>
