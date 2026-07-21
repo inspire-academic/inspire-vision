@@ -1,0 +1,8 @@
+{
+  "_comment": "Isolated Slice 0 staging Supabase project. URL and anon/publishable key only — same public-by-design category as the values already hardcoded in assets/supabase.js for production. No service-role key exists for this project anywhere in this repo, per Founder instruction — privileged operations (auth.users deletion, mentor_assignments seeding) are performed manually via the Supabase dashboard, never scripted.",
+  "PROJECT_NAME": "inspire-vision-staging",
+  "PROJECT_REF": "glisozcknfcvrllatipo",
+  "SUPABASE_URL": "https://glisozcknfcvrllatipo.supabase.co",
+  "SUPABASE_ANON_KEY": "sb_publishable_Tipl_Tud8hEdmMn9j0r5ag_IkEBNeWF",
+  "PRODUCTION_PROJECT_REF_DO_NOT_USE": "ygtsrdwoikqnrbexjrtl"
+}
