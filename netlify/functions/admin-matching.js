@@ -60,8 +60,21 @@ exports.handler = async (event) => {
       const unassignedMentees = users
         .filter(u => u.user_metadata?.mentorship_role === 'mentee' && !assignedStudentIds.has(u.id))
         .map(u => ({ id: u.id, email: u.email, full_name: u.user_metadata?.full_name || '' }));
+      // Full roster for admin/mentees.html — same underlying data as
+      // unassignedMentees above, just not filtered down, plus each row's
+      // current mentor (if any) for display.
+      const assignmentByStudent = new Map((assignments || []).map(a => [a.student_id, a]));
+      const allMentees = users
+        .filter(u => u.user_metadata?.mentorship_role === 'mentee')
+        .map(u => ({
+          id: u.id,
+          email: u.email,
+          full_name: u.user_metadata?.full_name || '',
+          created_at: u.created_at,
+          mentor_name: assignmentByStudent.get(u.id)?.mentor_name || null,
+        }));
 
-      return { statusCode: 200, body: JSON.stringify({ mentors, unassignedMentees, activeAssignments: assignments || [] }) };
+      return { statusCode: 200, body: JSON.stringify({ mentors, unassignedMentees, allMentees, activeAssignments: assignments || [] }) };
     }
 
     if (action === 'assign') {
