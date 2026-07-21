@@ -619,6 +619,11 @@
       .footer-brand { grid-column: 1 / -1; }
     }
     @media (max-width: 768px) {
+      /* Desktop-only CTA button injected into .iv-nav directly (outside .nav-links,
+         so styles.css's ".nav-links { display: none }" doesn't catch it) and
+         flex-shrink:0, so on narrow viewports it was pushed off the right edge
+         of the screen instead of collapsing into the hamburger menu. */
+      .nav-right { display: none; }
       /* Swap in compressed, phone-sized photography instead of the desktop originals */
       .hero-bg { background-image: var(--img-hero-banner-mobile); }
       .cardinal-1 .cardinal-bg { background-image: var(--img-cardinal-academic-mobile); }
