@@ -62,6 +62,6 @@ NOTIFY pgrst, 'reload schema';
 -- ============================================
 -- Confirm setup
 -- ============================================
-SELECT polname, cmd, qual, with_check
+SELECT policyname, cmd, qual, with_check
 FROM pg_policies
 WHERE schemaname = 'mentorship' AND tablename = 'session_notes';
