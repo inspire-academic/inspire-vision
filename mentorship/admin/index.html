@@ -4,19 +4,126 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Mentorship Admin</title>
+  <meta name="description" content="Mentor applications, matching, mentees, safeguarding, and reports.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .admin-wrap { max-width: 800px; margin: 0 auto }
+    .ix-section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--mentorship-gold); margin: 28px 0 12px }
+    .ix-section-title:first-of-type { margin-top: 0 }
+    .ix-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 8px; }
+    .ix-stat {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 16px 18px;
+    }
+    .ix-stat.warn { border-color: rgba(239,68,68,.5); }
+    .ix-stat-value { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .ix-stat.warn .ix-stat-value { color: #fca5a5; }
+    .ix-stat-label { font-size: 11px; opacity: .6; }
+    .ix-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .ix-tool-card {
+      display: block; text-decoration: none; color: inherit;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 18px 20px;
+      transition: border-color .15s;
+    }
+    .ix-tool-card:hover { border-color: var(--mentorship-gold); }
+    .ix-tool-icon {
+      width: 34px; height: 34px; border-radius: 9px; margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(184,92,26,.15); color: var(--mentorship-gold);
+    }
+    .ix-tool-icon svg { width: 17px; height: 17px; stroke-width: 1.8; }
+    .ix-tool-title { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
+    .ix-tool-desc { font-size: 12px; opacity: .6; }
+  </style>
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Mentorship Admin</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Admin</div>
+        <h1 class="page-title">Mentorship Admin</h1>
+      </div>
+    </div>
+    <div id="content">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
+    </div>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    function stat(value, label, warn) {
+      return `<div class="ix-stat${warn ? ' warn' : ''}"><div class="ix-stat-value">${value}</div><div class="ix-stat-label">${escapeHtml(label)}</div></div>`;
+    }
+
+    const TOOLS = [
+      { href: '/mentorship/admin/mentors.html', icon: '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>', title: 'Manage Mentors', desc: 'Review and approve applications' },
+      { href: '/mentorship/admin/matching.html', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', title: 'Mentor Matching', desc: 'Pair mentors with mentees' },
+      { href: '/mentorship/admin/mentees.html', icon: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>', title: 'Manage Mentees', desc: 'Full roster + assignment status' },
+      { href: '/mentorship/admin/safeguarding.html', icon: '<path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/>', title: 'Safeguarding Queue', desc: 'Ask for Help / Prayer & Support' },
+      { href: '/mentorship/admin/reports.html', icon: '<path d="M18 20V10M12 20V4M6 20v-6"/>', title: 'Reports', desc: 'Programme-wide stats' },
+    ];
+
+    function render(stats) {
+      const content = $('content');
+      const toolsHtml = TOOLS.map(t => `
+        <a class="ix-tool-card" href="${t.href}">
+          <div class="ix-tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${t.icon}</svg></div>
+          <div class="ix-tool-title">${escapeHtml(t.title)}</div>
+          <div class="ix-tool-desc">${escapeHtml(t.desc)}</div>
+        </a>`).join('');
+
+      const statsHtml = stats ? `
+        <div class="ix-section-title">At a Glance</div>
+        <div class="ix-stat-grid">
+          ${stat(stats.mentors.pendingReview, 'Mentors awaiting review', stats.mentors.pendingReview > 0)}
+          ${stat(stats.mentees.unassigned, 'Mentees awaiting a mentor', stats.mentees.unassigned > 0)}
+          ${stat(stats.assignments.active, 'Active pairings')}
+          ${stat(stats.helpRequests.new, 'New help requests', stats.helpRequests.new > 0)}
+        </div>` : '';
+
+      content.innerHTML = `${statsHtml}<div class="ix-section-title">Tools</div><div class="ix-tools-grid">${toolsHtml}</div>`;
+    }
+
+    (async () => {
+      const content = $('content');
+      try {
+        const db = await getDB();
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) { window.location.href = '/mentorship/login.html'; return; }
+
+        const res = await fetch('/.netlify/functions/admin-reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({}),
+        });
+        if (res.status === 401) { window.location.href = '/mentorship/login.html'; return; }
+        if (res.status === 403) {
+          content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>You\'re not authorized to view this page.</div>';
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        // Non-fatal if stats fail to load (e.g. not configured yet) — the
+        // tool links themselves don't depend on this succeeding.
+        render(res.status === 200 ? data : null);
+      } catch (e) {
+        console.warn('Admin index page failed:', e);
+        render(null);
+      }
+    })();
+  </script>
 </body>
 </html>

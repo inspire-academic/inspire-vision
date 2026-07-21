@@ -4,19 +4,135 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | Reports</title>
+  <meta name="description" content="Programme-wide mentorship stats.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .admin-wrap { max-width: 800px; margin: 0 auto }
+    .rp-section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--mentorship-gold); margin: 28px 0 12px }
+    .rp-section-title:first-of-type { margin-top: 0 }
+    .rp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .rp-stat {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 18px 20px;
+    }
+    .rp-stat.warn { border-color: rgba(239,68,68,.5); }
+    .rp-stat-value { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+    .rp-stat.warn .rp-stat-value { color: #fca5a5; }
+    .rp-stat-label { font-size: 12px; opacity: .6; }
+  </style>
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">Reports</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Admin</div>
+        <h1 class="page-title">Reports</h1>
+      </div>
+    </div>
+    <div id="content">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
+    </div>
   </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    function stat(value, label, warn) {
+      return `<div class="rp-stat${warn ? ' warn' : ''}"><div class="rp-stat-value">${value}</div><div class="rp-stat-label">${escapeHtml(label)}</div></div>`;
+    }
+
+    function render(d) {
+      const content = $('content');
+      content.innerHTML = `
+        <div class="rp-section-title">Mentors</div>
+        <div class="rp-grid">
+          ${stat(d.mentors.approved, 'Approved')}
+          ${stat(d.mentors.pendingReview, 'Awaiting review', d.mentors.pendingReview > 0)}
+          ${stat(d.mentors.rejected, 'Rejected')}
+        </div>
+
+        <div class="rp-section-title">Mentees</div>
+        <div class="rp-grid">
+          ${stat(d.mentees.total, 'Total')}
+          ${stat(d.mentees.assigned, 'Assigned')}
+          ${stat(d.mentees.unassigned, 'Awaiting a mentor', d.mentees.unassigned > 0)}
+        </div>
+
+        <div class="rp-section-title">Pairings</div>
+        <div class="rp-grid">
+          ${stat(d.assignments.active, 'Active')}
+          ${stat(d.assignments.ended, 'Ended')}
+        </div>
+
+        <div class="rp-section-title">Sessions Logged</div>
+        <div class="rp-grid">
+          ${stat(d.sessions.scheduled, 'Scheduled (upcoming)')}
+          ${stat(d.sessions.completed, 'Completed')}
+          ${stat(d.sessions.cancelled, 'Cancelled')}
+        </div>
+
+        <div class="rp-section-title">Ask for Help / Prayer &amp; Support</div>
+        <div class="rp-grid">
+          ${stat(d.helpRequests.new, 'New', d.helpRequests.new > 0)}
+          ${stat(d.helpRequests.seen, 'Seen')}
+          ${stat(d.helpRequests.resolved, 'Resolved')}
+          ${stat(d.helpRequests.urgentOpen, 'Urgent — still open', d.helpRequests.urgentOpen > 0)}
+        </div>
+        <div class="list-card-meta" style="margin:8px 2px 0"><a href="/mentorship/admin/safeguarding.html" style="color:var(--mentorship-gold)">Open the safeguarding queue →</a></div>
+
+        <div class="rp-section-title">Student Engagement (all-time)</div>
+        <div class="rp-grid">
+          ${stat(d.engagement.goals, 'Goals set')}
+          ${stat(d.engagement.checkIns, 'Check-ins logged')}
+          ${stat(d.engagement.journalEntries, 'Journal entries')}
+        </div>
+      `;
+    }
+
+    (async () => {
+      const content = $('content');
+      try {
+        const db = await getDB();
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) { window.location.href = '/mentorship/login.html'; return; }
+
+        const res = await fetch('/.netlify/functions/admin-reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({}),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) { window.location.href = '/mentorship/login.html'; return; }
+        if (res.status === 403) {
+          content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>You\'re not authorized to view this page.</div>';
+          return;
+        }
+        if (res.status !== 200) {
+          content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div>${escapeHtml(data.error || 'Something went wrong loading reports.')}</div>`;
+          return;
+        }
+        render(data);
+      } catch (e) {
+        console.warn('Reports page failed:', e);
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div>Something went wrong — please try again.</div>';
+      }
+    })();
+  </script>
 </body>
 </html>
