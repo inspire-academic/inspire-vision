@@ -791,6 +791,16 @@ body.auth-body {
       justify-content: center;
       margin-bottom: 10px;
     }
+    /* SVG root elements clip to their own viewBox by default (UA-stylesheet
+       overflow:hidden) — the axis labels ("Intellectual", "Physical",
+       "Emotional", "Character") are deliberately positioned outside the
+       180-wide viewBox so they sit clear of the hexagon, so without this
+       they render truncated instead of just spilling into the wrapper's
+       already-empty margin. */
+    /* svg.compass-chart (not just .compass-chart) needed: Chrome's UA
+       stylesheet rule `svg:not(:root) { overflow: hidden; }` has slightly
+       higher specificity than a bare class selector and otherwise wins. */
+    svg.compass-chart { overflow: visible; }
     .compass-legend {
       display: flex;
       align-items: center;
