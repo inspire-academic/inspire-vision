@@ -3,20 +3,235 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | For Parents & Guardians</title>
+  <title>Inspire Mentorship | For Parents &amp; Guardians</title>
+  <meta name="description" content="How Inspire Mentorship keeps your child safe, what to expect, and answers to common questions from parents and guardians.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.parents-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    .pg-header {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1000px; margin: 0 auto; padding: 28px 24px 0;
+    }
+    .pg-brand { color: #f4f6f9; text-decoration: none; font-weight: 800; letter-spacing: .02em; }
+    .pg-brand span { color: var(--mentorship-gold); }
+    .pg-back { color: rgba(244,246,249,.6); font-size: 13px; text-decoration: none; }
+    .pg-back:hover { color: var(--mentorship-gold); }
+
+    .pg-hero { max-width: 760px; margin: 0 auto; padding: 56px 24px 40px; text-align: center; }
+    .pg-eyebrow { color: var(--mentorship-gold); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; margin-bottom: 14px; }
+    .pg-hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.15; margin-bottom: 16px; }
+    .pg-hero p { color: rgba(244,246,249,.72); font-size: 16px; line-height: 1.65; max-width: 600px; margin: 0 auto 28px; }
+    .pg-hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .pg-btn {
+      display: inline-block; padding: 13px 26px; border-radius: 9px; font-weight: 700; font-size: 14px; text-decoration: none;
+    }
+    .pg-btn-primary { background: var(--mentorship-gold); color: #fff; }
+    .pg-btn-primary:hover { opacity: .92; }
+    .pg-btn-outline { border: 1px solid rgba(255,255,255,.2); color: #f4f6f9; }
+    .pg-btn-outline:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
+
+    .pg-section { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+    .pg-section-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; text-align: center; }
+    .pg-section-sub { color: rgba(244,246,249,.6); font-size: 14px; text-align: center; max-width: 560px; margin: 0 auto 32px; line-height: 1.6; }
+
+    .pg-values { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .pg-value-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 24px 22px; }
+    .pg-value-icon {
+      width: 40px; height: 40px; border-radius: 10px; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(184,92,26,.15); color: var(--mentorship-gold);
+    }
+    .pg-value-icon svg { width: 20px; height: 20px; stroke-width: 1.7; }
+    .pg-value-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .pg-value-card p { font-size: 13px; color: rgba(244,246,249,.62); line-height: 1.6; }
+
+    .pg-safety-section { background: rgba(184,92,26,.06); border-top: 1px solid rgba(184,92,26,.2); border-bottom: 1px solid rgba(184,92,26,.2); }
+    .pg-safety-list { display: flex; flex-direction: column; gap: 14px; max-width: 640px; margin: 0 auto; }
+    .pg-safety-item { display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px 20px; }
+    .pg-safety-check { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(184,92,26,.18); color: var(--mentorship-gold); display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+    .pg-safety-check svg { width: 14px; height: 14px; stroke-width: 3; }
+    .pg-safety-item p { font-size: 14px; line-height: 1.55; color: rgba(244,246,249,.85); }
+    .pg-safety-item strong { color: #fff; }
+
+    .pg-steps { counter-reset: pg-step; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .pg-step { position: relative; padding-top: 8px; }
+    .pg-step::before {
+      counter-increment: pg-step; content: counter(pg-step);
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--mentorship-gold); color: #fff; font-weight: 800; font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .pg-step h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .pg-step p { font-size: 13px; color: rgba(244,246,249,.6); line-height: 1.55; }
+
+    .pg-faq-item { border-bottom: 1px solid rgba(255,255,255,.08); padding: 18px 0; }
+    .pg-faq-item:last-child { border-bottom: none; }
+    .pg-faq-q { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+    .pg-faq-q h3 { font-size: 15px; font-weight: 700; }
+    .pg-faq-icon { flex-shrink: 0; width: 20px; height: 20px; color: var(--mentorship-gold); transition: transform .2s; }
+    .pg-faq-item.open .pg-faq-icon { transform: rotate(45deg); }
+    .pg-faq-a { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
+    .pg-faq-item.open .pg-faq-a { max-height: 240px; }
+    .pg-faq-a p { font-size: 13px; color: rgba(244,246,249,.65); line-height: 1.6; padding-top: 12px; }
+
+    .pg-cta { text-align: center; padding: 56px 24px 72px; }
+    .pg-cta h2 { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+    .pg-cta p { color: rgba(244,246,249,.62); font-size: 14px; margin-bottom: 24px; }
+
+    .pg-footer { text-align: center; padding: 24px; border-top: 1px solid rgba(255,255,255,.06); font-size: 12px; color: rgba(244,246,249,.4); }
+  </style>
 </head>
-<body style="background:#0A1628;color:#f4f6f9;font-family:sans-serif;
-display:grid;place-items:center;min-height:100vh;text-align:center">
-  <div>
-    <p style="color:#B85C1A;font-size:12px;letter-spacing:.2em;
-    text-transform:uppercase;margin-bottom:12px">Inspire Mentorship</p>
-    <h1 style="font-size:28px;margin-bottom:8px">For Parents & Guardians</h1>
-    <p style="opacity:.6;margin-bottom:24px">Coming soon — this section is being built.</p>
-    <a href="/mentorship/dashboard/"
-       style="color:#B85C1A;font-weight:700">← Back to Dashboard</a>
+<body class="parents-body">
+
+  <div class="pg-header">
+    <a href="/mentorship/index.html" class="pg-brand">INSPIRE <span>MENTORSHIP</span></a>
+    <a href="https://www.inspirevision.org" class="pg-back">← Inspire Vision</a>
   </div>
+
+  <section class="pg-hero">
+    <div class="pg-eyebrow">For Parents &amp; Guardians</div>
+    <h1>Your Child, Walked Alongside — Never Alone</h1>
+    <p>Inspire Mentorship pairs young people with a caring, vetted adult who helps them build character, resilience, and purpose. Here's exactly how it works, and how we keep them safe.</p>
+    <div class="pg-hero-btns">
+      <a href="/mentorship/join.html" class="pg-btn pg-btn-primary">Enroll Your Child →</a>
+      <a href="#safety" class="pg-btn pg-btn-outline">See How We Keep Them Safe</a>
+    </div>
+  </section>
+
+  <section class="pg-section">
+    <div class="pg-section-title">Why Families Choose Inspire Mentorship</div>
+    <div class="pg-section-sub">A movement dedicated to raising young people of character, competence, wisdom, and purpose — rooted in faith, not just achievement.</div>
+    <div class="pg-values">
+      <div class="pg-value-card">
+        <div class="pg-value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a5 5 0 0110 0v2"/><circle cx="17" cy="9" r="2"/><path d="M17 15c2 0 5 1 5 3v1"/></svg></div>
+        <h3>One-to-One, Not a Classroom</h3>
+        <p>Your child is paired individually with a mentor — never a group session, never self-selected. Every pairing is made by our team.</p>
+      </div>
+      <div class="pg-value-card">
+        <div class="pg-value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/></svg></div>
+        <h3>Rooted in Faith &amp; Character</h3>
+        <p>Alongside goals and life skills, the journey is grounded in truth, encouragement, and the belief that every young person was made for more.</p>
+      </div>
+      <div class="pg-value-card">
+        <div class="pg-value-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <h3>Real Tools, Real Progress</h3>
+        <p>Goal-setting, weekly check-ins, and a private journal give your child a structured, supported way to reflect and grow — not just a chat.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pg-section pg-safety-section" id="safety">
+    <div class="pg-section-title">How We Keep Your Child Safe</div>
+    <div class="pg-section-sub">Safeguarding isn't an afterthought — it shapes how mentors are approved and how every pairing is made.</div>
+    <div class="pg-safety-list">
+      <div class="pg-safety-item">
+        <div class="pg-safety-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <p><strong>Every mentor is reviewed before approval.</strong> Nobody is matched with a young person on the basis of an application alone — our team reviews each one individually, a process that may include a background check.</p>
+      </div>
+      <div class="pg-safety-item">
+        <div class="pg-safety-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <p><strong>Pairings are made by our team, not chosen by mentors or mentees.</strong> There is no self-service matching anywhere in the platform — a mentor can never assign themselves to a young person.</p>
+      </div>
+      <div class="pg-safety-item">
+        <div class="pg-safety-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <p><strong>Your child can always ask for help.</strong> A private "Ask for Help" and "Prayer &amp; Support" channel lets them reach out at any time, and every request is reviewed by our team.</p>
+      </div>
+      <div class="pg-safety-item">
+        <div class="pg-safety-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <p><strong>Parents and guardians may be involved</strong> in their child's mentorship journey, particularly for mentees under 18 — this is part of what your child agrees to when they enroll.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pg-section">
+    <div class="pg-section-title">What to Expect</div>
+    <div class="pg-section-sub">A simple, guided path from enrollment to an ongoing mentoring relationship.</div>
+    <div class="pg-steps">
+      <div class="pg-step">
+        <h3>Enroll</h3>
+        <p>Your child (or you, on their behalf) signs up and shares a bit about themselves — their strengths, what matters to them, and what they're hoping to grow in.</p>
+      </div>
+      <div class="pg-step">
+        <h3>Matched by Our Team</h3>
+        <p>Once a reviewed, approved mentor is available, our team pairs them with your child — never automatically, never self-selected.</p>
+      </div>
+      <div class="pg-step">
+        <h3>Ongoing Check-Ins</h3>
+        <p>Your child sets goals, checks in regularly, and reflects in a private journal, with support from their mentor along the way.</p>
+      </div>
+      <div class="pg-step">
+        <h3>Mentor Sessions</h3>
+        <p>Mentors log a summary of each session your child can see, so growth is visible — not just a private conversation you never hear about.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pg-section">
+    <div class="pg-section-title">Common Questions</div>
+    <div id="pgFaq">
+      <div class="pg-faq-item open">
+        <div class="pg-faq-q">
+          <h3>Who are the mentors?</h3>
+          <svg class="pg-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="pg-faq-a"><p>Adults who apply through our mentor application, share their motivation for mentoring, and go through a safeguarding review before they're ever approved to be matched with a young person.</p></div>
+      </div>
+      <div class="pg-faq-item">
+        <div class="pg-faq-q">
+          <h3>How is my child matched with a mentor?</h3>
+          <svg class="pg-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="pg-faq-a"><p>Our team makes every pairing directly — your child doesn't browse or choose a mentor, and a mentor can't select a mentee. It's a deliberate, one-to-one match made on your child's behalf.</p></div>
+      </div>
+      <div class="pg-faq-item">
+        <div class="pg-faq-q">
+          <h3>Can I stay involved as a parent or guardian?</h3>
+          <svg class="pg-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="pg-faq-a"><p>Yes. Parents and guardians may be involved in the mentorship journey, especially for mentees under 18 — this is agreed to as part of enrollment.</p></div>
+      </div>
+      <div class="pg-faq-item">
+        <div class="pg-faq-q">
+          <h3>What if I have a concern?</h3>
+          <svg class="pg-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="pg-faq-a"><p>Your child can raise anything, anytime, through the private Ask for Help / Prayer &amp; Support channel in their dashboard, which our team reviews directly.</p></div>
+      </div>
+      <div class="pg-faq-item">
+        <div class="pg-faq-q">
+          <h3>Is this program faith-based?</h3>
+          <svg class="pg-faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="pg-faq-a"><p>Yes — Inspire Mentorship is rooted in faith and character formation alongside practical goals and life skills, as part of the wider Inspire Vision movement.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pg-cta">
+    <h2>Ready to Get Started?</h2>
+    <p>Enrollment takes a few minutes, and every mentor pairing goes through our team.</p>
+    <a href="/mentorship/join.html" class="pg-btn pg-btn-primary">Enroll Your Child →</a>
+  </section>
+
+  <div class="pg-footer">Inspire Mentorship™ · part of Inspire Vision</div>
+
+  <script>
+    document.getElementById('pgFaq').addEventListener('click', (e) => {
+      const q = e.target.closest('.pg-faq-q');
+      if (!q) return;
+      q.closest('.pg-faq-item').classList.toggle('open');
+    });
+  </script>
 </body>
 </html>
