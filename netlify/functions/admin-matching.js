@@ -39,21 +39,21 @@ exports.handler = async (event) => {
     const { action, mentorId, studentId, assignmentId } = JSON.parse(event.body || '{}');
 
     if (action === 'list') {
-      const [users, { data: assignments, error: assignErr }, { data: approvals, error: approvalErr }] = await Promise.all([
+      const [users, { data: assignments, error: assignErr }, { data: applications, error: appErr }] = await Promise.all([
         listAllUsers(admin),
         admin.schema('mentorship').from('mentor_assignments').select('*').eq('status', 'active'),
-        admin.schema('mentorship').from('mentor_approvals').select('mentor_id').eq('status', 'approved'),
+        admin.schema('mentorship').from('mentor_applications').select('mentor_id').eq('status', 'approved'),
       ]);
       if (assignErr) throw assignErr;
-      if (approvalErr) throw approvalErr;
+      if (appErr) throw appErr;
 
       const assignedStudentIds = new Set((assignments || []).map(a => a.student_id));
-      // Picker reads mentor_approvals (service-role-only table), not
+      // Picker reads mentor_applications (service-role-only writes), not
       // user_metadata.mentor_status — the latter is client-writable by the
       // account owner (docs/assurance/mentorship/FOLLOWUP-mentor-status-spoofable-picker.md),
       // so a self-elevated account could otherwise appear here as if
       // genuinely vetted by admin-mentors.js.
-      const approvedMentorIds = new Set((approvals || []).map(a => a.mentor_id));
+      const approvedMentorIds = new Set((applications || []).map(a => a.mentor_id));
       const mentors = users
         .filter(u => approvedMentorIds.has(u.id))
         .map(u => ({ id: u.id, email: u.email, full_name: u.user_metadata?.full_name || '' }));

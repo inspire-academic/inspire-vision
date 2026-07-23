@@ -75,16 +75,18 @@
       btn.textContent = 'Submitting…';
       msg.className = 'auth-msg';
       try {
+        const fullName = document.getElementById('fullName').value.trim();
+        const motivation = document.getElementById('motivation').value.trim();
         const db = await getDB();
         const { data, error } = await db.auth.signUp({
           email: document.getElementById('email').value.trim(),
           password,
           options: {
             data: {
-              full_name: document.getElementById('fullName').value.trim(),
+              full_name: fullName,
               mentorship_role: 'mentor',
               mentor_status: 'pending_review',
-              mentor_motivation: document.getElementById('motivation').value.trim(),
+              mentor_motivation: motivation,
             },
           },
         });
@@ -93,6 +95,21 @@
           btn.disabled = false;
           btn.textContent = 'Submit Application';
           return;
+        }
+        // The real application record admin-mentors.js reads — user_metadata
+        // above is kept only so this account can read its own status for
+        // the login redirect. Best-effort: signup already succeeded and the
+        // account is real either way; a failure here is logged, not shown
+        // as an error, since there's nothing more the applicant can do
+        // (retrying signUp would just fail with "already registered").
+        if (data?.user) {
+          const { error: appErr } = await db.schema('mentorship').from('mentor_applications').insert({
+            mentor_id: data.user.id,
+            email: data.user.email,
+            full_name: fullName,
+            motivation,
+          });
+          if (appErr) console.warn('Could not create mentor_applications row (account was still created):', appErr);
         }
         // Mentor accounts never auto-redirect into mentor-portal — pending
         // review regardless of whether email confirmation is also required.

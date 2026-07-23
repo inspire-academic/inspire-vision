@@ -45,24 +45,19 @@ exports.handler = async (event) => {
     if (assignErr) throw assignErr;
 
     const mentees = users.filter(u => u.user_metadata?.mentorship_role === 'mentee');
-    // Pending applications only ever exist in user_metadata (see
-    // admin-mentors.js) — mentor_approvals only gets a row once a
-    // decision has actually been made.
-    const pendingMentors = users.filter(u =>
-      u.user_metadata?.mentorship_role === 'mentor' && u.user_metadata?.mentor_status === 'pending_review'
-    ).length;
     const assignedMenteeIds = new Set((activeAssignments || []).map(a => a.student_id));
     const assignedMenteeCount = mentees.filter(u => assignedMenteeIds.has(u.id)).length;
 
     const [
-      approvedMentors, rejectedMentors,
+      pendingMentors, approvedMentors, rejectedMentors,
       endedAssignments,
       sessionsScheduled, sessionsCompleted, sessionsCancelled,
       hrNew, hrSeen, hrResolved,
       goalsCount, checkInsCount, journalCount,
     ] = await Promise.all([
-      countTable(admin, 'mentor_approvals', { status: 'approved' }),
-      countTable(admin, 'mentor_approvals', { status: 'rejected' }),
+      countTable(admin, 'mentor_applications', { status: 'pending_review' }),
+      countTable(admin, 'mentor_applications', { status: 'approved' }),
+      countTable(admin, 'mentor_applications', { status: 'rejected' }),
       countTable(admin, 'mentor_assignments', { status: 'ended' }),
       countTable(admin, 'sessions', { status: 'scheduled' }),
       countTable(admin, 'sessions', { status: 'completed' }),

@@ -1,8 +1,13 @@
 // Mentor application review — list / approve / reject pending mentor
-// applications. Mentor profiles live in Supabase Auth user_metadata
-// (set at signup in mentors.html), which the browser can never list
-// across users — only a service-role key can, and that key must never
-// reach the client. This function is the one place it's used.
+// applications. The queryable record of truth is mentorship.mentor_applications
+// (mentorship_schema_v5_mentor_applications.sql) — mentors.html inserts a
+// row there right after signup. Approval still also touches
+// auth.users.user_metadata purely so the account can read its own status
+// client-side for the login redirect; that copy is never trusted for
+// anything security-relevant (see mentor_applications' own RLS: an
+// applicant can create their own pending row and read it back, but there
+// is no client UPDATE/DELETE policy at all — only this service-role
+// function can change status).
 //
 // Requires two env vars in Netlify's dashboard, neither of which exist
 // yet (Site settings -> Environment variables):
@@ -16,33 +21,19 @@
 // the allowlist, gets a 401/403 — this endpoint can read every
 // mentee's name and email and can grant mentor access to minors, so it
 // is not something to leave open.
-//
-// Known scaling limit: pending applications are found by paging
-// through *all* users via listUsers() and filtering client-side, since
-// mentor profiles aren't in a queryable table. Fine while the mentor
-// pipeline is small; if it grows, move mentor applications into their
-// own `mentorship.mentor_applications` table with normal RLS instead.
 const { getAdminClient, requireAdmin } = require('./_lib/adminAuth');
 
 async function listPendingMentors(admin) {
-  const pending = [];
-  for (let page = 1; page <= 5; page++) {
-    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
-    if (error) throw error;
-    for (const u of data.users) {
-      if (u.user_metadata?.mentorship_role === 'mentor' && u.user_metadata?.mentor_status === 'pending_review') {
-        pending.push({
-          id: u.id,
-          email: u.email,
-          full_name: u.user_metadata?.full_name || '',
-          motivation: u.user_metadata?.mentor_motivation || '',
-          created_at: u.created_at,
-        });
-      }
-    }
-    if (data.users.length < 200) break;
-  }
-  return pending;
+  const { data, error } = await admin.schema('mentorship').from('mentor_applications')
+    .select('*').eq('status', 'pending_review').order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data || []).map(a => ({
+    id: a.mentor_id,
+    email: a.email,
+    full_name: a.full_name || '',
+    motivation: a.motivation || '',
+    created_at: a.created_at,
+  }));
 }
 
 exports.handler = async (event) => {
@@ -78,7 +69,7 @@ exports.handler = async (event) => {
       // existing fields so approving someone doesn't wipe their name,
       // email, or application answers. This metadata copy is kept purely
       // so the client can read its own status for the login redirect —
-      // it is NOT the authoritative record any more (see mentor_approvals
+      // it is NOT the authoritative record (see mentor_applications
       // below), because a user can freely rewrite their own metadata.
       const { error: updateErr } = await admin.auth.admin.updateUserById(userId, {
         user_metadata: {
@@ -90,14 +81,22 @@ exports.handler = async (event) => {
 
       // Authoritative record (docs/assurance/mentorship/FOLLOWUP-mentor-status-spoofable-picker.md):
       // admin-matching.js's mentor picker must read this, not user_metadata,
-      // since only this table is unreachable by the account owner themselves.
-      const { error: approvalErr } = await admin.schema('mentorship').from('mentor_approvals').upsert({
+      // since only this table is unreachable by the account owner themselves
+      // — mentor_applications has no client UPDATE policy at all. Upsert,
+      // not update: if mentors.html's own insert at signup ever failed
+      // (logged there, best-effort), a plain UPDATE would silently affect
+      // zero rows and this approval would appear to succeed while doing
+      // nothing — upsert recreates the row from the auth account instead.
+      const { error: appErr } = await admin.schema('mentorship').from('mentor_applications').upsert({
         mentor_id: userId,
+        email: existing.user.email,
+        full_name: existing.user.user_metadata?.full_name || '',
+        motivation: existing.user.user_metadata?.mentor_motivation || '',
         status: newStatus,
         reviewed_by: auth.user.id,
         reviewed_at: new Date().toISOString(),
       });
-      if (approvalErr) return { statusCode: 500, body: JSON.stringify({ error: approvalErr.message }) };
+      if (appErr) return { statusCode: 500, body: JSON.stringify({ error: appErr.message }) };
 
       return { statusCode: 200, body: JSON.stringify({ ok: true }) };
     }
