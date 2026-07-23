@@ -21,7 +21,12 @@ module.exports = defineConfig({
   workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: 'list',
+  // 'list' for readable console output either way; 'html' so the CI
+  // workflow's "Upload Playwright report" step actually has something to
+  // upload on failure — it was previously a silent no-op (list-only
+  // produces no report directory) rather than the working diagnostic
+  // artifact it was meant to be.
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:4173',
     trace: 'retain-on-failure',
