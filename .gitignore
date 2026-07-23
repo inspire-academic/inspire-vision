@@ -1,2 +1,9 @@
 # Local Netlify folder
 .netlify
+
+# Node dependencies
+node_modules
+
+# Playwright test output
+test-results
+playwright-report

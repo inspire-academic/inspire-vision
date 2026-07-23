@@ -2,8 +2,15 @@
   "name": "inspire-vision",
   "version": "1.0.0",
   "description": "Inspire Vision platform — mentorship, health, and faith cardinals",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
   "dependencies": {
     "resend": "^3.5.0",
     "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "serve": "^14.2.3"
   }
 }

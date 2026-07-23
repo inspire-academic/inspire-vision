@@ -1,0 +1,11 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/mentorship/dashboard", "destination": "/mentorship/dashboard/index.html" },
+    { "source": "/mentorship/dashboard/", "destination": "/mentorship/dashboard/index.html" },
+    { "source": "/mentorship/mentor-portal", "destination": "/mentorship/mentor-portal/index.html" },
+    { "source": "/mentorship/mentor-portal/", "destination": "/mentorship/mentor-portal/index.html" },
+    { "source": "/mentorship/admin", "destination": "/mentorship/admin/index.html" },
+    { "source": "/mentorship/admin/", "destination": "/mentorship/admin/index.html" }
+  ]
+}
