@@ -120,7 +120,10 @@
           <textarea id="sessionNotes" placeholder="A short summary of what you covered or plan to cover — your mentee will see this." style="min-height:80px"></textarea>
         </div>
         <div class="auth-msg" id="sessionFormMsg"></div>
-        <button class="auth-btn" id="saveSessionBtn">Save Session</button>
+        <div style="display:flex; gap:10px">
+          <button class="auth-btn" id="saveSessionBtn" style="flex:1">Save Session</button>
+          <button class="auth-btn" id="cancelEditBtn" style="flex:0 0 auto; display:none; background:transparent; border:1px solid rgba(255,255,255,.15)">Cancel</button>
+        </div>
       </div>
 
       <div class="page-eyebrow" style="margin-bottom:12px">Session History</div>
@@ -176,8 +179,11 @@
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
   let mentees = [];
 
+  let sessionsById = new Map();
+
   function renderSessions(rows) {
     const list = $('sessionsList');
+    sessionsById = new Map(rows.map(s => [s.id, s]));
     if (!rows.length) {
       list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div>No sessions logged yet for this mentee.</div>';
       return;
@@ -186,16 +192,60 @@
       const dt = new Date(s.scheduled_at);
       const statusLabel = { scheduled: 'Scheduled', completed: 'Completed', cancelled: 'Cancelled' }[s.status] || s.status;
       return `
-        <div class="list-card">
+        <div class="list-card" data-id="${s.id}">
           <div class="list-card-top">
             <div class="list-card-title">${dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
             <span class="badge badge-muted">${statusLabel}</span>
           </div>
           <div class="list-card-meta">${dt.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' })} · ${s.duration_minutes || 60} min</div>
           ${s.notes ? `<div class="list-card-desc" style="margin-top:8px">${escapeHtml(s.notes)}</div>` : ''}
+          <div class="list-card-actions" style="margin-top:10px">
+            <button class="list-card-btn" data-action="edit-session">Edit</button>
+          </div>
         </div>`;
     }).join('');
   }
+
+  function toDatetimeLocal(iso) {
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  let editingSessionId = null;
+
+  function enterEditMode(session) {
+    editingSessionId = session.id;
+    $('menteeSelect').value = session.student_id;
+    $('sessionDate').value = toDatetimeLocal(session.scheduled_at);
+    $('sessionDuration').value = session.duration_minutes || 60;
+    $('sessionStatus').value = session.status || 'scheduled';
+    $('sessionNotes').value = session.notes || '';
+    $('saveSessionBtn').textContent = 'Update Session';
+    $('cancelEditBtn').style.display = '';
+    $('sessionFormMsg').className = 'auth-msg';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function exitEditMode() {
+    editingSessionId = null;
+    $('sessionDate').value = '';
+    $('sessionDuration').value = 60;
+    $('sessionStatus').value = 'scheduled';
+    $('sessionNotes').value = '';
+    $('saveSessionBtn').textContent = 'Save Session';
+    $('cancelEditBtn').style.display = 'none';
+  }
+
+  $('cancelEditBtn').addEventListener('click', exitEditMode);
+
+  $('sessionsList').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action="edit-session"]');
+    if (!btn) return;
+    const card = btn.closest('.list-card');
+    const session = sessionsById.get(card.dataset.id);
+    if (session) enterEditMode(session);
+  });
 
   async function loadSessions(studentId) {
     $('sessionsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>';
@@ -205,7 +255,10 @@
     renderSessions(data || []);
   }
 
-  $('menteeSelect').addEventListener('change', () => loadSessions($('menteeSelect').value));
+  $('menteeSelect').addEventListener('change', () => {
+    exitEditMode();
+    loadSessions($('menteeSelect').value);
+  });
 
   $('saveSessionBtn').addEventListener('click', async () => {
     const studentId = $('menteeSelect').value;
@@ -213,29 +266,32 @@
     const msg = $('sessionFormMsg');
     if (!studentId) { msg.textContent = 'No mentee assigned yet.'; msg.className = 'auth-msg show error'; return; }
     if (!dateVal) { msg.textContent = 'Pick a date and time.'; msg.className = 'auth-msg show error'; return; }
-    const mentee = mentees.find(m => m.student_id === studentId);
+    const isEditing = !!editingSessionId;
     const btn = $('saveSessionBtn');
-    btn.disabled = true; btn.textContent = 'Saving…';
-    const { error } = await dbClient.schema('mentorship').from('sessions').insert({
-      mentor_id: currentUser.id,
-      student_id: studentId,
-      mentor_name: currentUser.user_metadata?.full_name || currentUser.email,
+    btn.disabled = true; btn.textContent = isEditing ? 'Updating…' : 'Saving…';
+    const payload = {
       scheduled_at: new Date(dateVal).toISOString(),
       duration_minutes: Number($('sessionDuration').value) || 60,
       status: $('sessionStatus').value,
       notes: $('sessionNotes').value.trim() || null,
-    });
+    };
+    const { error } = isEditing
+      ? await dbClient.schema('mentorship').from('sessions').update(payload).eq('id', editingSessionId)
+      : await dbClient.schema('mentorship').from('sessions').insert({
+          ...payload,
+          mentor_id: currentUser.id,
+          student_id: studentId,
+          mentor_name: currentUser.user_metadata?.full_name || currentUser.email,
+        });
     if (error) {
       msg.textContent = error.message || 'Could not save this session.';
       msg.className = 'auth-msg show error';
-      btn.disabled = false; btn.textContent = 'Save Session';
+      btn.disabled = false; btn.textContent = isEditing ? 'Update Session' : 'Save Session';
       return;
     }
-    $('sessionDate').value = '';
-    $('sessionNotes').value = '';
-    $('sessionStatus').value = 'scheduled';
+    exitEditMode();
     msg.className = 'auth-msg';
-    btn.disabled = false; btn.textContent = 'Save Session';
+    btn.disabled = false;
     await loadSessions(studentId);
   });
 
