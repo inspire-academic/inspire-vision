@@ -1,6 +1,19 @@
 # Follow-up Finding — Spoofable `mentor_status` in admin-matching picker
 
-**Status:** OPEN, not fixed by V-01 remediation (2026-07-12). Logged separately per Founder instruction — out of scope for the `session_notes` RLS fix.
+**Status:** RESOLVED (2026-07-25 verification; fix landed 2026-07-2x per commit history). Logged separately per Founder instruction — out of scope for the `session_notes` RLS fix.
+
+## Resolution
+
+`supabase/mentorship_schema_v5_mentor_applications.sql` added a real
+`mentorship.mentor_applications` table — service-role-only status
+transitions (no client UPDATE policy; INSERT/SELECT restricted to the
+owning mentor's own row). `netlify/functions/admin-matching.js`'s
+`list` action now sources its `approvedMentorIds` set from
+`mentor_applications.status = 'approved'` instead of
+`user_metadata.mentor_status`, exactly per this doc's recommendation.
+Code-reviewed 2026-07-25 to confirm the RLS policies and the
+picker query match; not re-exploited live (the original finding was
+never live-exploited either, per its own Disposition note).
 
 **Source:** Identified during code review while verifying V-01's fix (`supabase/mentorship_schema_v3_fix_session_notes_rls.sql`) does not rely on `user_metadata` for authorization. It doesn't — but this adjacent path does.
 

@@ -2,6 +2,43 @@
 
 **Status: DRAFT — Phase 1-3 discovery + static/API verification complete. Live account walkthrough not yet performed (pending Founder direction). Browser-level checks (console, network, visual, accessibility) not performed this session — no browser-automation tool is available; see Methodology.**
 
+## Resolution Update (2026-07-25)
+
+The findings below reflect the module's state as of commit `38f9a1f`
+(2026-07-12). Code-reviewed against the current codebase (`8889aea`,
+2026-07-23) as follows — this is a code-level re-check, not a live
+re-exploitation pass:
+
+- **F-01 (round-trip missing, CRITICAL) — RESOLVED.** `fa45d8e feat:
+  schema for the mentor<->student round trip (F-01) + real
+  mentor-approval source of truth` added the mentor-visible read path.
+- **F-02 (dead `sessions` table) — RESOLVED.** `mentor-portal/sessions.html`
+  now creates and edits real `mentorship.sessions` rows (`ca36ad3`,
+  `84c7a33`).
+- **F-03 (no in-app safeguarding queue) — RESOLVED.** `dfbef0d feat:
+  real in-app safeguarding queue for Ask for Help / Prayer & Support
+  (F-03)`, plus `admin/safeguarding.html` built out (`0b4bcf2`).
+- **F-04 (unauthenticated help-request email) — RESOLVED.** `63c496d
+  fix: notify-help-request.js had no auth check at all (V-02)` — now
+  requires a valid bearer token and derives student identity
+  server-side from the verified session, not the request body.
+- **F-05 (client-writable `mentor_status` self-elevation) — RESOLVED.**
+  See `docs/assurance/mentorship/FOLLOWUP-mentor-status-spoofable-picker.md`
+  — `admin-matching.js`'s picker now sources approval status from the
+  service-role-only `mentorship.mentor_applications` table (`8889aea`).
+- **F-06 (dashboard light mode) — not re-checked this pass.**
+- **Public STUB pages** (`index`, `philosophy`, `parents`, `journey`,
+  `resources`, `stories`) and **admin STUB pages** (`index`, `mentees`,
+  `reports`, `safeguarding`) listed below — all built out since
+  (`41d982d`, `4303f31`, `5ee857e`, `0b4bcf2`, `584f457`, `dfbef0d`,
+  and others). None of the module's pages are stubs as of 2026-07-25.
+
+**The "Round-Trip Verdict: FAILED" and "Recommendation: Repair
+required" lines below are historical** — they applied to the
+2026-07-12 codebase and are superseded by the F-01/F-02 fixes above.
+This report is kept intact rather than rewritten so the original
+findings remain an accurate record of what was found and when.
+
 ## Executive Summary
 
 - **Round-trip verdict: FAILED.** There is no implemented mechanism by which a mentor can see anything a student writes (goals, journal, check-ins, tasks, help requests), and no mechanism by which mentor output ever becomes visible to a student. This is not an untested gap — it is confirmed absent from the code (see Finding F-01).
