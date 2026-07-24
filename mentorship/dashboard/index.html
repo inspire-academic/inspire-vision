@@ -540,12 +540,11 @@
 
 <!-- ── THEME TOGGLE ─────────────────────────────────────────────
      Own localStorage key ("iv-theme") so this doesn't collide with
-     inspireacademic.org's "ia-theme". Note: this dashboard's CSS is a
-     fixed navy/gold palette with no [data-theme="light"] overrides yet —
-     the toggle flips the attribute and persists the choice, but there's
-     no distinct light visual theme defined for this page yet. Building
-     one wasn't in this phase's scope; do that before this toggle does
-     anything visually beyond the icon swap. -->
+     inspireacademic.org's "ia-theme". The [data-theme="light"] surface/
+     text/border overrides live in mentorship/css/mentorship.css (the
+     shared dashboard-shell stylesheet) — see that file's "LIGHT THEME"
+     block. Sidebar/topbar/hero stay pinned dark by design; only the
+     scrollable content area switches. -->
 <script>
   (function () {
     const html = document.documentElement;

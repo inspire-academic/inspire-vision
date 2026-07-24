@@ -26,7 +26,20 @@ re-exploitation pass:
   See `docs/assurance/mentorship/FOLLOWUP-mentor-status-spoofable-picker.md`
   — `admin-matching.js`'s picker now sources approval status from the
   service-role-only `mentorship.mentor_applications` table (`8889aea`).
-- **F-06 (dashboard light mode) — not re-checked this pass.**
+- **F-06 (dashboard light mode) — RESOLVED, and was already resolved at the
+  time this report's own commit (`38f9a1f`) was tested.** `a23c01f fix:
+  light/dark theme toggle on the mentorship dashboard did nothing` plus
+  three same-day follow-ups (`75e7a27`, `c9f948b`, `ad6030e`) added the
+  full `[data-theme="light"]` surface/text/border override block to
+  `mentorship/css/mentorship.css` and fixed the legibility bugs that
+  first pass turned up (hero headline, compass grid, Daily Encouragement
+  card). All four commits are ancestors of `38f9a1f`. The finding was
+  stale: it was based on a leftover comment in `dashboard/index.html`
+  claiming no light theme existed, which was never updated after the
+  CSS moved to the shared stylesheet — that comment has now been
+  corrected (2026-07-25). Re-verified 2026-07-25 by code review only;
+  no browser-automation tool was available this session to confirm
+  visually (see Open Decisions).
 - **Public STUB pages** (`index`, `philosophy`, `parents`, `journey`,
   `resources`, `stories`) and **admin STUB pages** (`index`, `mentees`,
   `reports`, `safeguarding`) listed below — all built out since
