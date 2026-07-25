@@ -9,11 +9,6 @@ functions = "netlify/functions"
   branch = "staging"
 
 [[redirects]]
-  from = "/mentorship"
-  to = "/mentorship/dashboard/"
-  status = 301
-
-[[redirects]]
   from = "/mentorship/dashboard"
   to = "/mentorship/dashboard/"
   status = 301
