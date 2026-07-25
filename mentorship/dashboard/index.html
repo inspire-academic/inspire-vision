@@ -297,31 +297,37 @@
 
           <!-- Right stacked column -->
           <div class="right-col">
-            <!-- Mentor message -->
+            <!-- Mentor message — sourced from mentorship.sessions.notes, the
+                 real mentor-visible-to-student channel built for the round
+                 trip (mentorship_schema_v4_round_trip.sql). No "N new"
+                 badge: there's no read-receipt/unread tracking anywhere in
+                 the schema, so a count here would just be another fake
+                 number — see id="mentorMsgText" for the honest fallback. -->
             <div class="mini-card">
               <div class="mini-card-header">
                 <div class="mini-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 </div>
                 <div>
-                  <div class="mini-label">Mentor Message <span class="mini-new">2 new</span></div>
+                  <div class="mini-label">Mentor Message</div>
                 </div>
               </div>
-              <div class="mini-message">"Proud of the effort you're putting in. Keep building brick by brick."</div>
-              <div class="mini-author">— Mr. David</div>
+              <div class="mini-message" id="mentorMsgText">Loading…</div>
+              <div class="mini-author" id="mentorMsgAuthor" style="display:none"></div>
             </div>
 
-            <!-- Recent achievement -->
+            <!-- Recent achievement — real consecutive-day streak computed
+                 from check_ins.created_at, not a fixed number. -->
             <div class="mini-card">
               <div class="achievement-header" style="margin-bottom:8px">
                 <div>
                   <div class="mini-label">Recent Achievement</div>
-                  <div class="achievement-name">Consistency Streak</div>
-                  <div class="achievement-sub">14 days in a row</div>
+                  <div class="achievement-name" id="achievementName">Consistency Streak</div>
+                  <div class="achievement-sub" id="achievementSub">Loading…</div>
                 </div>
-                <div class="streak-flame">🔥</div>
+                <div class="streak-flame" id="streakFlame" style="display:none">🔥</div>
               </div>
-              <div class="achievement-desc">Keep going! Small steps, big future.</div>
+              <div class="achievement-desc" id="achievementDesc"></div>
             </div>
 
             <!-- Daily encouragement -->
@@ -473,9 +479,12 @@
 
           <!-- Right col continues -->
           <div class="right-col">
+            <!-- Same mentorship.community_stats() RPC already live on the
+                 public mentorship/index.html "A Living Community" section
+                 — same real number, not a second fake one. -->
             <div class="mini-card" style="background:rgba(201,168,76,.06);border-color:var(--gold-border)">
               <div class="mini-label" style="color:var(--gold)">Community</div>
-              <div style="font-size:13px;font-weight:700;margin-bottom:6px">3 peers completed goals this week</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:6px" id="communityStatText">Loading…</div>
               <div style="font-size:11px;color:var(--text-muted);line-height:1.5">Your pod is moving. Keep up the momentum — your breakthrough inspires theirs.</div>
             </div>
           </div>
@@ -693,6 +702,61 @@
     });
   }
 
+  // Most recent mentor-authored session note — the real round-trip channel
+  // (mentorship_schema_v4_round_trip.sql). Rows come pre-filtered to
+  // notes IS NOT NULL, most recent first, limit 1.
+  function renderMentorMessage(rows) {
+    const row = rows[0];
+    const authorEl = $('mentorMsgAuthor');
+    if (!row || !row.notes) {
+      $('mentorMsgText').textContent = "Your mentor's updates will show up here once you're matched and they log a session.";
+      authorEl.style.display = 'none';
+      return;
+    }
+    $('mentorMsgText').textContent = `"${row.notes}"`;
+    authorEl.textContent = `— ${row.mentor_name || 'Your Mentor'}`;
+    authorEl.style.display = '';
+  }
+
+  // Real consecutive-day streak from check_ins.created_at — today (or
+  // yesterday, if today's check-in hasn't happened yet) counting
+  // backward until a day is missed. A streak in progress isn't broken
+  // until a full day passes with no check-in.
+  function computeStreak(checkIns) {
+    if (!checkIns.length) return 0;
+    const days = new Set(checkIns.map(c => new Date(c.created_at).toDateString()));
+    const cursor = new Date();
+    if (!days.has(cursor.toDateString())) cursor.setDate(cursor.getDate() - 1);
+    let streak = 0;
+    while (days.has(cursor.toDateString())) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function renderStreak(checkIns) {
+    const streak = computeStreak(checkIns);
+    $('streakFlame').style.display = streak > 0 ? '' : 'none';
+    if (streak > 0) {
+      $('achievementSub').textContent = `${streak} day${streak === 1 ? '' : 's'} in a row`;
+      $('achievementDesc').textContent = 'Keep going! Small steps, big future.';
+    } else {
+      $('achievementSub').textContent = 'Not started yet';
+      $('achievementDesc').textContent = 'Check in today to start your streak.';
+    }
+  }
+
+  // Same RPC already live on the public mentorship/index.html "A Living
+  // Community" section (mentorship_schema_v2.sql) — one real number,
+  // reused, not a second fake one invented for this page.
+  function renderCommunityStat(stats) {
+    const n = stats?.goals_completed_this_week ?? 0;
+    $('communityStatText').textContent = n > 0
+      ? `${n} ${n === 1 ? 'person has' : 'people have'} completed a goal this week`
+      : 'No goals completed yet this week — you could be first.';
+  }
+
   const MOOD_TEXT = {
     struggling: 'Finding it tough right now 💙',
     hard:       "It's been challenging 🌧️",
@@ -827,7 +891,11 @@
         dbClient.schema('mentorship').from('goals').select('*').eq('student_id', currentUser.id).eq('status', 'active').order('created_at', { ascending: false }),
         dbClient.schema('mentorship').from('sessions').select('*').eq('student_id', currentUser.id).eq('status', 'scheduled').gte('scheduled_at', new Date().toISOString()).order('scheduled_at', { ascending: true }).limit(1),
         dbClient.schema('mentorship').from('tasks').select('*').eq('student_id', currentUser.id).order('order_index', { ascending: true }),
-        dbClient.schema('mentorship').from('check_ins').select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false }).limit(1),
+        // Full recent history, not just the latest row — computeStreak()
+        // needs every day, not only the most recent check-in. 60 days is
+        // more than enough runway for any real streak.
+        dbClient.schema('mentorship').from('check_ins').select('created_at, mood').eq('student_id', currentUser.id)
+          .gte('created_at', new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()).order('created_at', { ascending: false }),
       ]);
       if (goalsErr || sessErr || taskErr || ciErr) {
         console.warn('mentorship schema not reachable yet (needs the SQL run + schema exposed in Supabase settings):',
@@ -837,6 +905,7 @@
       renderGrowthCompass(goals || []);
       renderSession(sessions || []);
       renderTasks(tasks || []);
+      renderStreak(checkIns || []);
       if (checkIns && checkIns[0]) selectMood(checkIns[0].mood);
     } catch (e) {
       console.warn('Mentorship data fetch failed:', e);
@@ -844,6 +913,30 @@
       renderGrowthCompass([]);
       renderSession([]);
       renderTasks([]);
+      renderStreak([]);
+    }
+
+    // Separate, independent try/catch per card: a failure in one (e.g.
+    // the mentorship_schema_v2 RPC not yet run) shouldn't blank out the
+    // other, unrelated card.
+    try {
+      const { data: notes, error: notesErr } = await dbClient.schema('mentorship').from('sessions')
+        .select('mentor_name, notes, scheduled_at').eq('student_id', currentUser.id)
+        .not('notes', 'is', null).order('scheduled_at', { ascending: false }).limit(1);
+      if (notesErr) throw notesErr;
+      renderMentorMessage(notes || []);
+    } catch (e) {
+      console.warn('Mentor message fetch failed:', e);
+      renderMentorMessage([]);
+    }
+
+    try {
+      const { data: stats, error: statsErr } = await dbClient.schema('mentorship').rpc('community_stats');
+      if (statsErr) throw statsErr;
+      renderCommunityStat(Array.isArray(stats) ? stats[0] : stats);
+    } catch (e) {
+      console.warn('Community stat fetch failed:', e);
+      renderCommunityStat(null);
     }
   })();
 </script>
