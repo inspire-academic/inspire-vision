@@ -3,6 +3,14 @@
 -- Run this in Supabase SQL Editor (after v6)
 -- Project: Inspire Ecosystem (ygtsrdwoikqnrbexjrtl)
 -- ============================================
+-- AMENDMENT 2026-07-25 (same day, after live verification): the column
+-- REVOKE below did NOT take effect — a student's own session could
+-- still read consent_token_hash back. Confirmed low actual risk (SHA-256
+-- is one-way) but fixed properly in
+-- mentorship_schema_v8_guardian_consent_column_fix.sql, which must be
+-- run after this file. Kept here unedited so this remains an accurate
+-- record of what was run and found.
+-- ============================================
 -- Founder decision 2026-07-25 (parent-involvement discussion): join.html
 -- previously only had the MENTEE tick a box saying "I understand a
 -- parent/guardian may be involved if I'm under 18" -- that's a minor
