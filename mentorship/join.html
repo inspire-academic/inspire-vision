@@ -36,9 +36,28 @@
         <label for="confirmPassword">Confirm password</label>
         <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" autocomplete="new-password">
       </div>
+      <div class="auth-field">
+        <label for="isMinor">Are you under 18?</label>
+        <select id="isMinor" name="isMinor" required>
+          <option value="" disabled selected>Select one</option>
+          <option value="no">No, I'm 18 or older</option>
+          <option value="yes">Yes, I'm under 18</option>
+        </select>
+      </div>
+      <div id="guardianFields" style="display:none">
+        <div class="auth-field">
+          <label for="guardianName">Parent/guardian full name</label>
+          <input type="text" id="guardianName" autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <label for="guardianEmail">Parent/guardian email</label>
+          <input type="email" id="guardianEmail" autocomplete="email">
+          <span class="auth-sub" style="display:block; margin-top:6px; font-size:12px">We'll email your parent/guardian to confirm they're aware of your mentorship journey before you're matched with a mentor. You can keep exploring the site in the meantime.</span>
+        </div>
+      </div>
       <label class="auth-check">
         <input type="checkbox" id="terms" required>
-        <span>I agree to be contacted about my mentorship journey and understand a parent/guardian may be involved if I'm under 18.</span>
+        <span>I agree to be contacted about my mentorship journey.</span>
       </label>
       <button type="submit" class="auth-btn" id="submitBtn">Create My Account</button>
     </form>
@@ -53,10 +72,34 @@
     const form = document.getElementById('joinForm');
     const msg = document.getElementById('authMsg');
     const btn = document.getElementById('submitBtn');
+    const isMinorSelect = document.getElementById('isMinor');
+    const guardianFields = document.getElementById('guardianFields');
+    const guardianNameInput = document.getElementById('guardianName');
+    const guardianEmailInput = document.getElementById('guardianEmail');
 
     function showMsg(text, type) {
       msg.textContent = text;
       msg.className = 'auth-msg show ' + type;
+    }
+
+    function syncGuardianFields() {
+      const isMinor = isMinorSelect.value === 'yes';
+      guardianFields.style.display = isMinor ? 'block' : 'none';
+      guardianNameInput.required = isMinor;
+      guardianEmailInput.required = isMinor;
+    }
+    isMinorSelect.addEventListener('change', syncGuardianFields);
+
+    // sha256Hex hashes the raw token before it's ever written to the
+    // database — see mentorship_schema_v7_guardian_consent.sql for why
+    // the mentee must never be able to read back their own raw token.
+    async function sha256Hex(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    function randomToken() {
+      const bytes = crypto.getRandomValues(new Uint8Array(32));
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     form.addEventListener('submit', async (e) => {
@@ -65,6 +108,13 @@
       const confirmPassword = document.getElementById('confirmPassword').value;
       if (password !== confirmPassword) {
         showMsg("Passwords don't match.", 'error');
+        return;
+      }
+      const isMinor = isMinorSelect.value === 'yes';
+      const guardianName = guardianNameInput.value.trim();
+      const guardianEmail = guardianEmailInput.value.trim();
+      if (isMinor && (!guardianName || !guardianEmail)) {
+        showMsg("Please enter your parent/guardian's name and email.", 'error');
         return;
       }
       btn.disabled = true;
@@ -79,6 +129,7 @@
             data: {
               full_name: document.getElementById('fullName').value.trim(),
               mentorship_role: 'mentee',
+              is_minor: isMinor,
             },
           },
         });
@@ -89,8 +140,38 @@
           return;
         }
         if (data.session) {
-          // Email confirmation is off for this project — straight in.
-          window.location.href = '/mentorship/onboarding/welcome.html';
+          // Best-effort, non-blocking — same reasoning as mentors.html's
+          // mentor_applications insert: the account already exists either
+          // way, and there's nothing more the signer-upper can do if this
+          // fails beyond what's already logged.
+          if (isMinor && data.user) {
+            try {
+              const rawToken = randomToken();
+              const tokenHash = await sha256Hex(rawToken);
+              const { error: consentErr } = await db.schema('mentorship').from('guardian_consents').insert({
+                student_id: data.user.id,
+                guardian_name: guardianName,
+                guardian_email: guardianEmail,
+                consent_token_hash: tokenHash,
+              });
+              if (consentErr) {
+                console.warn('Could not create guardian_consents row (account was still created):', consentErr);
+              } else {
+                await fetch('/.netlify/functions/guardian-consent-request', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.session.access_token}` },
+                  body: JSON.stringify({ guardianName, guardianEmail, consentToken: rawToken }),
+                }).catch(err => console.warn('Could not send guardian consent email:', err));
+              }
+            } catch (err) {
+              console.warn('Guardian consent setup failed (account was still created):', err);
+            }
+            showMsg("Account created! We've also emailed your parent/guardian to confirm — you can keep going in the meantime.", 'success');
+            setTimeout(() => { window.location.href = '/mentorship/onboarding/welcome.html'; }, 1800);
+          } else {
+            // Email confirmation is off for this project — straight in.
+            window.location.href = '/mentorship/onboarding/welcome.html';
+          }
         } else {
           showMsg("Account created! Check your email to confirm it, then sign in.", 'success');
           form.reset();

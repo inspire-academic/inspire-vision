@@ -92,7 +92,10 @@
                <div class="assign-row">
                  <select id="mentorSelect">${mentors.map(m => `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}</option>`).join('')}</select>
                  <span class="assign-arrow">→</span>
-                 <select id="menteeSelect">${unassignedMentees.map(m => `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}</option>`).join('')}</select>
+                 <select id="menteeSelect">${unassignedMentees.map(m => {
+                   const flag = m.is_minor && m.guardian_consent_status !== 'confirmed' ? ' — ⚠️ guardian consent pending' : '';
+                   return `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}${flag}</option>`;
+                 }).join('')}</select>
                  <button class="admin-btn admin-btn-approve" id="assignBtn">Assign</button>
                </div>
              </div>`

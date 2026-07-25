@@ -39,13 +39,15 @@ exports.handler = async (event) => {
     const { action, mentorId, studentId, assignmentId } = JSON.parse(event.body || '{}');
 
     if (action === 'list') {
-      const [users, { data: assignments, error: assignErr }, { data: applications, error: appErr }] = await Promise.all([
+      const [users, { data: assignments, error: assignErr }, { data: applications, error: appErr }, { data: consents, error: consentErr }] = await Promise.all([
         listAllUsers(admin),
         admin.schema('mentorship').from('mentor_assignments').select('*').eq('status', 'active'),
         admin.schema('mentorship').from('mentor_applications').select('mentor_id').eq('status', 'approved'),
+        admin.schema('mentorship').from('guardian_consents').select('student_id, status'),
       ]);
       if (assignErr) throw assignErr;
       if (appErr) throw appErr;
+      if (consentErr) throw consentErr;
 
       const assignedStudentIds = new Set((assignments || []).map(a => a.student_id));
       // Picker reads mentor_applications (service-role-only writes), not
@@ -57,9 +59,21 @@ exports.handler = async (event) => {
       const mentors = users
         .filter(u => approvedMentorIds.has(u.id))
         .map(u => ({ id: u.id, email: u.email, full_name: u.user_metadata?.full_name || '' }));
+      // Surfaced so admin/matching.html can flag an unconfirmed minor in
+      // the picker before hitting the hard server-side gate below — see
+      // "assign" action. is_minor is self-reported at signup (same trust
+      // level as mentorship_role elsewhere in this schema).
+      const consentByStudent = new Map((consents || []).map(c => [c.student_id, c.status]));
+      const toMenteeRow = u => ({
+        id: u.id,
+        email: u.email,
+        full_name: u.user_metadata?.full_name || '',
+        is_minor: !!u.user_metadata?.is_minor,
+        guardian_consent_status: consentByStudent.get(u.id) || null,
+      });
       const unassignedMentees = users
         .filter(u => u.user_metadata?.mentorship_role === 'mentee' && !assignedStudentIds.has(u.id))
-        .map(u => ({ id: u.id, email: u.email, full_name: u.user_metadata?.full_name || '' }));
+        .map(toMenteeRow);
       // Full roster for admin/mentees.html — same underlying data as
       // unassignedMentees above, just not filtered down, plus each row's
       // current mentor (if any) for display.
@@ -67,9 +81,7 @@ exports.handler = async (event) => {
       const allMentees = users
         .filter(u => u.user_metadata?.mentorship_role === 'mentee')
         .map(u => ({
-          id: u.id,
-          email: u.email,
-          full_name: u.user_metadata?.full_name || '',
+          ...toMenteeRow(u),
           created_at: u.created_at,
           mentor_name: assignmentByStudent.get(u.id)?.mentor_name || null,
         }));
@@ -87,6 +99,20 @@ exports.handler = async (event) => {
       ]);
       if (mentorErr || !mentorData?.user) return { statusCode: 404, body: JSON.stringify({ error: 'Mentor not found' }) };
       if (studentErr || !studentData?.user) return { statusCode: 404, body: JSON.stringify({ error: 'Mentee not found' }) };
+
+      // Hard safeguarding gate: an under-18 mentee cannot be paired with a
+      // mentor until their guardian has confirmed via the emailed link
+      // (mentorship_schema_v7_guardian_consent.sql, guardian-consent-
+      // confirm.js). This is the actual enforcement point — the picker
+      // badge in admin/matching.html is just a heads-up, not the guard.
+      if (studentData.user.user_metadata?.is_minor) {
+        const { data: consent, error: consentCheckErr } = await admin.schema('mentorship').from('guardian_consents')
+          .select('status').eq('student_id', studentId).maybeSingle();
+        if (consentCheckErr) throw consentCheckErr;
+        if (!consent || consent.status !== 'confirmed') {
+          return { statusCode: 403, body: JSON.stringify({ error: 'This mentee is under 18 and guardian consent has not been confirmed yet — a mentor cannot be assigned until then.' }) };
+        }
+      }
 
       // End any existing active assignment for this student first — the
       // unique index only stops two rows existing at once, it doesn't
