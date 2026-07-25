@@ -158,6 +158,13 @@
       grid-template-columns: repeat(4, 1fr);
       width: 100%;
       gap: 12px;
+      /* Without this, the cards' new rounded top corners sat flush against
+         .cardinals-separator's white edge with zero gap -- the rounding
+         was there but had no visible space around it to actually read as
+         a corner, so the row still looked joined to the section above.
+         Matches the between-card gap color (body's navy shows through,
+         both here and in the grid gap) for one consistent look. */
+      margin-top: 16px;
     }
     .cardinal {
       position: relative;
