@@ -51,6 +51,32 @@ test.describe('Mentorship auth pages', () => {
     tracker.assertNoErrors();
   });
 
+  test('join.html shows/hides guardian fields based on the under-18 answer', async ({ page }) => {
+    const tracker = trackConsoleErrors(page);
+    await page.goto('/mentorship/join.html');
+    const guardianFields = page.locator('#guardianFields');
+    const guardianName = page.locator('#guardianName');
+    const guardianEmail = page.locator('#guardianEmail');
+
+    // Hidden and not required before an answer is picked — this is the
+    // "18 or older" majority case and must not force guardian info on it.
+    await expect(guardianFields).toBeHidden();
+    await expect(guardianName).toHaveJSProperty('required', false);
+    await expect(guardianEmail).toHaveJSProperty('required', false);
+
+    await page.selectOption('#isMinor', 'yes');
+    await expect(guardianFields).toBeVisible();
+    await expect(guardianName).toHaveJSProperty('required', true);
+    await expect(guardianEmail).toHaveJSProperty('required', true);
+
+    await page.selectOption('#isMinor', 'no');
+    await expect(guardianFields).toBeHidden();
+    await expect(guardianName).toHaveJSProperty('required', false);
+    await expect(guardianEmail).toHaveJSProperty('required', false);
+
+    tracker.assertNoErrors();
+  });
+
   test('mentors.html (become a mentor) renders the application form', async ({ page }) => {
     const tracker = trackConsoleErrors(page);
     await page.goto('/mentorship/mentors.html');
