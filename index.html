@@ -147,17 +147,25 @@
       line-height: 1.6;
     }
 
-    /* ── FOUR CARDINALS — full bleed ── */
+    /* ── FOUR CARDINALS ──
+       Was true full-bleed (zero gap, square corners) -- softened per
+       Founder review against the "Begin Your Journey" cards below:
+       same idea (rounded + separated) but a smaller gap than Journey's
+       1.25rem, and a shadow Journey doesn't have, for a subtle
+       embossed/object feel these didn't have before. */
     .cardinals {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       width: 100%;
+      gap: 12px;
     }
     .cardinal {
       position: relative;
       overflow: hidden;
       cursor: pointer;
       min-height: 580px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .cardinal-bg {
       position: absolute;
