@@ -6,6 +6,13 @@ No CLAUDE.md existed in this repo before this file. It was created
 actually known and built so far — not a full governance document like
 inspire-academic's CLAUDE.md. Extend it as more of the platform is
 built out, rather than treating this as complete.
+
+Refreshed 2026-07-25: the Mentorship module went from mostly stub pages
+to fully built out between 2026-07-09 and 2026-07-23 (see git log). The
+file structure and status notes below now reflect that. For the
+detailed, finding-by-finding assessment of what's real vs. what still
+has gaps, see `docs/mentorship/FOUNDER-E2E-ROUND-TRIP-REPORT.md` — this
+file only tracks the high-level shape of the repo.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## THIS REPOSITORY
@@ -27,7 +34,7 @@ domain/repo, inspireacademic.org):
 | Cardinal | Status here |
 |---|---|
 | Inspire Academic™ | Own repo/domain — `academic.html` here just links out |
-| Mentorship & Formation™ | **This build** — `mentorship/` module, live folder structure as of 2026-07-09 |
+| Mentorship & Formation™ | **This build** — `mentorship/` module, fully built out as of 2026-07-25 (no stub pages remain — public site, onboarding, student dashboard, mentor-portal, and admin are all real and wired to live Supabase). See `docs/mentorship/FOUNDER-E2E-ROUND-TRIP-REPORT.md` for known gaps and open decisions. |
 | Health & Wellbeing™ | Not yet built — homepage links to `coming-soon.html` |
 | Faith & Spiritual Formation™ | Partially built — `pages/inspire-faith.html`, `admin/faith-admin.html` exist; homepage nav/footer still link to `coming-soon.html` |
 
@@ -51,56 +58,70 @@ aliases do the same. All 29 stub pages' inline colours were updated to
 match. If you're building new Mentorship UI, use `var(--clr-mentorship)`
 (or the `--mentorship-*` aliases) — don't reintroduce the old gold.
 
-## TARGET FILE STRUCTURE — Mentorship module
+## CURRENT FILE STRUCTURE — Mentorship module
 
-Built 2026-07-09. Everything below exists; pages marked "stub" render
-the generic coming-soon template (see `mentorship/css/mentorship.css`'s
-sibling stub pages) rather than real content.
+As of 2026-07-25, every page below is real and wired to live Supabase —
+none of them are the generic coming-soon stub template anymore. (The
+"stub" annotations below are gone deliberately; if you're looking for
+a snapshot of what was still a stub and when, `git log` on the
+individual file or the Founder E2E report's superseded "Journey
+Coverage" tables have that history.)
 
 ```
 mentorship/
-├── index.html              ← public landing (stub)
-├── join.html                ← become a mentee (stub)
-├── mentors.html              ← become a mentor (stub)
-├── parents.html               ← parent/guardian info (stub)
-├── journey.html                ← mentee journey (stub)
-├── philosophy.html              ← why mentorship matters (stub)
-├── stories.html                  ← testimonies (stub)
-├── resources.html                 ← public resources (stub)
+├── index.html              ← public landing
+├── login.html                ← shared sign-in, redirectForRole() branches on role/status
+├── join.html                   ← mentee signup (auth.signUp)
+├── mentors.html                  ← mentor application (mentor_status: pending_review)
+├── parents.html                    ← parent/guardian info
+├── journey.html                      ← mentee journey (auth-gated — see open decisions)
+├── philosophy.html                     ← why mentorship matters
+├── stories.html                          ← testimonies (auth-gated — see open decisions)
+├── resources.html                          ← public resources (auth-gated — see open decisions)
 │
 ├── onboarding/
-│   ├── welcome.html         ← stub
-│   ├── know-me.html          ← stub
-│   ├── strengths.html         ← stub
-│   ├── life-wheel.html         ← stub
-│   └── goals.html               ← stub
+│   ├── welcome.html
+│   ├── know-me.html
+│   ├── strengths.html
+│   ├── life-wheel.html
+│   └── goals.html          ← last step, real insert into mentorship.goals
 │
 ├── dashboard/
-│   ├── index.html            ← THE MAIN DASHBOARD — real, built, wired
-│   ├── goals.html              ← stub
-│   ├── check-in.html            ← stub
-│   ├── journal.html              ← stub
-│   ├── mentor.html                ← stub
-│   ├── prayer-support.html         ← stub
-│   └── growth-compass.html          ← stub
+│   ├── index.html            ← THE MAIN DASHBOARD
+│   ├── goals.html
+│   ├── check-in.html
+│   ├── journal.html
+│   ├── mentor.html
+│   ├── prayer-support.html
+│   └── growth-compass.html
 │
 ├── mentor-portal/
-│   ├── index.html            ← stub
-│   ├── mentees.html            ← stub
-│   ├── session-notes.html       ← stub
-│   └── resources.html             ← stub
+│   ├── index.html
+│   ├── mentees.html
+│   ├── mentee-detail.html   ← mentor-side view into a mentee's progress (the round-trip)
+│   ├── sessions.html          ← create/edit mentorship.sessions rows
+│   ├── session-notes.html       ← re-verifies the assignment exists before allowing a note
+│   └── resources.html
 │
 ├── admin/
-│   ├── index.html            ← stub
-│   ├── mentees.html            ← stub
-│   ├── mentors.html              ← stub
-│   ├── matching.html               ← stub
-│   ├── safeguarding.html            ← stub
-│   └── reports.html                  ← stub
+│   ├── index.html
+│   ├── mentees.html
+│   ├── mentors.html            ← approval queue, requireAdmin() server-gated
+│   ├── matching.html             ← assign/end pairings, sources approval from mentor_applications
+│   ├── safeguarding.html           ← in-app queue for help_requests
+│   └── reports.html
 │
 └── css/
-    └── mentorship.css       ← module styles; see design-system conflict note above
+    └── mentorship.css       ← module + dashboard-shell styles (incl. light/dark theme)
 ```
+
+Supabase schema lives in `supabase/mentorship_schema*.sql` (v1 through
+v5 — v4 added the mentor↔student round trip, v5 added the
+`mentor_applications` table as the non-spoofable source of truth for
+mentor approval status). Netlify Functions in `netlify/functions/`:
+`admin-mentors.js`, `admin-matching.js`, `admin-reports.js`,
+`admin-help-requests.js`, `notify-help-request.js` — all but
+`notify-help-request.js` are `requireAdmin()`-gated.
 
 Image assets live at root level (not under `mentorship/`), per the
 same pattern the rest of this repo uses:
@@ -110,7 +131,7 @@ assets/images/mentorship/
 ├── hero/          ← hero banners (empty, .gitkeep — no real photography yet)
 ├── portraits/      ← mentor photos (empty, .gitkeep)
 ├── sections/        ← section images (empty, .gitkeep)
-└── icons/             ← module icons (empty, .gitkeep)
+└── icons/             ← icon.svg (brand mark, added 2026-07-25 for manifest.json)
 ```
 
 ## SHARED INFRASTRUCTURE (pre-existing, not part of this build)
@@ -127,12 +148,16 @@ assets/images/mentorship/
 - `assets/nav.js` — shared marketing-site nav renderer (used by public pages
   like `index.html`; the dashboard has its own separate sidebar, not this).
 - `supabase/vision_schema.sql` — defines `vision.subscribers`,
-  `vision.registrations`, `vision.partners`. **No `mentorship.*` tables
-  exist yet** — the dashboard's goals/sessions/tasks data is still
-  hardcoded with `TODO Phase 4` comments marking where real queries go.
-- No `manifest.json` exists yet — the dashboard links to `/manifest.json`
-  per the Academic repo's PWA pattern, but the file itself still needs
-  creating.
+  `vision.registrations`, `vision.partners`. `mentorship.*` is a
+  separate, now fully-populated schema (`supabase/mentorship_schema*.sql`,
+  v1-v5) — 8 RLS-enabled tables, all live-wired, no hardcoded/TODO data
+  left in the module.
+- `manifest.json` exists at repo root (added 2026-07-25), referencing
+  `assets/images/mentorship/icons/icon.svg` as a scalable brand-mark
+  icon — no raster PNG icon set exists yet (unlike inspire-academic's
+  `/icons/icon-192.png` + `icon-512.png` pattern), so add one if a
+  raster fallback is ever needed for a platform that doesn't support
+  SVG manifest icons.
 
 ## BRANCHING
 

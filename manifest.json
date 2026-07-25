@@ -1,0 +1,28 @@
+{
+  "name": "Inspire Mentorship",
+  "short_name": "Mentorship",
+  "description": "Faith-rooted mentorship and character formation for young people.",
+  "start_url": "/mentorship/dashboard/",
+  "scope": "/mentorship/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1628",
+  "theme_color": "#0d1b2a",
+  "icons": [
+    {
+      "src": "/assets/images/mentorship/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/mentorship/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["education", "lifestyle"],
+  "lang": "en-GB"
+}

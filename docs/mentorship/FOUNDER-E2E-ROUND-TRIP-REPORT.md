@@ -2,6 +2,34 @@
 
 **Status: DRAFT — Phase 1-3 discovery + static/API verification complete. Live account walkthrough not yet performed (pending Founder direction). Browser-level checks (console, network, visual, accessibility) not performed this session — no browser-automation tool is available; see Methodology.**
 
+## Current State (2026-07-25) — read this first
+
+Everything below the "Resolution Update" section is a **frozen snapshot
+of the 2026-07-12 codebase** (commit `38f9a1f`), kept intact on purpose
+as a historical record — it is not a live description of the module.
+In particular, the bolded verdicts further down (`Round-Trip Verdict:
+FAILED`, `Founder Walkthrough: Blocked`, the Final Readiness Assessment
+block) describe a state that **no longer applies**.
+
+As of today, code review confirms: the mentor↔student round trip
+exists (F-01/F-02 resolved), an in-app safeguarding queue exists
+(F-03 resolved), the unauthenticated help-request endpoint now
+requires auth (F-04 resolved), the mentor-approval picker sources a
+non-spoofable table (F-05 resolved), and the dashboard's light theme
+was already working, contrary to a stale code comment (F-06 resolved).
+No stub pages remain anywhere in the module. None of this has been
+re-verified live in a browser this session (no browser-automation tool
+was available) or against real accounts in the shared production
+Supabase project — see "Open Decisions for the Founder" at the bottom,
+none of which have been answered yet.
+
+**Bottom line:** the structural blockers this report originally found
+are fixed at the code level. What's left is (1) the three open
+Founder decisions below, and (2) an actual live/browser-tooled pass to
+confirm the code-level fixes hold up in practice — this report
+upgrades that from "blocked by missing round-trip" to "blocked by
+never having been run."
+
 ## Resolution Update (2026-07-25)
 
 The findings below reflect the module's state as of commit `38f9a1f`

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Inspire Mentorship">
+  <rect width="512" height="512" rx="96" fill="#0A1628"/>
+  <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"
+        fill="#B85C1A"
+        transform="translate(256 256) scale(18) translate(-12 -11.675)"/>
+</svg>
