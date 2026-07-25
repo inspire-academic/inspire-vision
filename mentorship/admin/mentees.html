@@ -46,6 +46,8 @@
     .mn-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
     .mn-badge-assigned { background: rgba(34,197,94,.15); color: #86efac; }
     .mn-badge-unassigned { background: rgba(255,255,255,.08); color: rgba(244,246,249,.6); }
+    .mn-badge-warn { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .mn-badges { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
   </style>
 </head>
 <body class="admin-body">
@@ -91,6 +93,11 @@
       }
       content.innerHTML = rows.map(m => {
         const joined = new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        // guardian_consent_status/is_minor come from admin-matching.js's
+        // 'list' action (mentorship_schema_v7_guardian_consent.sql) — only
+        // flagged when it's actually actionable (a minor without confirmed
+        // consent yet), so most rows show nothing extra.
+        const consentWarning = m.is_minor && m.guardian_consent_status !== 'confirmed';
         return `
           <div class="mn-card">
             <div>
@@ -98,7 +105,10 @@
               <div class="mn-email">${escapeHtml(m.email)}</div>
               <div class="mn-meta">${m.mentor_name ? `Mentor: ${escapeHtml(m.mentor_name)}` : 'Not yet assigned'} · Joined ${joined}</div>
             </div>
-            <span class="mn-badge ${m.mentor_name ? 'mn-badge-assigned' : 'mn-badge-unassigned'}">${m.mentor_name ? 'Assigned' : 'Unassigned'}</span>
+            <div class="mn-badges">
+              <span class="mn-badge ${m.mentor_name ? 'mn-badge-assigned' : 'mn-badge-unassigned'}">${m.mentor_name ? 'Assigned' : 'Unassigned'}</span>
+              ${consentWarning ? '<span class="mn-badge mn-badge-warn">⚠️ Guardian consent pending</span>' : ''}
+            </div>
           </div>`;
       }).join('');
     }
