@@ -64,7 +64,13 @@ body.auth-body {
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 10px;
   padding: 11px 14px;
-  font-size: 14px;
+  /* 16px, not 14px: below 16px, iOS Safari auto-zooms the whole page on
+     focus -- a jarring bug that would hit every mobile visitor on their
+     very first interaction (signup/login), the two forms this class is
+     shared across. This class is also reused by every dashboard form
+     (check-in, journal, goals, prayer-support, session-notes, etc.), so
+     one change here covers all of them. */
+  font-size: 16px;
   font-family: inherit;
   color: #f4f6f9;
 }
@@ -99,7 +105,7 @@ body.auth-body {
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 10px;
   padding: 11px 14px;
-  font-size: 14px;
+  font-size: 16px; /* same iOS auto-zoom reasoning as .auth-field input above */
   font-family: inherit;
   color: #f4f6f9;
 }
@@ -496,7 +502,7 @@ body.auth-body {
       color: var(--text);
     }
     .topbar-menu {
-      width: 36px; height: 36px;
+      width: 44px; height: 44px; /* WCAG 2.5.5 / Apple HIG minimum touch target -- was 36px */
       border-radius: 9px;
       border: 1px solid var(--border-md);
       display: grid; place-items: center;
@@ -532,14 +538,14 @@ body.auth-body {
       border: none; outline: none;
       background: transparent;
       color: var(--text);
-      font-size: 12px;
+      font-size: 16px; /* iOS auto-zoom threshold, same as .auth-field input */
       font-weight: 500;
       width: 100%;
     }
     .topbar-search input::placeholder { color: var(--text-soft) }
     .topbar-bell {
       position: relative;
-      width: 38px; height: 38px;
+      width: 44px; height: 44px; /* WCAG 2.5.5 / Apple HIG minimum touch target -- was 38px */
       border-radius: 50%;
       border: 1px solid var(--border-md);
       display: grid; place-items: center;
@@ -550,7 +556,7 @@ body.auth-body {
     .topbar-bell svg { width: 18px; height: 18px; stroke-width: 1.8 }
     .topbar-theme-toggle {
       position: relative;
-      width: 38px; height: 38px;
+      width: 44px; height: 44px; /* WCAG 2.5.5 / Apple HIG minimum touch target -- was 38px */
       border-radius: 50%;
       border: 1px solid var(--border-md);
       display: grid; place-items: center;
@@ -571,13 +577,13 @@ body.auth-body {
       border: 2px solid var(--navy);
     }
     .topbar-avatar {
-      width: 38px; height: 38px;
+      width: 44px; height: 44px; /* WCAG 2.5.5 / Apple HIG minimum touch target -- was 38px */
       border-radius: 50%;
       background: linear-gradient(135deg, var(--gold), #a07830);
       border: 2px solid var(--gold);
       overflow: hidden;
       display: grid; place-items: center;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--on-gold);
       flex-shrink: 0;
