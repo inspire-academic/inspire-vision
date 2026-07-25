@@ -77,6 +77,29 @@ exports.handler = async (event) => {
     if (e1) throw e1;
     if (e2) throw e2;
 
+    // Guardian consent (mentorship_schema_v7/_v8) — is_minor is
+    // self-reported at signup (auth.users.user_metadata), same trust
+    // level as mentorship_role elsewhere; missingRequest catches minors
+    // whose join.html insert into guardian_consents never landed (e.g. a
+    // transient failure at signup — best-effort by design, see join.html).
+    const { data: consents, error: gcErr } = await admin.schema('mentorship').from('guardian_consents').select('status');
+    if (gcErr) throw gcErr;
+    const gcPending = (consents || []).filter(c => c.status === 'pending').length;
+    const gcConfirmed = (consents || []).filter(c => c.status === 'confirmed').length;
+    const totalMinors = users.filter(u => u.user_metadata?.is_minor).length;
+    const gcMissing = Math.max(0, totalMinors - gcPending - gcConfirmed);
+
+    // Mentor safeguarding checks (mentorship_schema_v9) — a mentor with
+    // no row at all (never reviewed) counts as "not started," same as a
+    // row explicitly set to 'not_started'.
+    const { data: sgChecks, error: sgErr } = await admin.schema('mentorship').from('mentor_safeguarding_checks').select('status');
+    if (sgErr) throw sgErr;
+    const sgInProgress = (sgChecks || []).filter(c => c.status === 'in_progress').length;
+    const sgPassed = (sgChecks || []).filter(c => c.status === 'passed').length;
+    const sgFailed = (sgChecks || []).filter(c => c.status === 'failed').length;
+    const totalMentorApplicants = pendingMentors + approvedMentors + rejectedMentors;
+    const sgNotStarted = Math.max(0, totalMentorApplicants - sgInProgress - sgPassed - sgFailed);
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -86,6 +109,8 @@ exports.handler = async (event) => {
         sessions: { scheduled: sessionsScheduled, completed: sessionsCompleted, cancelled: sessionsCancelled },
         helpRequests: { new: hrNew, seen: hrSeen, resolved: hrResolved, urgentOpen: (hrUrgentNew || 0) + (hrUrgentSeen || 0) },
         engagement: { goals: goalsCount, checkIns: checkInsCount, journalEntries: journalCount },
+        guardianConsent: { pending: gcPending, confirmed: gcConfirmed, missingRequest: gcMissing },
+        mentorSafeguarding: { notStarted: sgNotStarted, inProgress: sgInProgress, passed: sgPassed, failed: sgFailed },
       }),
     };
   } catch (error) {

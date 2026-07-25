@@ -102,6 +102,21 @@
           ${stat(d.engagement.checkIns, 'Check-ins logged')}
           ${stat(d.engagement.journalEntries, 'Journal entries')}
         </div>
+
+        <div class="rp-section-title">Guardian Consent (under-18 mentees)</div>
+        <div class="rp-grid">
+          ${stat(d.guardianConsent.confirmed, 'Confirmed')}
+          ${stat(d.guardianConsent.pending, 'Awaiting guardian', d.guardianConsent.pending > 0)}
+          ${stat(d.guardianConsent.missingRequest, 'No request on file', d.guardianConsent.missingRequest > 0)}
+        </div>
+
+        <div class="rp-section-title">Mentor Safeguarding Checks</div>
+        <div class="rp-grid">
+          ${stat(d.mentorSafeguarding.passed, 'Passed')}
+          ${stat(d.mentorSafeguarding.inProgress, 'In progress')}
+          ${stat(d.mentorSafeguarding.notStarted, 'Not started', d.mentorSafeguarding.notStarted > 0)}
+          ${stat(d.mentorSafeguarding.failed, 'Failed', d.mentorSafeguarding.failed > 0)}
+        </div>
       `;
     }
 
