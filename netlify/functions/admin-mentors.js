@@ -24,15 +24,22 @@
 const { getAdminClient, requireAdmin } = require('./_lib/adminAuth');
 
 async function listPendingMentors(admin) {
-  const { data, error } = await admin.schema('mentorship').from('mentor_applications')
-    .select('*').eq('status', 'pending_review').order('created_at', { ascending: true });
+  const [{ data, error }, { data: checks, error: checksErr }] = await Promise.all([
+    admin.schema('mentorship').from('mentor_applications')
+      .select('*').eq('status', 'pending_review').order('created_at', { ascending: true }),
+    admin.schema('mentorship').from('mentor_safeguarding_checks').select('*'),
+  ]);
   if (error) throw error;
+  if (checksErr) throw checksErr;
+  const checkByMentor = new Map((checks || []).map(c => [c.mentor_id, c]));
   return (data || []).map(a => ({
     id: a.mentor_id,
     email: a.email,
     full_name: a.full_name || '',
     motivation: a.motivation || '',
     created_at: a.created_at,
+    safeguarding_status: checkByMentor.get(a.mentor_id)?.status || 'not_started',
+    safeguarding_notes: checkByMentor.get(a.mentor_id)?.notes || '',
   }));
 }
 
@@ -51,11 +58,32 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { action, userId } = JSON.parse(event.body || '{}');
+    const { action, userId, safeguardingStatus, safeguardingNotes } = JSON.parse(event.body || '{}');
 
     if (action === 'list') {
       const pending = await listPendingMentors(admin);
       return { statusCode: 200, body: JSON.stringify({ pending }) };
+    }
+
+    if (action === 'setSafeguarding') {
+      if (!userId) return { statusCode: 400, body: JSON.stringify({ error: 'Missing userId' }) };
+      const allowed = ['not_started', 'in_progress', 'passed', 'failed'];
+      if (!allowed.includes(safeguardingStatus)) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'Invalid safeguardingStatus' }) };
+      }
+      // Upsert, same reasoning as mentor_applications' approval upsert:
+      // this may be the first time a check is recorded for this mentor,
+      // so a plain UPDATE could silently affect zero rows.
+      const { error: upsertErr } = await admin.schema('mentorship').from('mentor_safeguarding_checks').upsert({
+        mentor_id: userId,
+        status: safeguardingStatus,
+        notes: safeguardingNotes || null,
+        checked_by: auth.user.id,
+        checked_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      if (upsertErr) return { statusCode: 500, body: JSON.stringify({ error: upsertErr.message }) };
+      return { statusCode: 200, body: JSON.stringify({ ok: true }) };
     }
 
     if (action === 'approve' || action === 'reject') {

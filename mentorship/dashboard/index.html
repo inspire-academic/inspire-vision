@@ -200,9 +200,10 @@
       <div class="card" id="guardianConsentBanner" style="display:none; margin:20px 28px 0; border-color:var(--gold-border); background:var(--gold-dim)">
         <div style="display:flex; align-items:flex-start; gap:12px">
           <div style="font-size:20px; line-height:1">✉️</div>
-          <div>
+          <div style="flex:1">
             <div style="font-weight:800; font-size:13px; margin-bottom:2px">Waiting on your parent/guardian</div>
             <div style="font-size:12px; color:var(--text-muted); line-height:1.5" id="guardianConsentText">We've emailed your parent/guardian to confirm they're aware of your mentorship journey. Everything here still works in the meantime — you just won't be matched with a mentor until they confirm.</div>
+            <button id="guardianConsentResendBtn" style="margin-top:10px; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; background:var(--gold-dim); border:1px solid var(--gold-border); color:var(--gold)">Resend email</button>
           </div>
         </div>
       </div>
@@ -782,6 +783,31 @@
             .select('status, guardian_name').eq('student_id', currentUser.id).maybeSingle();
           if (consent && consent.status === 'pending') {
             $('guardianConsentBanner').style.display = '';
+            $('guardianConsentResendBtn')?.addEventListener('click', async (e) => {
+              const resendBtn = e.currentTarget;
+              resendBtn.disabled = true;
+              resendBtn.textContent = 'Sending…';
+              try {
+                const { data: { session } } = await dbClient.auth.getSession();
+                const res = await fetch('/.netlify/functions/guardian-consent-resend', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                });
+                const result = await res.json().catch(() => ({}));
+                if (result.sent) {
+                  resendBtn.textContent = 'Sent ✓';
+                  setTimeout(() => { resendBtn.disabled = false; resendBtn.textContent = 'Resend email'; }, 2500);
+                } else {
+                  if (result.reason !== 'already confirmed') console.warn('Guardian consent resend did not send:', result);
+                  resendBtn.disabled = false;
+                  resendBtn.textContent = 'Resend email';
+                }
+              } catch (err) {
+                console.warn('Guardian consent resend failed:', err);
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Resend email';
+              }
+            });
           }
         } catch (e) {
           console.warn('Guardian consent check failed (non-fatal):', e);
