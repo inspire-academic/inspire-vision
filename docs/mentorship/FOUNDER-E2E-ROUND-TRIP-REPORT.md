@@ -30,6 +30,37 @@ confirm the code-level fixes hold up in practice — this report
 upgrades that from "blocked by missing round-trip" to "blocked by
 never having been run."
 
+### Live Verification — 2026-07-25 (Founder-approved)
+
+Per Founder sign-off, two of the three open decisions below were acted
+on:
+
+- **Synthetic test account created** via the real `join.html` signup
+  flow (REST call to Supabase Auth, same client the page itself uses):
+  `inspire.science.uk+claudetest-student-20260725@gmail.com`, user id
+  `81ff1652-f534-4fb7-9d28-a7241502c9df`. Email confirmation is off for
+  this project, so the account is immediately live with role
+  `mentee`. **Not yet cleaned up** — needs deleting from Supabase Auth
+  (Dashboard → Authentication → Users, or the Admin API) once no
+  longer needed; this Claude session has no service-role access to
+  delete it directly.
+- **F-04 live-fire confirmation, both halves tested:**
+  - Unauthenticated POST to `/.netlify/functions/notify-help-request`
+    on the live `staging.staging.inspirevision.org` deploy → **401
+    `{"error":"Missing Authorization header"}`**, confirming the fix
+    actually blocks unauthenticated callers, not just in source.
+  - Same request with the synthetic account's bearer token → **200
+    `{"sent":true,"messageId":"fb4182df-6fea-494c-a580-32a7f54863b7"}`**
+    — one real email sent to whatever `HELP_REQUEST_NOTIFY_EMAIL` is
+    configured to, body clearly marked `[CLAUDE TEST - please
+    ignore/delete]`.
+- **Not done:** the mentor-side of the round trip was not live-walked.
+  That requires either admin credentials (to approve a test mentor
+  application via `admin/mentors.html`, gated by the `ADMIN_EMAILS`
+  allowlist) or a connected browser session to do it by hand — neither
+  was available this session. The round trip remains verified by code
+  review only (see F-01/F-02 above), not by a live account walkthrough.
+
 ## Resolution Update (2026-07-25)
 
 The findings below reflect the module's state as of commit `38f9a1f`
