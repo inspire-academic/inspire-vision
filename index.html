@@ -165,6 +165,12 @@
          Matches the between-card gap color (body's navy shows through,
          both here and in the grid gap) for one consistent look. */
       margin-top: 16px;
+      /* Same fix, mirrored: the bottom edge sat flush against
+         .journey-section immediately below (which switches to --navy2),
+         so the bottom corners had the identical "still joined" problem
+         the top corners had. Same 16px, same reasoning, both sides now
+         read as real card edges instead of just the left/right gaps. */
+      margin-bottom: 16px;
     }
     .cardinal {
       position: relative;
