@@ -51,7 +51,13 @@
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to right, rgba(10,22,40,0.88) 0%, rgba(10,22,40,0.60) 50%, rgba(10,22,40,0.15) 100%);
+      /* Lightened overall + narrowed the dark-to-light spread per Founder
+         review: was 0.88 -> 0.60 -> 0.15 (very dark left fading to
+         nearly-bare photo on the right, a 0.73 swing). Now 0.65 -> 0.48
+         -> 0.28 -- still darkest under the text on the left for
+         legibility, but noticeably lighter throughout and a much
+         gentler transition (0.37 swing). */
+      background: linear-gradient(to right, rgba(10,22,40,0.65) 0%, rgba(10,22,40,0.48) 50%, rgba(10,22,40,0.28) 100%);
       z-index: 1;
     }
     .hero-content {
@@ -735,7 +741,10 @@
       .hero-content { padding: 3.5rem 1.5rem; margin-top: 0; }
       .hero h1 { font-size: clamp(2.1rem, 8vw, 2.6rem); }
       .hero-desc { font-size: 0.95rem; margin-bottom: 2rem; }
-      .hero-overlay { background: linear-gradient(180deg, rgba(10,22,40,0.55) 0%, rgba(10,22,40,0.80) 55%, rgba(10,22,40,0.94) 100%); }
+      /* Same lightening as the desktop overlay above, proportionally
+         applied to this top-to-bottom mobile gradient: was 0.55 -> 0.80
+         -> 0.94, now 0.42 -> 0.55 -> 0.65. */
+      .hero-overlay { background: linear-gradient(180deg, rgba(10,22,40,0.42) 0%, rgba(10,22,40,0.55) 55%, rgba(10,22,40,0.65) 100%); }
 
       .cardinals { grid-template-columns: 1fr; }
       .cardinal, .cardinal-content { min-height: 420px; }
