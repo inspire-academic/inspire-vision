@@ -30,24 +30,16 @@
     </div>
   </section>
 
-  <section class="pg-section">
-    <div class="pg-section-title">A Living Community</div>
-    <div class="pg-section-sub">Real numbers, drawn from what our community is doing this week — you'd be joining something already in motion.</div>
-    <div class="pg-stats">
-      <div class="pg-stat-card">
-        <div class="pg-stat-value" id="statGoals">—</div>
-        <div class="pg-stat-label">Goals completed this week</div>
-      </div>
-      <div class="pg-stat-card">
-        <div class="pg-stat-value" id="statCheckins">—</div>
-        <div class="pg-stat-label">Check-ins this week</div>
-      </div>
-      <div class="pg-stat-card">
-        <div class="pg-stat-value" id="statActive">—</div>
-        <div class="pg-stat-label">Mentees active this week</div>
-      </div>
-    </div>
-  </section>
+  <!-- "A Living Community" stats section (live goals/check-ins/active-
+       mentees counts via mentorship.community_stats(), see below)
+       removed 2026-07-26 per Founder decision: with a small user base
+       the real numbers were honest zeros, which undercut the section's
+       own "you'd be joining something already in motion" pitch instead
+       of supporting it. Bring back once there's a number worth
+       showing -- the RPC call further down and its three #statGoals/
+       #statCheckins/#statActive targets were removed too, but
+       mentorship.community_stats() itself is untouched in the schema,
+       so this is a re-add, not a rebuild, when that time comes. -->
 
   <section class="pg-section">
     <div class="pg-section-title">Where Do You Feel Called?</div>
@@ -125,24 +117,5 @@
   </section>
 
   <div class="pg-footer">Inspire Mentorship™ · part of Inspire Vision</div>
-
-  <script src="/assets/supabase.js"></script>
-  <script>
-    (async () => {
-      try {
-        const db = await getDB();
-        const { data, error } = await db.schema('mentorship').rpc('community_stats');
-        if (error) { console.warn('community_stats failed:', error); return; }
-        const row = Array.isArray(data) ? data[0] : data;
-        if (row) {
-          document.getElementById('statGoals').textContent = row.goals_completed_this_week ?? '0';
-          document.getElementById('statCheckins').textContent = row.checkins_this_week ?? '0';
-          document.getElementById('statActive').textContent = row.active_students_this_week ?? '0';
-        }
-      } catch (e) {
-        console.warn('Community stats failed to load:', e);
-      }
-    })();
-  </script>
 </body>
 </html>
