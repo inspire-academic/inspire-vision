@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
 </head>
 <body class="auth-body">
-  <div class="auth-card">
+  <div class="auth-card" id="loginCard">
     <div class="auth-eyebrow">Inspire Mentorship</div>
     <div class="auth-title">Welcome back</div>
     <div class="auth-sub">Sign in to continue your journey.</div>
@@ -36,6 +36,14 @@
     </div>
   </div>
 
+  <div class="auth-card" id="bridgeCard" style="display:none">
+    <div class="auth-eyebrow">Inspire Mentorship</div>
+    <div class="auth-title">You're signed in — but not a mentee yet</div>
+    <div class="auth-sub">This is the same account you use for Inspire Academic, but it doesn't have a mentee profile here. Would you like to join the mentorship programme? It only takes a couple of minutes and includes the parent/guardian consent step if you're under 18.</div>
+    <a href="/mentorship/join.html" class="auth-btn" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box">Join as a mentee</a>
+    <button type="button" class="auth-btn-secondary" id="bridgeSignOut">Not right now, sign me out</button>
+  </div>
+
   <script src="/assets/supabase.js"></script>
   <script>
     const form = document.getElementById('loginForm');
@@ -56,6 +64,11 @@
       } catch (e) { /* not signed in — stay on the form */ }
     })();
 
+    function showBridge() {
+      document.getElementById('loginCard').style.display = 'none';
+      document.getElementById('bridgeCard').style.display = 'block';
+    }
+
     function redirectForRole(user) {
       const role = user.user_metadata?.mentorship_role;
       const mentorStatus = user.user_metadata?.mentor_status;
@@ -72,12 +85,27 @@
         showMsg("Your mentor application is still under review — we'll email you once it's approved.", 'success');
         return;
       }
+      if (role !== 'mentee') {
+        // Authenticated (e.g. an Inspire Academic account sharing this Supabase
+        // project) but never went through join.html — don't silently drop them
+        // into onboarding as if they'd signed up here. Require explicit opt-in
+        // so the guardian-consent step in join.html can't be bypassed.
+        showBridge();
+        return;
+      }
       if (!user.user_metadata?.onboarding_complete) {
         window.location.href = '/mentorship/onboarding/welcome.html';
         return;
       }
       window.location.href = '/mentorship/dashboard/';
     }
+
+    document.getElementById('bridgeSignOut').addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      document.getElementById('bridgeCard').style.display = 'none';
+      document.getElementById('loginCard').style.display = '';
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
