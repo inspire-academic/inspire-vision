@@ -60,7 +60,7 @@
       try {
         const db = await getDB();
         const { data: { user } } = await db.auth.getUser();
-        if (user) redirectForRole(user);
+        if (user) await redirectForRole(user);
       } catch (e) { /* not signed in — stay on the form */ }
     })();
 
@@ -69,7 +69,25 @@
       document.getElementById('bridgeCard').style.display = 'block';
     }
 
-    function redirectForRole(user) {
+    // ADMIN_EMAILS is a Netlify secret — the client can't read it directly,
+    // so we ask an existing admin-gated endpoint whether this session passes.
+    async function isAdmin() {
+      try {
+        const db = await getDB();
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) return false;
+        const res = await fetch('/.netlify/functions/admin-reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({}),
+        });
+        return res.status === 200;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function redirectForRole(user) {
       const role = user.user_metadata?.mentorship_role;
       const mentorStatus = user.user_metadata?.mentor_status;
       if (role === 'mentor') {
@@ -87,9 +105,16 @@
       }
       if (role !== 'mentee') {
         // Authenticated (e.g. an Inspire Academic account sharing this Supabase
-        // project) but never went through join.html — don't silently drop them
-        // into onboarding as if they'd signed up here. Require explicit opt-in
-        // so the guardian-consent step in join.html can't be bypassed.
+        // project) but never went through join.html. Admins fall in this
+        // bucket too (they don't have a mentee/mentor profile) — send them
+        // straight to the admin panel instead of the mentee-signup prompt.
+        if (await isAdmin()) {
+          window.location.href = '/mentorship/admin/';
+          return;
+        }
+        // Not an admin either — don't silently drop them into onboarding as
+        // if they'd signed up here. Require explicit opt-in so the
+        // guardian-consent step in join.html can't be bypassed.
         showBridge();
         return;
       }
@@ -124,7 +149,7 @@
           btn.textContent = 'Sign In';
           return;
         }
-        redirectForRole(data.user);
+        await redirectForRole(data.user);
       } catch (e) {
         console.warn('Login failed:', e);
         showMsg('Something went wrong — please try again.', 'error');
