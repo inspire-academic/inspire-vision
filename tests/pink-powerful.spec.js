@@ -1,4 +1,4 @@
-// Pink & Powerful (Brovelyn Childcare Services x Inspire Health & Wellbeing)
+// Pink & Powerful (Brovelyn Care Agency x Inspire Health & Wellbeing)
 // event registration page — pages/pink-powerful-registration.html.
 //
 // The legacy-URL 301 redirects (/Pink&PowerfullRegistration,
@@ -38,7 +38,7 @@ test.describe('Pink & Powerful registration page', () => {
     await page.goto('/pages/pink-powerful-registration.html');
     const logos = page.locator('.logos .logo-box img');
     await expect(logos).toHaveCount(2);
-    await expect(logos.nth(0)).toHaveAttribute('alt', 'Brovelyn Childcare Services');
+    await expect(logos.nth(0)).toHaveAttribute('alt', 'Brovelyn Care Agency');
     await expect(logos.nth(1)).toHaveAttribute('alt', /Inspire Health/);
     await expect(page.locator('.collab')).toContainText('In collaboration, presents');
   });

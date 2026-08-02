@@ -1,5 +1,5 @@
 // Sends the organiser notification + registrant confirmation email for the
-// Pink & Powerful (Brovelyn Childcare Services x Inspire Health & Wellbeing)
+// Pink & Powerful (Brovelyn Care Agency x Inspire Health & Wellbeing)
 // registration form (pages/pink-powerful-registration.html).
 //
 // Deliberately does NOT touch Supabase — the registration row is already
@@ -148,7 +148,7 @@ exports.handler = async (event) => {
       <p>Hi ${escapeHtml(fullName)},</p>
       <p>Thank you for registering your interest in <strong>Pink &amp; Powerful</strong> — Saturday 18 October 2026.</p>
       <p>We've recorded your interest and will be in touch when venue and full programme details are confirmed.</p>
-      <p>With thanks,<br>Brovelyn Childcare Services &amp; Inspire Health &amp; Wellbeing</p>
+      <p>With thanks,<br>Brovelyn Care Agency &amp; Inspire Health &amp; Wellbeing</p>
       <p class="meta">You're receiving this because you registered at inspirevision.org/pink-powerful-registration. This email confirms your event-contact registration only${marketingConsent ? ' and your opt-in for further updates' : ''}.</p>
     </div>
   </div>
