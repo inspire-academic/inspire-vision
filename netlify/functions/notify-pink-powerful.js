@@ -78,13 +78,19 @@ exports.handler = async (event) => {
 
   const registeredAt = new Date().toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London' });
 
+  // Same comma-separated-list convention as ADMIN_EMAILS
+  // (netlify/functions/_lib/adminAuth.js) — lets more than one organiser
+  // receive the alert without hardcoding any address in source.
+  const notifyEmails = process.env.PINK_POWERFUL_NOTIFY_EMAIL
+    .split(',').map((e) => e.trim()).filter(Boolean);
+
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     // 1. Organiser notification — internal, not shown to the registrant.
     const organiserSend = resend.emails.send({
       from: 'Inspire Health & Wellbeing <noreply@inspireacademic.org>',
-      to: process.env.PINK_POWERFUL_NOTIFY_EMAIL,
+      to: notifyEmails,
       subject: `New Pink & Powerful registration: ${fullName}`,
       html: `
 <!DOCTYPE html>
