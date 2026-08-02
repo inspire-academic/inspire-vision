@@ -14,8 +14,8 @@
 <body class="auth-body">
   <div class="auth-card">
     <div class="auth-eyebrow">Inspire Mentorship</div>
-    <div class="auth-title">Become a Mentee</div>
-    <div class="auth-sub">Start your journey — build character, resilience and purpose with a mentor who walks with you.</div>
+    <div class="auth-title" id="pageTitle">Become a Mentee</div>
+    <div class="auth-sub" id="pageSub">Start your journey — build character, resilience and purpose with a mentor who walks with you.</div>
 
     <div class="auth-msg" id="authMsg"></div>
 
@@ -24,17 +24,19 @@
         <label for="fullName">Full name</label>
         <input type="text" id="fullName" name="fullName" required autocomplete="name">
       </div>
-      <div class="auth-field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email">
-      </div>
-      <div class="auth-field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
-      </div>
-      <div class="auth-field">
-        <label for="confirmPassword">Confirm password</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" autocomplete="new-password">
+      <div id="credentialFields">
+        <div class="auth-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" autocomplete="new-password">
+        </div>
       </div>
       <div class="auth-field">
         <label for="isMinor">Are you under 18?</label>
@@ -62,9 +64,10 @@
       <button type="submit" class="auth-btn" id="submitBtn">Create My Account</button>
     </form>
 
-    <div class="auth-footer">
+    <div class="auth-footer" id="joinFooter">
       Already have an account? <a href="/mentorship/login.html">Sign in</a>
     </div>
+    <button type="button" class="auth-btn-secondary" id="notMeSignOut" style="display:none">Not you? Sign out</button>
   </div>
 
   <script src="/assets/supabase.js"></script>
@@ -76,6 +79,19 @@
     const guardianFields = document.getElementById('guardianFields');
     const guardianNameInput = document.getElementById('guardianName');
     const guardianEmailInput = document.getElementById('guardianEmail');
+    const credentialFields = document.getElementById('credentialFields');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const fullNameInput = document.getElementById('fullName');
+
+    // Set when the visitor arrives already signed in (e.g. an Inspire
+    // Academic account sharing this Supabase project — see
+    // mentorship/login.html's bridge card, which links here). Non-null
+    // means "attach a mentee profile to this existing account" instead of
+    // "create a brand new account" — the two need very different submit
+    // handling below.
+    let bridgedUser = null;
 
     function showMsg(text, type) {
       msg.textContent = text;
@@ -102,13 +118,82 @@
       return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
+    // Shared by both the fresh-signup and already-signed-in paths — best
+    // effort and non-blocking either way, since the mentee profile is
+    // already saved by the time this runs regardless of outcome.
+    async function setupGuardianConsent(db, accessToken, studentId, guardianName, guardianEmail) {
+      try {
+        const rawToken = randomToken();
+        const tokenHash = await sha256Hex(rawToken);
+        const { error: consentErr } = await db.schema('mentorship').from('guardian_consents').insert({
+          student_id: studentId,
+          guardian_name: guardianName,
+          guardian_email: guardianEmail,
+          consent_token_hash: tokenHash,
+        });
+        if (consentErr) {
+          console.warn('Could not create guardian_consents row (account was still created):', consentErr);
+          return;
+        }
+        await fetch('/.netlify/functions/guardian-consent-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+          body: JSON.stringify({ guardianName, guardianEmail, consentToken: rawToken }),
+        }).catch(err => console.warn('Could not send guardian consent email:', err));
+      } catch (err) {
+        console.warn('Guardian consent setup failed (account was still created):', err);
+      }
+    }
+
+    // Switches the form from "create a new account" to "attach a mentee
+    // profile to the account I'm already signed in with" — credentials
+    // aren't needed or askable a second time.
+    function enterBridgeMode(user) {
+      bridgedUser = user;
+      credentialFields.style.display = 'none';
+      emailInput.required = false;
+      passwordInput.required = false;
+      confirmPasswordInput.required = false;
+      if (user.user_metadata?.full_name) fullNameInput.value = user.user_metadata.full_name;
+      document.getElementById('pageTitle').textContent = 'Complete Your Mentee Profile';
+      document.getElementById('pageSub').textContent =
+        `You're already signed in as ${user.email} — this is the same account you use for Inspire Academic. Just a few more details to join the mentorship programme.`;
+      btn.textContent = 'Join as a Mentee';
+      document.getElementById('joinFooter').style.display = 'none';
+      document.getElementById('notMeSignOut').style.display = 'block';
+    }
+
+    // A visitor who already has a mentee/mentor profile has no business on
+    // this form at all — send them to login.html, whose redirectForRole()
+    // already knows exactly where each role belongs.
+    (async () => {
+      try {
+        const db = await getDB();
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) return;
+        if (user.user_metadata?.mentorship_role) {
+          window.location.href = '/mentorship/login.html';
+          return;
+        }
+        enterBridgeMode(user);
+      } catch (e) { /* not signed in — normal signup flow */ }
+    })();
+
+    document.getElementById('notMeSignOut').addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.reload();
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      if (password !== confirmPassword) {
-        showMsg("Passwords don't match.", 'error');
-        return;
+      if (!bridgedUser) {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (password !== confirmPassword) {
+          showMsg("Passwords don't match.", 'error');
+          return;
+        }
       }
       const isMinor = isMinorSelect.value === 'yes';
       const guardianName = guardianNameInput.value.trim();
@@ -118,16 +203,51 @@
         return;
       }
       btn.disabled = true;
-      btn.textContent = 'Creating account…';
       msg.className = 'auth-msg';
+
+      if (bridgedUser) {
+        btn.textContent = 'Saving…';
+        try {
+          const db = await getDB();
+          const { data, error } = await db.auth.updateUser({
+            data: {
+              full_name: fullNameInput.value.trim(),
+              mentorship_role: 'mentee',
+              is_minor: isMinor,
+            },
+          });
+          if (error) {
+            showMsg(error.message || 'Could not save your mentee profile — please try again.', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Join as a Mentee';
+            return;
+          }
+          const { data: { session } } = await db.auth.getSession();
+          if (isMinor && session) {
+            await setupGuardianConsent(db, session.access_token, data.user.id, guardianName, guardianEmail);
+            showMsg("You're in! We've also emailed your parent/guardian to confirm — you can keep going in the meantime.", 'success');
+            setTimeout(() => { window.location.href = '/mentorship/onboarding/welcome.html'; }, 1800);
+          } else {
+            window.location.href = '/mentorship/onboarding/welcome.html';
+          }
+        } catch (e) {
+          console.warn('Mentee profile setup failed:', e);
+          showMsg('Something went wrong — please try again.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Join as a Mentee';
+        }
+        return;
+      }
+
+      btn.textContent = 'Creating account…';
       try {
         const db = await getDB();
         const { data, error } = await db.auth.signUp({
-          email: document.getElementById('email').value.trim(),
-          password,
+          email: emailInput.value.trim(),
+          password: passwordInput.value,
           options: {
             data: {
-              full_name: document.getElementById('fullName').value.trim(),
+              full_name: fullNameInput.value.trim(),
               mentorship_role: 'mentee',
               is_minor: isMinor,
             },
@@ -140,32 +260,8 @@
           return;
         }
         if (data.session) {
-          // Best-effort, non-blocking — same reasoning as mentors.html's
-          // mentor_applications insert: the account already exists either
-          // way, and there's nothing more the signer-upper can do if this
-          // fails beyond what's already logged.
           if (isMinor && data.user) {
-            try {
-              const rawToken = randomToken();
-              const tokenHash = await sha256Hex(rawToken);
-              const { error: consentErr } = await db.schema('mentorship').from('guardian_consents').insert({
-                student_id: data.user.id,
-                guardian_name: guardianName,
-                guardian_email: guardianEmail,
-                consent_token_hash: tokenHash,
-              });
-              if (consentErr) {
-                console.warn('Could not create guardian_consents row (account was still created):', consentErr);
-              } else {
-                await fetch('/.netlify/functions/guardian-consent-request', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.session.access_token}` },
-                  body: JSON.stringify({ guardianName, guardianEmail, consentToken: rawToken }),
-                }).catch(err => console.warn('Could not send guardian consent email:', err));
-              }
-            } catch (err) {
-              console.warn('Guardian consent setup failed (account was still created):', err);
-            }
+            await setupGuardianConsent(db, data.session.access_token, data.user.id, guardianName, guardianEmail);
             showMsg("Account created! We've also emailed your parent/guardian to confirm — you can keep going in the meantime.", 'success');
             setTimeout(() => { window.location.href = '/mentorship/onboarding/welcome.html'; }, 1800);
           } else {
