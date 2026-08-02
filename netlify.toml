@@ -17,3 +17,30 @@ functions = "netlify/functions"
   from = "/mentorship/mentor-portal"
   to = "/mentorship/mentor-portal/"
   status = 301
+
+# Pink & Powerful (Brovelyn Childcare Services x Inspire Health & Wellbeing)
+# — canonical route serves the page file without changing the URL; the two
+# originally-requested URLs (raw "&" and percent-encoded "%26", plus the
+# "Powerfull" misspelling) permanently redirect to the canonical route so
+# any link already shared with that URL still works.
+[[redirects]]
+  from = "/Pink&PowerfullRegistration"
+  to = "/pink-powerful-registration"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/Pink%26PowerfullRegistration"
+  to = "/pink-powerful-registration"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/pink-powerful-registration"
+  to = "/pages/pink-powerful-registration.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/pink-powerful/registrations"
+  to = "/admin/pink-powerful-registrations.html"
+  status = 200

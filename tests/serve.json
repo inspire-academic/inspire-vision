@@ -6,6 +6,8 @@
     { "source": "/mentorship/mentor-portal", "destination": "/mentorship/mentor-portal/index.html" },
     { "source": "/mentorship/mentor-portal/", "destination": "/mentorship/mentor-portal/index.html" },
     { "source": "/mentorship/admin", "destination": "/mentorship/admin/index.html" },
-    { "source": "/mentorship/admin/", "destination": "/mentorship/admin/index.html" }
+    { "source": "/mentorship/admin/", "destination": "/mentorship/admin/index.html" },
+    { "source": "/pink-powerful-registration", "destination": "/pages/pink-powerful-registration.html" },
+    { "source": "/admin/pink-powerful/registrations", "destination": "/admin/pink-powerful-registrations.html" }
   ]
 }

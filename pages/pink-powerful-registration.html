@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<!-- Pink & Powerful collaboration variant: Brovelyn Childcare Services presented first, followed by Inspire Health & Wellbeing.
+     Adapted from a standalone design file into this repo's page/routing/Supabase conventions — see CLAUDE.md and
+     docs/pink-powerful/README.md for the architecture notes behind these choices. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pink &amp; Powerful | Register Your Interest | Inspire Vision</title>
+<meta name="description" content="Save the date — Saturday 18 October 2026. Register your interest for Pink & Powerful: Stories. Support. Hope. Presented by Brovelyn Childcare Services in collaboration with Inspire Health & Wellbeing.">
+<link rel="canonical" href="https://inspirevision.org/pink-powerful-registration">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Inspire Vision">
+<meta property="og:title" content="Pink & Powerful | Register Your Interest">
+<meta property="og:description" content="Save the date — Saturday 18 October 2026. Stories. Support. Hope. A breast cancer awareness initiative by Brovelyn Childcare Services in collaboration with Inspire Health & Wellbeing.">
+<meta property="og:url" content="https://inspirevision.org/pink-powerful-registration">
+<meta property="og:image" content="https://inspirevision.org/assets/images/health/pink-powerful/hero-bg.jpg">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pink & Powerful | Register Your Interest">
+<meta name="twitter:description" content="Save the date — Saturday 18 October 2026. Stories. Support. Hope.">
+<meta name="twitter:image" content="https://inspirevision.org/assets/images/health/pink-powerful/hero-bg.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink:#e61f78; --pink2:#f04b96; --pink-soft:#fff0f7;
+  --purple:#4b174f; --purple-dark:#291033; --ink:#3b1742;
+  --muted:#78667a; --white:#fff; --blue:#0867b2;
+  --shadow:0 24px 70px rgba(74,18,73,.14);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"DM Sans",sans-serif;color:var(--ink);background:
+radial-gradient(circle at 82% 8%,rgba(255,184,216,.52),transparent 28%),
+linear-gradient(180deg,#fff9fc 0%,#fff 50%,#fff8fb 100%);line-height:1.55}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.container{width:min(calc(100% - 32px),1220px);margin:auto}
+.header{padding:22px 0 10px}
+.header-row{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center}
+.logos{display:flex;align-items:center;justify-content:center;gap:18px}
+.logo-box img{object-fit:contain}
+.logo-inspire img{width:150px;max-height:110px}
+.logo-brovelyn img{width:135px;max-height:115px}
+.logo-divider{height:88px;width:1px;background:linear-gradient(transparent,rgba(230,31,120,.55),transparent)}
+.collab{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;width:100%;margin-top:2px}
+.collab:before,.collab:after{content:"";width:34px;height:1px;background:var(--pink2)}
+.hero{padding:18px 0 54px}
+.hero-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:34px;align-items:stretch}
+.hero-copy{padding:28px 0 10px;display:flex;flex-direction:column;justify-content:center}
+.save{margin:0;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;font-size:clamp(2.2rem,4.8vw,4.8rem);line-height:.95;letter-spacing:-.04em;text-transform:uppercase}
+.for{display:flex;align-items:center;gap:14px;margin:20px 0 0;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:.38em}
+.for:before,.for:after{content:"";height:1px;flex:1;max-width:120px;background:var(--pink2)}
+.title{margin:0;line-height:.82;display:flex;flex-wrap:wrap;align-items:center}
+.title .pink{font-family:"Montserrat",sans-serif;font-weight:800;color:var(--pink);font-size:clamp(4rem,8vw,7.2rem);letter-spacing:-.07em;text-transform:uppercase}
+.title .amp{font-family:"Montserrat",sans-serif;font-weight:800;color:var(--pink);font-size:clamp(3rem,6vw,5rem);margin-left:10px}
+.title .power{width:100%;margin:-2px 0 0 14px;font-family:"Great Vibes",cursive;color:var(--pink);font-size:clamp(4.6rem,8.8vw,8rem);font-weight:400;line-height:.8}
+.tagline{display:flex;align-items:center;gap:10px;margin:34px 0 22px;color:var(--purple);font-family:"Montserrat",sans-serif;font-weight:700;font-size:clamp(1rem,1.8vw,1.32rem)}
+.tagline:before,.tagline:after{content:"♥";color:var(--pink)}
+.facts{display:flex;flex-wrap:wrap;gap:18px;margin:6px 0 22px}
+.fact{display:flex;gap:12px;align-items:center;min-width:220px}
+.fact+.fact{border-left:1px solid rgba(230,31,120,.3);padding-left:22px}
+.fact-icon{font-size:2rem;color:var(--pink);width:46px;text-align:center}
+.fact strong{display:block;font-family:"Montserrat",sans-serif;text-transform:uppercase;font-size:1rem;color:var(--purple)}
+.fact span{font-weight:600}
+.initiative{max-width:560px;margin:0}
+.inspire-name{color:var(--pink);font-weight:700}
+.brovelyn-name{color:var(--blue);font-weight:700}
+.hero-image{position:relative;min-height:610px;border-radius:30px;overflow:hidden;box-shadow:var(--shadow);background-image:linear-gradient(180deg,rgba(255,255,255,.03),rgba(204,13,91,.55)),url("/assets/images/health/pink-powerful/hero-bg.jpg");background-size:cover;background-position:center}
+.hero-image:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(191,12,83,.68) 100%)}
+.quote{position:absolute;z-index:2;left:28px;right:28px;bottom:34px;margin-left:auto;max-width:530px;color:#fff;font-family:"Montserrat",sans-serif;font-weight:700;font-size:clamp(1.5rem,2.5vw,2.35rem);line-height:1.22;text-shadow:0 4px 18px rgba(70,4,31,.25)}
+.quote:before{content:"“";color:rgba(255,255,255,.55);font-size:1.8em;vertical-align:-.2em}
+.section{padding:0 0 72px}
+.main-grid{display:grid;grid-template-columns:1.13fr .87fr;gap:38px;align-items:start}
+.expect-title{display:flex;align-items:center;gap:16px;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin:22px 0 30px}
+.expect-title:before,.expect-title:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(230,31,120,.45),transparent)}
+.expect-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.expect{text-align:center}
+.icon{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;background:linear-gradient(145deg,#fff,#ffe5f1);box-shadow:0 12px 30px rgba(209,24,104,.12);font-size:2rem}
+.expect h3{margin:0 0 8px;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;font-size:.74rem;text-transform:uppercase;line-height:1.35;min-height:48px}
+.expect p{margin:0;font-size:.78rem;line-height:1.5}
+.story{display:grid;grid-template-columns:.85fr 1.15fr;gap:26px;align-items:center;margin-top:40px;padding:18px;border:1px solid rgba(230,31,120,.16);border-radius:22px;background:rgba(255,255,255,.82);box-shadow:0 14px 38px rgba(79,15,69,.07)}
+.story img{width:100%;height:230px;border-radius:16px;object-fit:cover}
+.eyebrow{margin:0 0 9px;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;text-transform:uppercase;font-size:.78rem;letter-spacing:.09em}
+.story h3{margin:0 0 12px;color:var(--pink);font-family:"Montserrat",sans-serif;font-size:clamp(1.35rem,2.4vw,2rem);line-height:1.25;text-transform:uppercase}
+.story p{margin:0}
+.form-card{position:sticky;top:18px;margin-top:-76px;padding:32px;border:1px solid rgba(230,31,120,.18);border-radius:28px;background:rgba(255,255,255,.97);box-shadow:var(--shadow)}
+.form-card h2{margin:0;color:var(--pink);font-family:"Montserrat",sans-serif;text-align:center;text-transform:uppercase;font-size:clamp(1.55rem,3vw,2.15rem);line-height:1.15}
+.form-sub{margin:7px 0 4px;text-align:center;font-family:"Montserrat",sans-serif;font-weight:700;color:var(--purple)}
+.form-intro{margin:0 auto 22px;max-width:420px;text-align:center;color:var(--muted);font-size:.92rem}
+.group{margin-bottom:12px}
+.group label{display:block;margin-bottom:5px;color:var(--purple);font-size:.78rem;font-weight:700}
+.control{width:100%;min-height:51px;padding:13px 14px;border:1px solid #d8ced9;border-radius:10px;outline:none;background:#fff;color:var(--ink)}
+.control:focus{border-color:var(--pink);box-shadow:0 0 0 4px rgba(230,31,120,.11)}
+.check{display:flex;align-items:flex-start;gap:10px;margin:16px 0;color:var(--purple);font-size:.85rem}
+.check input{width:18px;height:18px;accent-color:var(--pink);margin-top:2px;flex-shrink:0}
+.submit{width:100%;min-height:58px;border:0;border-radius:999px;background:linear-gradient(100deg,var(--pink),#f51d83);color:#fff;font-family:"Montserrat",sans-serif;font-weight:800;text-transform:uppercase;cursor:pointer;box-shadow:0 14px 30px rgba(216,22,109,.28)}
+.submit:disabled{opacity:.65;cursor:wait}
+.note{text-align:center;font-size:.75rem;color:#7b6c7c;margin:13px 0 0}
+.status{display:none;margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.86rem;font-weight:600}
+.status.success{display:block;color:#126a36;background:#eaf8ef;border:1px solid #bbe6c9}
+.status.error{display:block;color:#9f1e44;background:#fff0f4;border:1px solid #f3c1d0}
+.banner{padding:0 0 24px}
+.banner-inner{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;padding:24px 30px;border-radius:24px;color:#fff;background:linear-gradient(105deg,#e32279,#da146e 55%,#ef3c8b);box-shadow:0 20px 48px rgba(192,18,91,.2)}
+.banner strong{display:block;font-family:"Montserrat",sans-serif;font-size:clamp(1.2rem,2.4vw,1.8rem);line-height:1.26}
+.banner em{display:block;margin-top:5px;font-family:"Great Vibes",cursive;font-size:clamp(1.55rem,3vw,2.15rem);font-style:normal}
+.banner-date{padding-left:28px;border-left:1px solid rgba(255,255,255,.5)}
+.banner-date span{display:block;font-family:"Montserrat",sans-serif;font-size:.86rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.banner-date b{display:block;font-family:"Montserrat",sans-serif;font-size:clamp(1.8rem,4vw,3.2rem);line-height:1}
+.closing{padding:8px 0 28px;text-align:center;color:var(--purple);font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:clamp(.86rem,1.7vw,1.18rem)}
+.footer{padding:44px 0 20px;color:#fff;background:radial-gradient(circle at 12% 20%,rgba(232,38,124,.18),transparent 30%),linear-gradient(110deg,#281035,#421447 58%,#32113e)}
+.footer-grid{display:grid;grid-template-columns:1.4fr .8fr .8fr 1.2fr;gap:32px}
+.footer-logos{display:flex;align-items:center;gap:12px}
+.footer-logos img{width:88px;height:76px;object-fit:contain;background:rgba(255,255,255,.94);border-radius:10px;padding:4px}
+.footer p,.footer li{color:rgba(255,255,255,.76);font-size:.82rem}
+.footer h3{margin:0 0 12px;font-family:"Montserrat",sans-serif;font-size:.8rem;text-transform:uppercase}
+.footer ul{list-style:none;margin:0;padding:0}
+.footer li{margin-bottom:7px}
+.footer a:hover,.footer a:focus-visible{color:#fff;text-decoration:underline}
+.footer-bottom{display:flex;justify-content:space-between;gap:18px;margin-top:34px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55);font-size:.72rem}
+.modal{position:fixed;inset:0;z-index:999;display:none;place-items:center;padding:24px;background:rgba(31,7,34,.72);backdrop-filter:blur(8px)}
+.modal.open{display:grid}
+.modal-card{width:min(100%,470px);padding:36px;border-radius:26px;background:#fff;text-align:center;box-shadow:0 30px 100px rgba(21,4,25,.35)}
+.modal-icon{width:74px;height:74px;margin:0 auto 17px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,var(--pink2),#b90f5b);font-size:2rem}
+.modal-card h2{font-family:"Montserrat",sans-serif;color:var(--purple);margin:0 0 9px}
+.modal-card p{color:var(--muted)}
+.modal-card button{border:0;border-radius:999px;background:var(--pink);color:#fff;font-weight:800;padding:12px 22px;cursor:pointer}
+@media(max-width:1080px){.header-row{align-items:center}.hero-grid{grid-template-columns:1fr}.main-grid{grid-template-columns:1fr}.form-card{position:relative;top:auto;margin:0 auto;width:min(100%,650px)}.expect-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.header-row{align-items:center}.logos{width:100%;justify-content:center}.logo-inspire img{width:122px}.logo-brovelyn img{width:108px}.collab{font-size:.68rem;text-align:center;white-space:normal}.hero-image{min-height:500px}.facts{flex-direction:column}.fact+.fact{border-left:0;padding-left:0}.expect-grid{grid-template-columns:repeat(2,1fr)}.expect:last-child{grid-column:1/-1;max-width:250px;margin:auto}.story{grid-template-columns:1fr}.banner-inner{grid-template-columns:1fr}.banner-date{border-left:0;border-top:1px solid rgba(255,255,255,.5);padding:17px 0 0}.footer-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.container{width:min(calc(100% - 22px),1220px)}.logo-inspire img{width:103px}.logo-brovelyn img{width:94px}.save{font-size:2.3rem}.title .pink{font-size:3.9rem}.title .amp{font-size:2.7rem}.title .power{font-size:4.3rem;margin-left:0}.tagline{font-size:.92rem}.hero-image{min-height:420px;background-position:58% center}.quote{left:18px;right:18px;bottom:22px;font-size:1.3rem}.expect-grid{grid-template-columns:1fr}.expect:last-child{grid-column:auto}.form-card{padding:24px 17px}.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column}}
+</style>
+</head>
+<body>
+<a class="visually-hidden" href="#register">Skip to registration form</a>
+<header class="header">
+  <div class="container header-row">
+    <div class="logos" aria-label="Brovelyn Childcare Services and Inspire Health and Wellbeing">
+      <div class="logo-box logo-brovelyn"><img src="/assets/images/health/pink-powerful/brovelyn-logo.png" alt="Brovelyn Childcare Services" width="270" height="230"></div>
+      <span class="logo-divider" aria-hidden="true"></span>
+      <div class="logo-box logo-inspire"><img src="/assets/images/health/pink-powerful/inspire-health-logo.png" alt="Inspire Health & Wellbeing" width="300" height="230"></div>
+    </div>
+    <div class="collab">♥ In collaboration, presents ♥</div>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <p class="save">Save the Date</p>
+      <div class="for">FOR</div>
+      <h1 class="title"><span class="pink">Pink</span><span class="amp">&amp;</span><span class="power">Powerful</span></h1>
+      <div class="tagline">Stories. Support. Hope.</div>
+      <div class="facts">
+        <div class="fact"><div class="fact-icon" aria-hidden="true">▣</div><div><strong>Saturday</strong><span>18th October 2026</span></div></div>
+        <div class="fact"><div class="fact-icon" aria-hidden="true">⌖</div><div><strong>United Kingdom</strong><span>Venue details to be announced</span></div></div>
+      </div>
+      <p class="initiative">An annual breast cancer awareness initiative by <span class="brovelyn-name">Brovelyn Childcare Services</span> in collaboration with <span class="inspire-name">Inspire Health &amp; Wellbeing</span>.</p>
+    </div>
+    <div class="hero-image" role="img" aria-label="Women united in support of breast cancer awareness">
+      <div class="quote">We don&rsquo;t just wear pink. We live pink. We are pink. We are powerful.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="register">
+  <div class="container main-grid">
+    <div>
+      <h2 class="expect-title">What to Expect</h2>
+      <div class="expect-grid">
+        <article class="expect"><div class="icon" aria-hidden="true">💬</div><h3>Inspiring Survivor Stories</h3><p>Real stories of courage, strength and hope.</p></article>
+        <article class="expect"><div class="icon" aria-hidden="true">🩺</div><h3>Health Talks &amp; Expert Insights</h3><p>Learn from healthcare professionals about prevention, early detection and care.</p></article>
+        <article class="expect"><div class="icon" aria-hidden="true">♥</div><h3>Health Checks</h3><p>Access essential health information, wellbeing guidance and trusted resources.</p></article>
+        <article class="expect"><div class="icon" aria-hidden="true">🤲</div><h3>Support &amp; Community</h3><p>Connect, share and find support in a safe and uplifting environment.</p></article>
+        <article class="expect"><div class="icon" aria-hidden="true">🎀</div><h3>Fun, Faith &amp; Empowerment</h3><p>A day of encouragement, empowerment and activities for all.</p></article>
+      </div>
+      <article class="story">
+        <img src="/assets/images/health/pink-powerful/story.jpg" alt="Women supporting one another at a breast cancer awareness gathering" loading="lazy">
+        <div><p class="eyebrow">One Cause. Two Organisations.</p><h3>Countless Lives Changed.</h3><p>Brovelyn Childcare Services and Inspire Health &amp; Wellbeing are joining forces to champion breast health, encourage early action and help build stronger, healthier communities.</p></div>
+      </article>
+    </div>
+
+    <aside class="form-card">
+      <h2>Register Your Interest</h2>
+      <p class="form-sub">Be the first to know more!</p>
+      <p class="form-intro">Register today to receive updates, event details and opportunities to be part of this powerful movement.</p>
+      <form id="interestForm" novalidate>
+        <div class="group"><label for="fullName">Full name *</label><input class="control" id="fullName" name="full_name" type="text" autocomplete="name" maxlength="120" required></div>
+        <div class="group"><label for="email">Email address *</label><input class="control" id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+        <div class="group"><label for="phone">Phone number</label><input class="control" id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div>
+        <div class="group"><label for="postcodeOrLocation">Postcode or location *</label><input class="control" id="postcodeOrLocation" name="postcode_or_location" type="text" autocomplete="postal-code" maxlength="100" required></div>
+        <div class="group"><label for="interest">I am interested in *</label>
+          <select class="control" id="interest" name="interest" required>
+            <option value="">Select an option</option>
+            <option value="attending">Attending the event</option>
+            <option value="survivor-story">Sharing my story</option>
+            <option value="volunteering">Volunteering</option>
+            <option value="healthcare-partner">Healthcare partnership</option>
+            <option value="sponsorship">Sponsorship or fundraising</option>
+            <option value="community-partner">Community partnership</option>
+            <option value="updates">Receiving event updates</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <label class="check"><input name="marketing_consent" type="checkbox"><span>I would like to receive updates about Pink &amp; Powerful and other relevant Brovelyn Childcare Services and Inspire Health &amp; Wellbeing initiatives. (Optional)</span></label>
+        <label class="check"><input name="privacy_consent" type="checkbox" required aria-required="true"><span>I agree that my information may be used to contact me about this event, in line with the <a href="#">Privacy Policy</a> and <a href="#">Safeguarding Policy</a>. *</span></label>
+        <input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" class="visually-hidden">
+        <button class="submit" id="submitButton" type="submit">Register My Interest →</button>
+        <p class="note">🔒 Your information is securely stored and used only to contact you about this event and the updates you request. Event-contact consent is separate from marketing consent — you control each independently.</p>
+        <div class="status" id="formStatus" role="status" aria-live="polite"></div>
+      </form>
+    </aside>
+  </div>
+</section>
+
+<section class="banner">
+  <div class="container">
+    <div class="banner-inner">
+      <div><strong>Mark your calendar.<br>Invite your friends. Be part of the change.</strong><em>Together, we are Pink &amp; Powerful.</em></div>
+      <div class="banner-date"><span>Event date: Saturday</span><b>18th October 2026</b><span>Venue details to be announced</span></div>
+    </div>
+  </div>
+</section>
+<p class="container closing">Stories heal. Early action saves lives. Support empowers. Hope transforms. ♥</p>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logos" aria-label="Brovelyn Childcare Services and Inspire Health and Wellbeing">
+          <img src="/assets/images/health/pink-powerful/brovelyn-logo.png" alt="Brovelyn Childcare Services" width="88" height="76" loading="lazy">
+          <img src="/assets/images/health/pink-powerful/inspire-health-logo.png" alt="Inspire Health & Wellbeing" width="88" height="76" loading="lazy">
+        </div>
+        <p>Brovelyn Childcare Services and Inspire Health &amp; Wellbeing are committed to building healthier communities and empowering people to live well, thrive and inspire others.</p>
+      </div>
+      <div><h3>Quick Links</h3><ul><li><a href="https://inspirevision.org">Our Mission</a></li><li><a href="https://inspirevision.org">Our Programmes</a></li><li><a href="#register">Register Interest</a></li><li><a href="https://inspirevision.org">Contact Us</a></li></ul></div>
+      <div><h3>Get Involved</h3><ul><li><a href="#register">Attend</a></li><li><a href="#register">Volunteer</a></li><li><a href="#register">Partner</a></li><li><a href="#register">Sponsor</a></li></ul></div>
+      <div><h3>Stay Connected</h3><p>Register above to receive event updates and further details.</p></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Brovelyn Childcare Services and Inspire Health &amp; Wellbeing. All rights reserved.</span><span>Privacy Policy &nbsp;|&nbsp; Terms &amp; Conditions &nbsp;|&nbsp; Safeguarding</span></div>
+  </div>
+</footer>
+
+<div class="modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+  <div class="modal-card"><div class="modal-icon" aria-hidden="true">✓</div><h2 id="successTitle">You&rsquo;re registered!</h2><p>Thank you for registering your interest in Pink &amp; Powerful. We will contact you when further event details are available.</p><button id="closeModal" type="button">Close</button></div>
+</div>
+
+<script src="/assets/supabase.js"></script>
+<script>
+const form = document.getElementById("interestForm");
+const btn = document.getElementById("submitButton");
+const statusBox = document.getElementById("formStatus");
+const modal = document.getElementById("successModal");
+const closeModal = document.getElementById("closeModal");
+
+const EVENT_SLUG = "pink-powerful-2026";
+
+function showStatus(type, msg) {
+  statusBox.className = "status " + type;
+  statusBox.setAttribute("role", type === "error" ? "alert" : "status");
+  statusBox.textContent = msg;
+}
+function clearStatus() {
+  statusBox.className = "status";
+  statusBox.textContent = "";
+}
+function openModal() {
+  modal.classList.add("open");
+  document.body.style.overflow = "hidden";
+  closeModal.focus();
+}
+function shutModal() {
+  modal.classList.remove("open");
+  document.body.style.overflow = "";
+}
+closeModal.addEventListener("click", shutModal);
+modal.addEventListener("click", e => { if (e.target === modal) shutModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") shutModal(); });
+
+let formStarted = false;
+form.addEventListener("input", () => { formStarted = true; }, { once: true });
+
+let submitting = false;
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  clearStatus();
+
+  // Prevents double-submit from a fast double-click, independent of the
+  // button's disabled attribute (which only takes effect after this
+  // handler yields to the event loop).
+  if (submitting) return;
+
+  if (!form.checkValidity()) { form.reportValidity(); return; }
+
+  // Honeypot — real visitors never see or fill this field.
+  if (form.website.value.trim()) return;
+
+  submitting = true;
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+
+  // Only the columns the database grants anon INSERT on are sent —
+  // event_slug/event_date/status are DB-side defaults, never client input.
+  const payload = {
+    full_name: form.full_name.value.trim(),
+    email: form.email.value.trim().toLowerCase(),
+    phone: form.phone.value.trim() || null,
+    postcode_or_location: form.postcode_or_location.value.trim(),
+    interest: form.interest.value,
+    marketing_consent: form.marketing_consent.checked,
+    privacy_consent: form.privacy_consent.checked,
+    source_page: location.pathname,
+  };
+
+  try {
+    const db = await getDB();
+    const { error } = await db.schema("vision").from("pink_powerful_registrations").insert(payload);
+    if (error) throw error;
+
+    // Best-effort notification/confirmation email — the registration is
+    // already saved regardless of whether this succeeds (same pattern as
+    // mentorship/join.html's guardian-consent-request call).
+    fetch("/.netlify/functions/notify-pink-powerful", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: payload.full_name,
+        email: payload.email,
+        phone: payload.phone,
+        location: payload.postcode_or_location,
+        interest: payload.interest,
+        marketingConsent: payload.marketing_consent,
+        eventSlug: EVENT_SLUG,
+      }),
+    }).catch(err => console.warn("Could not send registration notification email:", err));
+
+    form.reset();
+    openModal();
+  } catch (err) {
+    console.error(err);
+    showStatus("error", "We could not submit your registration just now. Please try again or contact Inspire directly.");
+  } finally {
+    submitting = false;
+    btn.disabled = false;
+    btn.textContent = "Register My Interest →";
+  }
+});
+</script>
+</body>
+</html>

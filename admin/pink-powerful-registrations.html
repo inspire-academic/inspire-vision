@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pink &amp; Powerful — Registrations Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/tokens.css" />
+
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║  PINK & POWERFUL — REGISTRATIONS ADMIN                            ║
+║                                                                    ║
+║  PRIVATE PAGE — do not link to this from the public site nav.    ║
+║  Canonical route: inspirevision.org/admin/pink-powerful/registrations
+║  (rewrites to this file — see netlify.toml).                     ║
+║                                                                    ║
+║  Protected two ways:                                              ║
+║    1. Supabase Auth (email + password) — proves who you are.     ║
+║    2. netlify/functions/admin-pink-powerful.js checks that email  ║
+║       against the ADMIN_EMAILS allowlist server-side before any   ║
+║       registration data is returned — logging in alone is not     ║
+║       enough, unlike admin/faith-admin.html's model.               ║
+║                                                                    ║
+║  SETUP REQUIRED BEFORE FIRST USE:                                  ║
+║  1. Run supabase/vision_schema_v2_pink_powerful.sql                ║
+║  2. Set SUPABASE_SERVICE_ROLE_KEY + ADMIN_EMAILS in Netlify env    ║
+║     (shared with the mentorship admin-*.js functions)              ║
+║  3. Create your login: Supabase Dashboard -> Authentication ->     ║
+║     Users -> Add User, using an email that is also in ADMIN_EMAILS ║
+║  4. Open this page and log in                                      ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  window.db = createClient(
+    'https://ygtsrdwoikqnrbexjrtl.supabase.co',
+    'sb_publishable_XxmrO4J18iyQ1Srub73BhQ_FBhd8mXR'
+  );
+  window.dispatchEvent(new Event('db-ready'));
+</script>
+
+<style>
+  :root {
+    --navy: #291033; --pink: #e61f78; --pink-light: #fff0f7;
+    --cream: #F6F4EF; --white: #fff; --text: #291033; --text-mid: #5a4a5f; --text-light: #8a7a8e;
+    --border: #E7DEE9; --success: #2E7D4F; --error: #C0392B; --warning: #B85C1A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(--cream); color: var(--text); line-height: 1.6; }
+  ::placeholder { color: var(--text-light); }
+
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .login-box { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+  .login-box .badge { width: 44px; height: 44px; background: var(--pink); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; color: #fff; font-weight: 800; }
+  .login-box h1 { font-size: 1.3rem; color: var(--navy); margin-bottom: 6px; }
+  .login-box p.sub { font-size: 0.82rem; color: var(--text-light); margin-bottom: 26px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.88rem; font-family: inherit; color: var(--text); background: var(--white); outline: none; }
+  .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(230,31,120,.12); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--navy); color: var(--white); border: none; border-radius: 6px; font-size: 0.86rem; font-weight: 600; padding: 12px 22px; cursor: pointer; }
+  .btn:hover { background: #3d1a4a; }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-pink { background: var(--pink); }
+  .btn-pink:hover { background: #c8195f; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-mid); }
+  .btn-ghost:hover { background: #faf9f6; }
+  .btn-sm { padding: 6px 12px; font-size: 0.76rem; width: auto; }
+  .msg { font-size: 0.8rem; margin-top: 12px; padding: 10px 12px; border-radius: 6px; display: none; }
+  .msg.show { display: block; }
+  .msg.error { background: #fdf0ee; color: var(--error); }
+  .msg.success { background: #eaf6ee; color: var(--success); }
+
+  #admin-screen { display: none; min-height: 100vh; }
+  .topbar { background: var(--navy); padding: 0 28px; height: 62px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar-left span { font-size: 0.92rem; font-weight: 700; color: var(--white); }
+  .topbar-left small { display: block; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-right .user-email { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+  .logout-btn { background: transparent; border: 1px solid rgba(255,255,255,0.25); color: var(--white); font-size: 0.78rem; padding: 7px 14px; border-radius: 6px; cursor: pointer; }
+  .logout-btn:hover { background: rgba(255,255,255,0.1); }
+
+  .main { max-width: 1280px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-card .num { font-size: 1.5rem; font-weight: 800; color: var(--navy); }
+  .stat-card .label { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .toolbar input, .toolbar select { padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; }
+  .toolbar input[type=search] { flex: 1; min-width: 180px; }
+  .toolbar .spacer { flex: 1; }
+
+  .table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 980px; }
+  th { text-align: left; padding: 12px 14px; background: #faf7f9; color: var(--text-mid); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fffafc; }
+  .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+  .badge.new { background: #FEF3C7; color: #B85C1A; }
+  .badge.contacted { background: #DBEAFE; color: #1A56A0; }
+  .badge.confirmed { background: #DCFCE7; color: #16A34A; }
+  .badge.declined { background: #F3E8E8; color: #8A5A5A; }
+  .badge.duplicate { background: #EAE7E0; color: #6B6459; }
+  .badge.archived { background: #EAE7E0; color: #6B6459; }
+  .consent-yes { color: var(--success); font-weight: 700; }
+  .consent-no { color: var(--text-light); }
+  .icon-btn { border: 1px solid var(--border); background: var(--white); border-radius: 6px; padding: 5px 9px; font-size: 0.72rem; cursor: pointer; color: var(--text-mid); }
+  .icon-btn:hover { background: #faf9f6; }
+  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .empty-state { text-align: center; padding: 50px 20px; color: var(--text-light); font-size: 0.86rem; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(41,16,51,0.55); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+  .modal-backdrop.open { display: flex; }
+  .modal-box { background: var(--white); border-radius: 12px; padding: 26px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+  .modal-box h2 { font-size: 1.1rem; color: var(--navy); margin-bottom: 16px; }
+  .modal-box .field { margin-bottom: 14px; }
+  .modal-box .detail-row { font-size: 0.82rem; margin-bottom: 6px; }
+  .modal-box .detail-row strong { color: var(--navy); display: inline-block; min-width: 120px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+  @media (max-width: 700px) {
+    .main { padding: 20px 14px 50px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="badge">P&amp;P</div>
+    <h1>Pink &amp; Powerful Admin</h1>
+    <p class="sub">Log in to review event registrations.</p>
+    <div class="field">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@inspirevision.org" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn" id="login-btn" style="width:100%">Log In</button>
+    <div class="msg" id="login-msg"></div>
+  </div>
+</div>
+
+<div id="admin-screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span>PINK &amp; POWERFUL</span>
+      <small>Registrations Admin</small>
+    </div>
+    <div class="topbar-right">
+      <span class="user-email" id="user-email-display"></span>
+      <button class="logout-btn" id="logout-btn">Log Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stats-grid" id="stats-grid">
+      <div class="empty-state" style="grid-column:1/-1">Loading…</div>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" id="search-input" placeholder="Search name, email, phone, location…" />
+      <select id="status-filter">
+        <option value="">All statuses</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="declined">Declined</option>
+        <option value="duplicate">Duplicate</option>
+        <option value="archived">Archived</option>
+      </select>
+      <select id="interest-filter">
+        <option value="">All interests</option>
+        <option value="attending">Attending the event</option>
+        <option value="survivor-story">Sharing my story</option>
+        <option value="volunteering">Volunteering</option>
+        <option value="healthcare-partner">Healthcare partnership</option>
+        <option value="sponsorship">Sponsorship or fundraising</option>
+        <option value="community-partner">Community partnership</option>
+        <option value="updates">Receiving event updates</option>
+        <option value="other">Other</option>
+      </select>
+      <select id="sort-order">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+      <span class="spacer"></span>
+      <button class="btn btn-ghost btn-sm" id="refresh-btn">Refresh</button>
+      <button class="btn btn-pink btn-sm" id="export-btn">Export CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Location</th>
+            <th>Interest</th>
+            <th>Consent</th>
+            <th>Registered</th>
+            <th>Status</th>
+            <th>Assigned</th>
+            <th>Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows-body">
+          <tr><td colspan="10" class="empty-state">Loading registrations…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal-box">
+    <h2>Registration details</h2>
+    <div id="modal-details"></div>
+    <div class="field">
+      <label for="modal-status">Status</label>
+      <select id="modal-status">
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="declined">Declined</option>
+        <option value="duplicate">Duplicate</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="modal-assigned">Assigned organiser</label>
+      <select id="modal-assigned"><option value="">Unassigned</option></select>
+    </div>
+    <div class="field">
+      <label for="modal-notes">Internal notes (never shown publicly)</label>
+      <textarea id="modal-notes" rows="4" placeholder="Follow-up notes for the team…"></textarea>
+    </div>
+    <div class="msg" id="modal-msg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-pink" id="modal-save-btn" style="flex:1">Save Changes</button>
+      <button class="btn btn-ghost" id="modal-close-btn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function getDB(cb) {
+  if (window.db) { cb(window.db); return; }
+  window.addEventListener('db-ready', () => cb(window.db), { once: true });
+}
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg show ' + type;
+}
+function hideMsg(id) { document.getElementById(id).className = 'msg'; }
+function fmtDateTime(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+const INTEREST_LABEL = {
+  attending: 'Attending the event', 'survivor-story': 'Sharing my story', volunteering: 'Volunteering',
+  'healthcare-partner': 'Healthcare partnership', sponsorship: 'Sponsorship or fundraising',
+  'community-partner': 'Community partnership', updates: 'Receiving event updates', other: 'Other',
+};
+
+/* ── AUTH ─────────────────────────────────────────── */
+let accessToken = null;
+let currentRegistrations = [];
+let currentOrganisers = [];
+
+getDB(async (db) => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) onSignedIn(session);
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) onSignedIn(session);
+    if (event === 'SIGNED_OUT') showLogin();
+  });
+});
+
+async function onSignedIn(session) {
+  accessToken = session.access_token;
+  document.getElementById('user-email-display').textContent = session.user.email;
+  const ok = await loadRegistrations();
+  if (ok) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+  } else {
+    // requireAdmin() rejected this session server-side (logged in, but not
+    // on ADMIN_EMAILS) — don't leave them staring at an empty admin shell.
+    showMsg('login-msg', 'This account is not authorised for the Pink & Powerful admin.', 'error');
+    getDB(db => db.auth.signOut());
+  }
+}
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-screen').style.display = 'none';
+  accessToken = null;
+}
+
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  hideMsg('login-msg');
+  if (!email || !password) { showMsg('login-msg', 'Please enter both email and password.', 'error'); return; }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Logging in…';
+  getDB(async (db) => {
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Log In';
+    if (error) showMsg('login-msg', 'Login failed — check your email and password.', 'error');
+  });
+});
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-btn').click(); });
+document.getElementById('logout-btn').addEventListener('click', () => getDB(db => db.auth.signOut()));
+
+/* ── DATA LOADING ─────────────────────────────────── */
+async function callAdmin(body) {
+  const res = await fetch('/.netlify/functions/admin-pink-powerful', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+async function loadRegistrations() {
+  try {
+    const { registrations, organisers, stats } = await callAdmin({ action: 'list' });
+    currentRegistrations = registrations || [];
+    currentOrganisers = organisers || [];
+    renderStats(stats);
+    populateOrganiserSelect();
+    renderRows();
+    return true;
+  } catch (err) {
+    // 401/403 land here too (requireAdmin rejects the session) — never log
+    // the raw registrations payload, only the error message.
+    console.warn('Could not load Pink & Powerful registrations:', err.message);
+    document.getElementById('rows-body').innerHTML = `<tr><td colspan="10" class="empty-state">${err.message === 'Not authorized' || err.message === 'Invalid or expired session' ? 'Not authorised.' : 'Could not load registrations: ' + escapeHtml(err.message)}</td></tr>`;
+    return err.message !== 'Not authorized' && err.message !== 'Invalid or expired session' ? true : false;
+  }
+}
+
+function renderStats(stats) {
+  if (!stats) return;
+  const cards = [
+    ['Total', stats.total], ['New', stats.new], ['Contacted', stats.contacted], ['Confirmed', stats.confirmed],
+    ['Declined', stats.declined], ['Volunteering', stats.volunteering], ['Survivor stories', stats.survivorStory],
+    ['Partnership', stats.partnership], ['Sponsorship', stats.sponsorship],
+  ];
+  document.getElementById('stats-grid').innerHTML = cards.map(([label, num]) =>
+    `<div class="stat-card"><div class="num">${num}</div><div class="label">${label}</div></div>`
+  ).join('');
+}
+
+function populateOrganiserSelect() {
+  const sel = document.getElementById('modal-assigned');
+  sel.innerHTML = '<option value="">Unassigned</option>' +
+    currentOrganisers.map(o => `<option value="${o.id}">${escapeHtml(o.email)}</option>`).join('');
+}
+
+function getFilteredSorted() {
+  const search = document.getElementById('search-input').value.trim().toLowerCase();
+  const status = document.getElementById('status-filter').value;
+  const interest = document.getElementById('interest-filter').value;
+  const order = document.getElementById('sort-order').value;
+
+  let rows = currentRegistrations.filter(r => {
+    if (status && r.status !== status) return false;
+    if (interest && r.interest !== interest) return false;
+    if (search) {
+      const hay = [r.full_name, r.email, r.phone, r.postcode_or_location].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  rows = rows.slice().sort((a, b) => {
+    const diff = new Date(a.created_at) - new Date(b.created_at);
+    return order === 'oldest' ? diff : -diff;
+  });
+  return rows;
+}
+
+function renderRows() {
+  const rows = getFilteredSorted();
+  const tbody = document.getElementById('rows-body');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No registrations match these filters.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${escapeHtml(r.full_name)}</td>
+      <td>
+        ${escapeHtml(r.email)}<br>
+        <span style="color:var(--text-light)">${r.phone ? escapeHtml(r.phone) : '—'}</span>
+      </td>
+      <td>${escapeHtml(r.postcode_or_location)}</td>
+      <td>${escapeHtml(INTEREST_LABEL[r.interest] || r.interest)}</td>
+      <td>
+        <span class="${r.privacy_consent ? 'consent-yes' : 'consent-no'}">Event ${r.privacy_consent ? '✓' : '✗'}</span><br>
+        <span class="${r.marketing_consent ? 'consent-yes' : 'consent-no'}">Marketing ${r.marketing_consent ? '✓' : '✗'}</span>
+      </td>
+      <td>${fmtDateTime(r.created_at)}</td>
+      <td><span class="badge ${r.status}">${r.status}</span></td>
+      <td>${r.assigned_to_email ? escapeHtml(r.assigned_to_email) : '—'}</td>
+      <td>${fmtDateTime(r.updated_at)}</td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn" onclick="openDetail('${r.id}')">Open</button>
+          <button class="icon-btn" onclick="copyText('${escapeHtml(r.email)}')">Copy email</button>
+          ${r.phone ? `<button class="icon-btn" onclick="copyText('${escapeHtml(r.phone)}')">Copy phone</button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('search-input').addEventListener('input', renderRows);
+document.getElementById('status-filter').addEventListener('change', renderRows);
+document.getElementById('interest-filter').addEventListener('change', renderRows);
+document.getElementById('sort-order').addEventListener('change', renderRows);
+document.getElementById('refresh-btn').addEventListener('click', loadRegistrations);
+
+window.copyText = function (text) {
+  navigator.clipboard?.writeText(text).catch(() => {});
+};
+
+/* ── DETAIL MODAL ─────────────────────────────────── */
+let openRegistrationId = null;
+
+window.openDetail = function (id) {
+  const r = currentRegistrations.find(x => x.id === id);
+  if (!r) return;
+  openRegistrationId = id;
+  document.getElementById('modal-details').innerHTML = `
+    <div class="detail-row"><strong>Name:</strong> ${escapeHtml(r.full_name)}</div>
+    <div class="detail-row"><strong>Email:</strong> ${escapeHtml(r.email)}</div>
+    <div class="detail-row"><strong>Phone:</strong> ${r.phone ? escapeHtml(r.phone) : '—'}</div>
+    <div class="detail-row"><strong>Location:</strong> ${escapeHtml(r.postcode_or_location)}</div>
+    <div class="detail-row"><strong>Interest:</strong> ${escapeHtml(INTEREST_LABEL[r.interest] || r.interest)}</div>
+    <div class="detail-row"><strong>Registered:</strong> ${fmtDateTime(r.created_at)}</div>
+    <div class="detail-row"><strong>Contacted:</strong> ${fmtDateTime(r.contacted_at)}</div>
+    <div class="detail-row"><strong>Confirmed:</strong> ${fmtDateTime(r.confirmed_at)}</div>
+  `;
+  document.getElementById('modal-status').value = r.status;
+  document.getElementById('modal-assigned').value = r.assigned_to || '';
+  document.getElementById('modal-notes').value = r.internal_notes || '';
+  hideMsg('modal-msg');
+  document.getElementById('detail-modal').classList.add('open');
+};
+
+function closeDetail() {
+  document.getElementById('detail-modal').classList.remove('open');
+  openRegistrationId = null;
+}
+document.getElementById('modal-close-btn').addEventListener('click', closeDetail);
+document.getElementById('detail-modal').addEventListener('click', e => { if (e.target.id === 'detail-modal') closeDetail(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('detail-modal').classList.contains('open')) closeDetail(); });
+
+document.getElementById('modal-save-btn').addEventListener('click', async () => {
+  if (!openRegistrationId) return;
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await callAdmin({
+      action: 'update',
+      registrationId: openRegistrationId,
+      patch: {
+        status: document.getElementById('modal-status').value,
+        assigned_to: document.getElementById('modal-assigned').value || null,
+        internal_notes: document.getElementById('modal-notes').value,
+      },
+    });
+    showMsg('modal-msg', 'Saved.', 'success');
+    await loadRegistrations();
+    setTimeout(closeDetail, 600);
+  } catch (err) {
+    showMsg('modal-msg', 'Could not save: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+});
+
+/* ── CSV EXPORT ───────────────────────────────────── */
+document.getElementById('export-btn').addEventListener('click', () => {
+  const rows = getFilteredSorted();
+  const headers = ['Name', 'Email', 'Phone', 'Location', 'Interest', 'Event consent', 'Marketing consent', 'Registered', 'Status', 'Assigned organiser', 'Internal notes'];
+  const csvEscape = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const lines = [headers.map(csvEscape).join(',')];
+  rows.forEach(r => {
+    lines.push([
+      r.full_name, r.email, r.phone || '', r.postcode_or_location,
+      INTEREST_LABEL[r.interest] || r.interest, r.privacy_consent ? 'Yes' : 'No', r.marketing_consent ? 'Yes' : 'No',
+      r.created_at, r.status, r.assigned_to_email || '', r.internal_notes || '',
+    ].map(csvEscape).join(','));
+  });
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pink-powerful-registrations-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
