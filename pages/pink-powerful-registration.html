@@ -48,9 +48,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .header{padding:22px 0 10px}
 .header-row{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center}
 .logos{display:flex;align-items:center;justify-content:center;gap:18px}
-.logo-box img{object-fit:contain}
-.logo-inspire img{width:150px;max-height:110px}
-.logo-brovelyn img{width:135px;max-height:115px}
+.logo-box{width:140px;height:120px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.95);border-radius:16px;padding:10px;box-shadow:0 6px 18px rgba(74,18,73,.1)}
+.logo-box img{width:100%;height:100%;object-fit:contain;border-radius:9px}
 .logo-divider{height:88px;width:1px;background:linear-gradient(transparent,rgba(230,31,120,.55),transparent)}
 .collab{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--pink);font-family:"Montserrat",sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;width:100%;margin-top:2px}
 .collab:before,.collab:after{content:"";width:34px;height:1px;background:var(--pink2)}
@@ -134,8 +133,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .modal-card p{color:var(--muted)}
 .modal-card button{border:0;border-radius:999px;background:var(--pink);color:#fff;font-weight:800;padding:12px 22px;cursor:pointer}
 @media(max-width:1080px){.header-row{align-items:center}.hero-grid{grid-template-columns:1fr}.main-grid{grid-template-columns:1fr}.form-card{position:relative;top:auto;margin:0 auto;width:min(100%,650px)}.expect-grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:760px){.header-row{align-items:center}.logos{width:100%;justify-content:center}.logo-inspire img{width:122px}.logo-brovelyn img{width:108px}.collab{font-size:.68rem;text-align:center;white-space:normal}.hero-image{min-height:500px}.facts{flex-direction:column}.fact+.fact{border-left:0;padding-left:0}.expect-grid{grid-template-columns:repeat(2,1fr)}.expect:last-child{grid-column:1/-1;max-width:250px;margin:auto}.story{grid-template-columns:1fr}.banner-inner{grid-template-columns:1fr}.banner-date{border-left:0;border-top:1px solid rgba(255,255,255,.5);padding:17px 0 0}.footer-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.container{width:min(calc(100% - 22px),1220px)}.logo-inspire img{width:103px}.logo-brovelyn img{width:94px}.save{font-size:2.3rem}.cause{font-size:1.35rem}.title .pink{font-size:3.9rem}.title .amp{font-size:2.7rem}.title .power{font-size:4.3rem;margin-left:0}.tagline{font-size:.92rem}.hero-image{min-height:420px;background-position:58% center}.quote{left:18px;right:18px;bottom:22px;font-size:1.3rem}.expect-grid{grid-template-columns:1fr}.expect:last-child{grid-column:auto}.form-card{padding:24px 17px}.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column}}
+@media(max-width:760px){.header-row{align-items:center}.logos{width:100%;justify-content:center}.logo-box{width:112px;height:98px}.collab{font-size:.68rem;text-align:center;white-space:normal}.hero-image{min-height:500px}.facts{flex-direction:column}.fact+.fact{border-left:0;padding-left:0}.expect-grid{grid-template-columns:repeat(2,1fr)}.expect:last-child{grid-column:1/-1;max-width:250px;margin:auto}.story{grid-template-columns:1fr}.banner-inner{grid-template-columns:1fr}.banner-date{border-left:0;border-top:1px solid rgba(255,255,255,.5);padding:17px 0 0}.footer-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.container{width:min(calc(100% - 22px),1220px)}.logo-box{width:94px;height:82px;padding:8px}.save{font-size:2.3rem}.cause{font-size:1.35rem}.title .pink{font-size:3.9rem}.title .amp{font-size:2.7rem}.title .power{font-size:4.3rem;margin-left:0}.tagline{font-size:.92rem}.hero-image{min-height:420px;background-position:58% center}.quote{left:18px;right:18px;bottom:22px;font-size:1.3rem}.expect-grid{grid-template-columns:1fr}.expect:last-child{grid-column:auto}.form-card{padding:24px 17px}.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -143,9 +142,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 <header class="header">
   <div class="container header-row">
     <div class="logos" aria-label="Brovelyn Care Agency and Inspire Health and Wellbeing">
-      <div class="logo-box logo-brovelyn"><img src="/assets/images/health/pink-powerful/brovelyn-logo.jpg" alt="Brovelyn Care Agency" width="270" height="206"></div>
+      <div class="logo-box logo-brovelyn"><img src="/assets/images/health/pink-powerful/brovelyn-logo.jpg" alt="Brovelyn Care Agency" width="140" height="120"></div>
       <span class="logo-divider" aria-hidden="true"></span>
-      <div class="logo-box logo-inspire"><img src="/assets/images/health/pink-powerful/inspire-health-logo.png" alt="Inspire Health & Wellbeing" width="300" height="230"></div>
+      <div class="logo-box logo-inspire"><img src="/assets/images/health/pink-powerful/inspire-health-logo.png" alt="Inspire Health & Wellbeing" width="140" height="120"></div>
     </div>
     <div class="collab">♥ In collaboration, presents ♥</div>
   </div>
