@@ -116,12 +116,33 @@ mentorship/
 ```
 
 Supabase schema lives in `supabase/mentorship_schema*.sql` (v1 through
-v5 — v4 added the mentor↔student round trip, v5 added the
-`mentor_applications` table as the non-spoofable source of truth for
-mentor approval status). Netlify Functions in `netlify/functions/`:
+v10 as of 2026-08-08 — v4 added the mentor↔student round trip, v5 added
+the `mentor_applications` table as the non-spoofable source of truth for
+mentor approval status, v10 added `mentorship.messages` — see note
+below). Netlify Functions in `netlify/functions/`:
 `admin-mentors.js`, `admin-matching.js`, `admin-reports.js`,
-`admin-help-requests.js`, `notify-help-request.js` — all but
-`notify-help-request.js` are `requireAdmin()`-gated.
+`admin-help-requests.js`, `notify-help-request.js`,
+`notify-mentor-message.js` — all but the two `notify-*.js` functions are
+`requireAdmin()`-gated (the `notify-*` ones instead verify the caller's
+own Supabase session and re-derive identity/authorization server-side,
+never trusting the request body — see each file's own comments).
+
+**2026-08-08 — mentor→mentee nudge messages added.** Eric asked for
+mentors to be able to proactively message an assigned mentee (e.g.
+checking in on a reading goal, offering help) from
+`mentor-portal/mentee-detail.html`'s new "Send a Nudge" tab. Backed by
+`mentorship.messages` (`mentorship_schema_v10_messages.sql`) — same
+assignment-gated RLS pattern as `session_notes`/`sessions`. On send,
+`notify-mentor-message.js` emails the mentee via the existing Resend
+account. **No SMS yet** — deliberately deferred: there's no phone-number
+field anywhere in the mentorship schema/signup flow and no SMS provider
+wired into this repo. If SMS is picked up later, it needs (1) a phone
+column + a collection UI (there is none today) and (2) a provider
+decision (Twilio, etc.) with new env vars. Mentee-side, messages surface
+in `dashboard/mentor.html`'s new "Messages from Your Mentor" feed (which
+also marks them read via the `mark_message_read()` RPC) and via the
+dashboard's notification bell, which was previously a permanently-empty
+hardcoded placeholder and is now wired to real unread-message data.
 
 Image assets live at root level (not under `mentorship/`), per the
 same pattern the rest of this repo uses:

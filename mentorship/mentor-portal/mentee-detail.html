@@ -108,6 +108,7 @@
         <button class="mp-tab" data-tab="checkins">Check-Ins</button>
         <button class="mp-tab" data-tab="journal">Journal</button>
         <button class="mp-tab" data-tab="help">Help Requests</button>
+        <button class="mp-tab" data-tab="message">Send a Nudge</button>
       </div>
 
       <div class="mp-section active" id="section-goals">
@@ -121,6 +122,22 @@
       </div>
       <div class="mp-section" id="section-help">
         <div id="helpList"><div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div></div>
+      </div>
+      <div class="mp-section" id="section-message">
+        <div class="card" style="max-width:560px; margin-bottom:24px">
+          <div class="card-title" style="margin-bottom:6px">Send a nudge</div>
+          <div class="list-card-desc" style="margin-bottom:14px">A short, encouraging check-in — it'll show up on their dashboard and we'll email them to let them know you wrote.</div>
+          <div id="quickTemplates" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px"></div>
+          <div class="auth-field">
+            <label for="messageBody">Message</label>
+            <textarea id="messageBody" placeholder="How's your reading going? Anything I can help with?" style="min-height:100px"></textarea>
+          </div>
+          <div class="auth-msg" id="messageFormMsg"></div>
+          <button class="auth-btn" id="sendMessageBtn">Send Nudge</button>
+        </div>
+
+        <div class="page-eyebrow" style="margin-bottom:12px">Sent Messages</div>
+        <div id="messagesList"><div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div></div>
       </div>
     </div>
   </main>
@@ -236,6 +253,38 @@
       </div>`).join('');
   }
 
+  function renderMessages(rows) {
+    const el = $('messagesList');
+    if (!rows.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div>No nudges sent yet — send your first one above.</div>'; return; }
+    el.innerHTML = rows.map(m => `
+      <div class="list-card">
+        <div class="list-card-desc" style="margin-bottom:8px">${escapeHtml(m.body)}</div>
+        <div class="list-card-top">
+          <div class="list-card-meta">${fmtDate(m.created_at)}</div>
+          <span class="badge badge-muted">${m.read_at ? 'Seen' : 'Not yet seen'}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  // Quick-fill starter texts, not auto-sent — the mentor always reviews/
+  // edits before hitting Send. The first template personalizes to the
+  // mentee's most recent active goal (e.g. "reading Mere Christianity")
+  // when one exists, falling back to a generic check-in otherwise.
+  function renderTemplates(goalTitle) {
+    const templates = [
+      { label: '📖 Check on progress', text: goalTitle ? `Hey! Just checking in — how's "${goalTitle}" coming along? Would love to hear how it's going.` : `Hey! Just checking in on your current goal — how's it going?` },
+      { label: '🤝 Offer help', text: `Hi! Wanted to see if you need any help with your current task, or want to talk it through together.` },
+      { label: '💛 Encourage', text: `Just thinking of you today — proud of the progress you're making. Keep going!` },
+    ];
+    $('quickTemplates').innerHTML = templates.map((t, i) => `<button type="button" class="list-card-btn" data-template="${i}">${t.label}</button>`).join('');
+    $('quickTemplates').querySelectorAll('[data-template]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('messageBody').value = templates[btn.dataset.template].text;
+        $('messageBody').focus();
+      });
+    });
+  }
+
   (async () => {
     try {
       const dbClient = await getDB();
@@ -268,16 +317,57 @@
       }
       $('menteeName').textContent = assignment.student_name || 'Mentee Progress';
 
-      const [goals, checkins, journal, help] = await Promise.all([
+      const [goals, checkins, journal, help, messages] = await Promise.all([
         dbClient.schema('mentorship').from('goals').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
         dbClient.schema('mentorship').from('check_ins').select('*').eq('student_id', studentId).order('created_at', { ascending: false }).limit(30),
         dbClient.schema('mentorship').from('journal_entries').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
         dbClient.schema('mentorship').from('help_requests').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('messages').select('*').eq('mentor_id', user.id).eq('student_id', studentId).order('created_at', { ascending: false }),
       ]);
       renderGoals(goals.data || []);
       renderCheckins(checkins.data || []);
       renderJournal(journal.data || []);
       renderHelp(help.data || []);
+      renderMessages(messages.data || []);
+
+      const activeGoal = (goals.data || []).find(g => g.status === 'active');
+      renderTemplates(activeGoal?.title || '');
+
+      $('sendMessageBtn').addEventListener('click', async () => {
+        const text = $('messageBody').value.trim();
+        const msg = $('messageFormMsg');
+        if (!text) { msg.textContent = 'Write a message first.'; msg.className = 'auth-msg show error'; return; }
+        const btn = $('sendMessageBtn');
+        btn.disabled = true; btn.textContent = 'Sending…';
+        const mentorName = user.user_metadata?.full_name || user.email;
+        const { error } = await dbClient.schema('mentorship').from('messages').insert({
+          mentor_id: user.id, student_id: studentId, mentor_name: mentorName, body: text,
+        });
+        if (error) {
+          msg.textContent = error.message || 'Could not send this message.';
+          msg.className = 'auth-msg show error';
+          btn.disabled = false; btn.textContent = 'Send Nudge';
+          return;
+        }
+        $('messageBody').value = '';
+        msg.textContent = 'Sent — they\'ll see it on their dashboard.';
+        msg.className = 'auth-msg show success';
+        btn.disabled = false; btn.textContent = 'Send Nudge';
+        const { data: refreshed } = await dbClient.schema('mentorship').from('messages')
+          .select('*').eq('mentor_id', user.id).eq('student_id', studentId).order('created_at', { ascending: false });
+        renderMessages(refreshed || []);
+
+        // Best-effort email alert — the message is already saved and shown
+        // above regardless of whether this succeeds.
+        try {
+          const { data: { session } } = await dbClient.auth.getSession();
+          await fetch('/.netlify/functions/notify-mentor-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+            body: JSON.stringify({ studentId, body: text }),
+          });
+        } catch (e) { console.warn('Nudge email notify failed (non-fatal):', e); }
+      });
     } catch (e) {
       console.warn('Mentee progress page failed:', e);
       window.location.href = '/mentorship/mentor-portal/mentees.html';

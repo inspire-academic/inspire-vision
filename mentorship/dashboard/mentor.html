@@ -148,6 +148,11 @@
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
       </div>
 
+      <div class="page-eyebrow" style="margin:28px 0 12px">Messages from Your Mentor</div>
+      <div id="messagesList">
+        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
+      </div>
+
       <div class="page-eyebrow" style="margin:28px 0 12px">Session History</div>
       <div id="sessionsList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading your sessions…</div>
@@ -280,6 +285,45 @@
     }).join('');
   }
 
+  function renderMessages(rows) {
+    const list = $('messagesList');
+    if (!rows.length) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div>No messages yet — they\'ll show up here when your mentor checks in.</div>';
+      return;
+    }
+    list.innerHTML = rows.map(m => `
+      <div class="list-card">
+        <div class="list-card-top">
+          <div class="list-card-title">${escapeHtml(m.mentor_name || 'Your Mentor')}</div>
+          ${!m.read_at ? '<span class="badge">New</span>' : ''}
+        </div>
+        <div class="list-card-desc" style="margin-top:6px">${escapeHtml(m.body)}</div>
+        <div class="list-card-meta">${new Date(m.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
+      </div>`).join('');
+  }
+
+  async function loadMessages() {
+    try {
+      const { data, error } = await dbClient.schema('mentorship').from('messages')
+        .select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false });
+      if (error) { console.warn('Load messages failed:', error); renderMessages([]); return; }
+      renderMessages(data || []);
+      // Viewing this page is the mark-of-read moment for a mentee's inbox.
+      // Best-effort — the RPC is scoped to auth.uid() = student_id
+      // server-side (mark_message_read, mentorship_schema_v10_messages.sql),
+      // so a failure here just leaves a message showing "New" a bit longer.
+      const unread = (data || []).filter(m => !m.read_at);
+      if (unread.length) {
+        await Promise.all(unread.map(m =>
+          dbClient.schema('mentorship').rpc('mark_message_read', { message_id: m.id }).catch(() => {})
+        ));
+      }
+    } catch (e) {
+      console.warn('Load messages failed:', e);
+      renderMessages([]);
+    }
+  }
+
   async function loadSessions() {
     try {
       const { data, error } = await dbClient.schema('mentorship').from('sessions')
@@ -308,7 +352,7 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
-      await loadSessions();
+      await Promise.all([loadSessions(), loadMessages()]);
     } catch (e) {
       console.warn('Mentor page init failed:', e);
       renderSummary([]);
