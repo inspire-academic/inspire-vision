@@ -297,12 +297,13 @@
 
           <!-- Right stacked column -->
           <div class="right-col">
-            <!-- Mentor message — sourced from mentorship.sessions.notes, the
-                 real mentor-visible-to-student channel built for the round
-                 trip (mentorship_schema_v4_round_trip.sql). No "N new"
-                 badge: there's no read-receipt/unread tracking anywhere in
-                 the schema, so a count here would just be another fake
-                 number — see id="mentorMsgText" for the honest fallback. -->
+            <!-- Mentor message — the more recent of mentorship.sessions.notes
+                 (round-trip channel, mentorship_schema_v4_round_trip.sql)
+                 and mentorship.messages (nudges, mentorship_schema_v10_
+                 messages.sql). Real unread tracking now exists on messages
+                 (read_at), surfaced via the notification bell above instead
+                 of a badge on this card, since a session note has no such
+                 concept. -->
             <div class="mini-card">
               <div class="mini-card-header">
                 <div class="mini-icon">
@@ -702,20 +703,37 @@
     });
   }
 
-  // Most recent mentor-authored session note — the real round-trip channel
-  // (mentorship_schema_v4_round_trip.sql). Rows come pre-filtered to
-  // notes IS NOT NULL, most recent first, limit 1.
+  // Most recent of a session note or a nudge message — whichever is more
+  // recent wins. Callers pass a pre-sorted array of { text, author, at }.
   function renderMentorMessage(rows) {
     const row = rows[0];
     const authorEl = $('mentorMsgAuthor');
-    if (!row || !row.notes) {
-      $('mentorMsgText').textContent = "Your mentor's updates will show up here once you're matched and they log a session.";
+    if (!row || !row.text) {
+      $('mentorMsgText').textContent = "Your mentor's updates will show up here once you're matched and they check in.";
       authorEl.style.display = 'none';
       return;
     }
-    $('mentorMsgText').textContent = `"${row.notes}"`;
-    authorEl.textContent = `— ${row.mentor_name || 'Your Mentor'}`;
+    $('mentorMsgText').textContent = `"${row.text}"`;
+    authorEl.textContent = `— ${row.author || 'Your Mentor'}`;
     authorEl.style.display = '';
+  }
+
+  // Notification bell — real unread mentorship.messages rows (read_at IS
+  // NULL). This was previously a hardcoded, permanently-empty placeholder;
+  // this is the first real data source wired into it.
+  function renderNotifications(rows) {
+    const badge = $('notifBadge');
+    const dropdown = $('notifDropdown');
+    if (!rows.length) {
+      badge.style.display = 'none';
+      dropdown.innerHTML = '<div class="topbar-dropdown-title">Notifications</div><div class="topbar-dropdown-empty">You\'re all caught up — no new notifications yet.</div>';
+      return;
+    }
+    badge.style.display = '';
+    dropdown.innerHTML = '<div class="topbar-dropdown-title">Notifications</div>' + rows.map(m => {
+      const preview = (m.body || '').length > 60 ? m.body.slice(0, 60) + '…' : (m.body || '');
+      return `<a class="topbar-dropdown-item" href="/mentorship/dashboard/mentor.html">💬 ${escapeHtml(m.mentor_name || 'Your mentor')}: ${escapeHtml(preview)}</a>`;
+    }).join('');
   }
 
   // Real consecutive-day streak from check_ins.created_at — today (or
@@ -920,14 +938,37 @@
     // the mentorship_schema_v2 RPC not yet run) shouldn't blank out the
     // other, unrelated card.
     try {
-      const { data: notes, error: notesErr } = await dbClient.schema('mentorship').from('sessions')
-        .select('mentor_name, notes, scheduled_at').eq('student_id', currentUser.id)
-        .not('notes', 'is', null).order('scheduled_at', { ascending: false }).limit(1);
+      const [{ data: notes, error: notesErr }, { data: msgs, error: msgsErr }] = await Promise.all([
+        dbClient.schema('mentorship').from('sessions')
+          .select('mentor_name, notes, scheduled_at').eq('student_id', currentUser.id)
+          .not('notes', 'is', null).order('scheduled_at', { ascending: false }).limit(1),
+        dbClient.schema('mentorship').from('messages')
+          .select('mentor_name, body, created_at').eq('student_id', currentUser.id)
+          .order('created_at', { ascending: false }).limit(1),
+      ]);
       if (notesErr) throw notesErr;
-      renderMentorMessage(notes || []);
+      if (msgsErr) throw msgsErr;
+      const candidates = [];
+      const note = (notes || [])[0];
+      const msg = (msgs || [])[0];
+      if (note) candidates.push({ text: note.notes, author: note.mentor_name, at: note.scheduled_at });
+      if (msg) candidates.push({ text: msg.body, author: msg.mentor_name, at: msg.created_at });
+      candidates.sort((a, b) => new Date(b.at) - new Date(a.at));
+      renderMentorMessage(candidates);
     } catch (e) {
       console.warn('Mentor message fetch failed:', e);
       renderMentorMessage([]);
+    }
+
+    try {
+      const { data: unread, error: unreadErr } = await dbClient.schema('mentorship').from('messages')
+        .select('id, mentor_name, body, created_at').eq('student_id', currentUser.id)
+        .is('read_at', null).order('created_at', { ascending: false }).limit(5);
+      if (unreadErr) throw unreadErr;
+      renderNotifications(unread || []);
+    } catch (e) {
+      console.warn('Notifications fetch failed:', e);
+      renderNotifications([]);
     }
 
     try {
