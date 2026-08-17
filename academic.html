@@ -287,23 +287,8 @@
     .excellence-divider { width: 1px; height: 60px; background: var(--border); flex-shrink: 0; }
     .excellence-desc { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.7); max-width: 400px; }
 
-    /* IMPACT */
-    .impact-section {
-      padding: 5rem 3rem;
-      background: var(--light-bg);
-    }
-    .impact-inner { max-width: var(--max-width); margin: 0 auto; }
-    .impact-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-    .impact-item { text-align: center; }
-    .impact-icon { width: 56px; height: 56px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; }
-    .impact-icon svg { width: 40px; height: 40px; stroke: var(--navy); fill: none; stroke-width: 1.2; }
-    .impact-number { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
-    .impact-label { font-size: 0.82rem; color: #64748b; line-height: 1.4; }
+    /* SECTION DIVIDER */
+    .section-divider { height: 3rem; background: var(--light-bg); }
 
     /* CTA */
     .cta-section {
@@ -339,15 +324,14 @@
 
     @media (max-width: 1024px) {
       .programs-grid { grid-template-columns: repeat(2, 1fr); }
-      .impact-grid { grid-template-columns: repeat(2, 1fr); }
       .excellence-inner { flex-wrap: wrap; }
       .excellence-divider { display: none; }
     }
     @media (max-width: 768px) {
-      .programs-section, .impact-section { padding: 3rem 1.5rem; }
+      .programs-section { padding: 3rem 1.5rem; }
+      .section-divider { height: 2rem; }
       .hero-content { padding: 2rem 1.5rem 3rem; }
       .programs-grid { grid-template-columns: 1fr; }
-      .impact-grid { grid-template-columns: repeat(2, 1fr); }
       .cta-content { padding: 3rem 1.5rem; }
       .excellence-banner { padding: 2.5rem 1.5rem; }
     }
@@ -494,36 +478,7 @@
     </div>
   </div>
 
-  <!-- IMPACT -->
-  <section class="impact-section" id="impact">
-    <div class="impact-inner">
-      <div class="text-center">
-        <span class="section-eyebrow">Our Impact</span>
-      </div>
-      <div class="impact-grid">
-        <div class="impact-item">
-          <div class="impact-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
-          <div class="impact-number">25,000+</div>
-          <div class="impact-label">Students Empowered</div>
-        </div>
-        <div class="impact-item">
-          <div class="impact-icon"><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg></div>
-          <div class="impact-number">1,200+</div>
-          <div class="impact-label">Research &amp; Innovation<br>Initiatives</div>
-        </div>
-        <div class="impact-item">
-          <div class="impact-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
-          <div class="impact-number">100+</div>
-          <div class="impact-label">Global University<br>Partners</div>
-        </div>
-        <div class="impact-item">
-          <div class="impact-icon"><svg viewBox="0 0 24 24"><polyline points="2,9 12,4 22,9"/><rect x="4" y="9" width="16" height="11"/><line x1="12" y1="9" x2="12" y2="20"/></svg></div>
-          <div class="impact-number">95%</div>
-          <div class="impact-label">Graduates in Meaningful<br>Careers or Further Study</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <div class="section-divider"></div>
 
   <!-- CTA -->
   <section class="cta-section">
