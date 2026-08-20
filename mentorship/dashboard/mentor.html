@@ -13,6 +13,15 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .pulse-item { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .pulse-item:last-child { border-bottom: none; }
+    .pulse-item-text { font-size: 13.5px; margin-bottom: 8px; color: #f4f6f9; }
+    .pulse-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .pulse-opt { text-align: center; }
+    .pulse-opt input { display: block; margin: 0 auto 4px; }
+    .pulse-opt label { font-size: 10px; color: rgba(244,246,249,.6); line-height: 1.3; display: block; }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -158,6 +167,8 @@
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
       </div>
 
+      <div id="pulseCard"></div>
+
       <div class="page-eyebrow" style="margin:28px 0 12px">Messages from Your Mentor</div>
       <div id="messagesList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
@@ -263,6 +274,102 @@
       </div>`;
   }
 
+  // Youth Strength of Relationship (YSoR) scale (Rhodes, Schwartz,
+  // Willis, & Wu, 2017, Youth & Society, 49(4), 415-437), normed on
+  // 5,222 real Big Brothers Big Sisters dyads and shown to predict
+  // match duration from 3 months in. Item wording and structure are
+  // verbatim from the published paper — the only change is substituting
+  // BBBS's own volunteer-nickname terms ("my Big") for "my mentor" /
+  // the mentee's own name, since Inspire Mentorship doesn't use that
+  // terminology; the actual content and meaning of every item is
+  // unchanged. Response scale: 1 (not at all true) to 5 (always true).
+  const PULSE_SCALE = ['Not at all true', 'A little true', 'Somewhat true', 'Mostly true', 'Always true'];
+  function ysorItems(mentorName) {
+    return [
+      { text: `${mentorName} has lots of good ideas about how to solve a problem.`, reverse: false },
+      { text: `${mentorName} helps me take my mind off things by doing something with me.`, reverse: false },
+      { text: `When I'm with ${mentorName}, I feel ignored.`, reverse: true },
+      { text: `When I'm with ${mentorName}, I feel mad.`, reverse: true },
+      { text: `When I am with ${mentorName}, I feel safe.`, reverse: false },
+      { text: `When I'm with ${mentorName}, I feel disappointed.`, reverse: true },
+      { text: `My relationship with ${mentorName} is very important to me.`, reverse: false },
+      { text: `When I'm with ${mentorName}, I feel bored.`, reverse: true },
+      { text: `When something is bugging me, ${mentorName} listens while I talk about it.`, reverse: false },
+      { text: `I feel close to ${mentorName}.`, reverse: false },
+    ];
+  }
+
+  function renderPulseCard(assignment) {
+    const el = $('pulseCard');
+    if (!assignment || assignment.status !== 'active') { el.innerHTML = ''; return; }
+    const firstWord = s => (s || '').trim().split(/\s+/)[0] || 'your mentor';
+    const mentorName = firstWord(assignment.mentor_name);
+    const items = ysorItems(mentorName);
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-label">How's It Going With ${escapeHtml(mentorName)}?</div>
+        <div class="list-card-meta" style="margin:8px 0 16px" id="pulseIntro">A short, private check-in — only you see your answers. About a minute.</div>
+        <div class="auth-msg" id="pulseMsg"></div>
+        <div id="pulseItems">
+          ${items.map((item, i) => `
+            <div class="pulse-item" data-idx="${i}" data-reverse="${item.reverse}">
+              <div class="pulse-item-text">${escapeHtml(item.text)}</div>
+              <div class="pulse-scale">
+                ${PULSE_SCALE.map((label, idx) => `
+                  <div class="pulse-opt">
+                    <input type="radio" name="pulse-${i}" value="${idx + 1}" id="pulse-${i}-${idx + 1}">
+                    <label for="pulse-${i}-${idx + 1}">${label}</label>
+                  </div>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+        <button class="auth-btn" id="savePulseBtn" style="margin-top:14px">Save Check-In</button>
+      </div>`;
+
+    $('savePulseBtn').addEventListener('click', async () => {
+      const rows = document.querySelectorAll('#pulseItems .pulse-item');
+      let missing = 0;
+      const raw = [];
+      rows.forEach(row => {
+        const checked = row.querySelector('input:checked');
+        if (!checked) { missing++; return; }
+        const val = Number(checked.value);
+        raw.push(row.dataset.reverse === 'true' ? 6 - val : val);
+      });
+      const msg = $('pulseMsg');
+      if (missing) {
+        msg.textContent = `Please answer every statement — ${missing} left to go.`;
+        msg.className = 'auth-msg show error';
+        return;
+      }
+      // Positive subscale: items 1,2,5,7,9,10 (0-indexed: 0,1,4,6,8,9). Negative: 3,4,6,8 (0-indexed: 2,3,5,7).
+      const positiveIdx = [0, 1, 4, 6, 8, 9];
+      const negativeIdx = [2, 3, 5, 7];
+      const avg = idxs => idxs.reduce((a, i) => a + raw[i], 0) / idxs.length;
+      const positive = avg(positiveIdx);
+      const negative = avg(negativeIdx);
+      const overall = raw.reduce((a, b) => a + b, 0) / raw.length;
+
+      const responses = {};
+      items.forEach((item, i) => { responses[`Y${i + 1}`] = raw[i]; });
+
+      const btn = $('savePulseBtn');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      const { error } = await dbClient.schema('mentorship').from('relationship_pulses').insert({
+        assignment_id: assignment.id, reporter: 'mentee', reporter_id: currentUser.id,
+        responses, subscale_1: positive.toFixed(2), subscale_2: negative.toFixed(2), overall: overall.toFixed(2),
+      });
+      if (error) {
+        console.warn('Save relationship pulse failed:', error);
+        msg.textContent = error.message || 'Could not save your check-in.';
+        msg.className = 'auth-msg show error';
+        btn.disabled = false; btn.textContent = 'Save Check-In';
+        return;
+      }
+      el.innerHTML = `<div class="card" style="margin-bottom:20px"><div class="empty-state"><div class="empty-state-icon">💙</div>Saved — thanks for being honest. You can check in again anytime.</div></div>`;
+    });
+  }
+
   function renderSummary(sessions) {
     const el = $('mentorSummary');
     const upcoming = sessions.find(s => s.status === 'scheduled' && new Date(s.scheduled_at) > new Date());
@@ -362,6 +469,7 @@
         .select('*').eq('student_id', currentUser.id).order('assigned_at', { ascending: false }).limit(1).maybeSingle();
       if (error) { console.warn('Load assignment failed:', error); return; }
       renderClosureCard(data);
+      renderPulseCard(data);
     } catch (e) {
       console.warn('Load assignment failed:', e);
     }
