@@ -169,6 +169,11 @@
 
       <div id="pulseCard"></div>
 
+      <div class="page-eyebrow" style="margin:28px 0 12px">What You've Agreed On</div>
+      <div id="recapsList">
+        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
+      </div>
+
       <div class="page-eyebrow" style="margin:28px 0 12px">Messages from Your Mentor</div>
       <div id="messagesList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
@@ -463,6 +468,31 @@
     }
   }
 
+  // mentorship.session_recaps is a view, not the session_notes table —
+  // it only ever exposes Goal/Next-Action/date for notes a mentor has
+  // explicitly marked shared, never Reality/Options/the freeform note.
+  // See mentorship_schema_v17_shareable_session_recaps.sql.
+  function renderRecaps(rows) {
+    const list = $('recapsList');
+    if (!rows.length) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div>Nothing shared yet — your mentor can share a session\'s goal and next step here.</div>';
+      return;
+    }
+    list.innerHTML = rows.map(r => `
+      <div class="list-card">
+        <div class="list-card-title" style="margin-bottom:6px">${escapeHtml(r.session_goal)}</div>
+        <div class="list-card-desc">Next step: ${escapeHtml(r.next_action)}${r.next_action_date ? ` <i>(by ${new Date(r.next_action_date).toLocaleDateString('en-GB', { day:'numeric', month:'short' })})</i>` : ''}</div>
+        <div class="list-card-meta">${new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
+      </div>`).join('');
+  }
+
+  async function loadRecaps() {
+    const { data, error } = await dbClient.schema('mentorship').from('session_recaps')
+      .select('*').order('created_at', { ascending: false }).limit(10);
+    if (error) { console.warn('Load session recaps failed:', error); renderRecaps([]); return; }
+    renderRecaps(data || []);
+  }
+
   async function loadAssignment() {
     try {
       const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
@@ -503,7 +533,7 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
-      await Promise.all([loadSessions(), loadMessages(), loadAssignment()]);
+      await Promise.all([loadSessions(), loadMessages(), loadAssignment(), loadRecaps()]);
     } catch (e) {
       console.warn('Mentor page init failed:', e);
       renderSummary([]);
