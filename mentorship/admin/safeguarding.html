@@ -61,6 +61,7 @@
         <div class="page-eyebrow">Admin · Safeguarding</div>
         <h1 class="page-title">Ask for Help / Prayer & Support</h1>
       </div>
+      <button class="admin-signout-btn" id="adminSignOutBtn">Sign out</button>
     </div>
     <div class="sg-filters" id="filters">
       <button class="sg-filter-btn active" data-filter="all">All</button>
@@ -83,6 +84,13 @@
     let allRequests = [];
     let currentFilter = 'all';
     let session = null;
+
+    // See admin/index.html for why this button was added to every admin page.
+    $('adminSignOutBtn')?.addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.href = '/mentorship/login.html';
+    });
 
     function renderRequests() {
       const content = $('content');

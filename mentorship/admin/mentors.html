@@ -64,6 +64,7 @@
         <div class="page-eyebrow">Admin</div>
         <h1 class="page-title">Manage Mentors</h1>
       </div>
+      <button class="admin-signout-btn" id="adminSignOutBtn">Sign out</button>
     </div>
     <div id="content">
       <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
@@ -75,6 +76,13 @@
     const $ = id => document.getElementById(id);
     const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
     const SG_LABEL = { not_started: 'Not started', in_progress: 'In progress', passed: 'Passed', failed: 'Failed' };
+
+    // See admin/index.html for why this button was added to every admin page.
+    $('adminSignOutBtn')?.addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.href = '/mentorship/login.html';
+    });
 
     function renderPending(pending) {
       const content = $('content');

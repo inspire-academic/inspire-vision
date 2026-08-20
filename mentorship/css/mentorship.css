@@ -178,6 +178,19 @@ body.auth-body {
   transition: opacity .18s;
 }
 .page-cta:hover { opacity: .9 }
+.admin-signout-btn {
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(244,246,249,.7);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.admin-signout-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
 .list-card {
   background: var(--card-bg, rgba(255,255,255,.05));
   border: 1px solid var(--border, rgba(255,255,255,.08));
