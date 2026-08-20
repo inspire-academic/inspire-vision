@@ -118,6 +118,12 @@
           ${stat(d.wellbeing.sixMonthAvg ?? '—', `Six Months In (n=${d.wellbeing.sixMonthCount})`)}
         </div>
 
+        <div class="rp-section-title">Relationship-Quality Pulse (SoR, 1-5 avg)</div>
+        <div class="rp-grid">
+          ${stat(d.relationshipPulse.menteeAvg ?? '—', `Mentee-reported (n=${d.relationshipPulse.menteeCount})`)}
+          ${stat(d.relationshipPulse.mentorAvg ?? '—', `Mentor-reported (n=${d.relationshipPulse.mentorCount})`)}
+        </div>
+
         <div class="rp-section-title">Guardian Consent (under-18 mentees)</div>
         <div class="rp-grid">
           ${stat(d.guardianConsent.confirmed, 'Confirmed')}

@@ -113,6 +113,14 @@ exports.handler = async (event) => {
     (epochRows || []).forEach(r => { if (epochByWave[r.wave]) epochByWave[r.wave].push(Number(r.overall)); });
     const avgOf = arr => arr.length ? Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 100) / 100 : null;
 
+    // Relationship-quality pulse (mentorship_schema_v16) — aggregate
+    // only, same reasoning as wellbeing above: individual responses are
+    // never exposed, including to the other side of the same pairing.
+    const { data: pulseRows, error: pulseErr } = await admin.schema('mentorship').from('relationship_pulses').select('reporter, overall');
+    if (pulseErr) throw pulseErr;
+    const menteeOveralls = (pulseRows || []).filter(r => r.reporter === 'mentee').map(r => Number(r.overall));
+    const mentorOveralls = (pulseRows || []).filter(r => r.reporter === 'mentor').map(r => Number(r.overall));
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -128,6 +136,10 @@ exports.handler = async (event) => {
           intakeCount: epochByWave.intake.length, intakeAvg: avgOf(epochByWave.intake),
           threeMonthCount: epochByWave['3_month'].length, threeMonthAvg: avgOf(epochByWave['3_month']),
           sixMonthCount: epochByWave['6_month'].length, sixMonthAvg: avgOf(epochByWave['6_month']),
+        },
+        relationshipPulse: {
+          menteeCount: menteeOveralls.length, menteeAvg: avgOf(menteeOveralls),
+          mentorCount: mentorOveralls.length, mentorAvg: avgOf(mentorOveralls),
         },
       }),
     };
