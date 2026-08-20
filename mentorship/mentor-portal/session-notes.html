@@ -138,6 +138,10 @@
           <label for="noteBody">Anything else? <span style="font-weight:400; opacity:.6">(optional)</span></label>
           <textarea id="noteBody" placeholder="Anything that doesn't fit the above" style="min-height:60px"></textarea>
         </div>
+        <label class="auth-check">
+          <input type="checkbox" id="shareWithStudent">
+          <span>Share the Goal and Next Step with your mentee — just those two, never Reality/Options or the note above.</span>
+        </label>
         <button class="auth-btn" id="saveNoteBtn">Save Note</button>
       </div>
 
@@ -214,7 +218,10 @@
       <div class="list-card">
         ${growHtml}
         ${n.note ? `<div class="list-card-desc" style="margin-top:${grow ? '8px' : '0'}; margin-bottom:8px">${escapeHtml(n.note)}</div>` : ''}
-        <div class="list-card-meta">${new Date(n.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
+        <div class="list-card-meta">
+          ${new Date(n.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}
+          ${n.shared_with_student ? '<span class="badge badge-muted">👁 Shared with mentee</span>' : ''}
+        </div>
       </div>`;
     }).join('');
   }
@@ -261,6 +268,7 @@
       session_goal: goal, session_reality: reality, session_options: options,
       next_action: nextAction, next_action_date: nextActionDate,
       note: note || null,
+      shared_with_student: $('shareWithStudent').checked,
     });
     if (error) {
       msg.textContent = error.message || 'Could not save this note.';
@@ -269,6 +277,7 @@
       return;
     }
     ['goalField', 'realityField', 'optionsField', 'nextActionField', 'nextActionDateField', 'noteBody'].forEach(id => { $(id).value = ''; });
+    $('shareWithStudent').checked = false;
     msg.className = 'auth-msg';
     btn.disabled = false; btn.textContent = 'Save Note';
     await loadNotes(studentId);
