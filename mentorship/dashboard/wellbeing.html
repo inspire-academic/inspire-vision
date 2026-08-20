@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | Check-Ins</title>
-  <meta name="description" content="Track how you're doing, week by week — mood check-ins and reflections.">
+  <title>Inspire Mentorship | My Wellbeing</title>
+  <meta name="description" content="A short, research-based check-in on how you've been doing lately.">
   <meta name="theme-color" content="#0A1628">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,18 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .epoch-item { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .epoch-item:last-child { border-bottom: none; }
+    .epoch-item-text { font-size: 14px; margin-bottom: 10px; color: #f4f6f9; }
+    .epoch-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .epoch-opt { text-align: center; }
+    .epoch-opt input { display: block; margin: 0 auto 4px; }
+    .epoch-opt label { font-size: 10.5px; color: rgba(244,246,249,.6); line-height: 1.3; display: block; }
+    .epoch-domain-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .epoch-domain-label { width: 110px; flex-shrink: 0; font-size: 13px; font-weight: 700; }
+    .epoch-domain-score { width: 34px; text-align: right; font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -49,7 +61,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Growth Compass
       </a>
-      <a class="nav-item" href="/mentorship/dashboard/wellbeing.html">
+      <a class="nav-item active" href="/mentorship/dashboard/wellbeing.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         My Wellbeing
       </a>
@@ -57,7 +69,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
         Growth Pathways
       </a>
-      <a class="nav-item active" href="/mentorship/dashboard/check-in.html">
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         Check-Ins
       </a>
@@ -114,21 +126,7 @@
       </button>
       <div class="topbar-welcome">
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
-        <div class="topbar-sub">Checking in regularly is one of the best things you can do for your growth.</div>
-      </div>
-      <div class="topbar-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="topbarSearch" placeholder="Search anything…" aria-label="Search">
-      </div>
-      <div class="topbar-dropdown-wrap">
-        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span class="notif-badge" id="notifBadge" style="display:none"></span>
-        </button>
-        <div class="topbar-dropdown" id="notifDropdown">
-          <div class="topbar-dropdown-title">Notifications</div>
-          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
-        </div>
+        <div class="topbar-sub">Not a test — there's no right or wrong answer.</div>
       </div>
       <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -144,53 +142,42 @@
     </header>
 
     <div class="content">
-
       <div class="page-header">
         <div>
           <div class="page-eyebrow">My Growth</div>
-          <h1 class="page-title">Check-Ins</h1>
+          <h1 class="page-title">My Wellbeing</h1>
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:24px; max-width:520px">
-        <div class="card-title" style="margin-bottom:2px">How are you doing today?</div>
-        <div class="mood-prompt">Select how you feel right now:</div>
-        <div class="mood-row">
-          <button class="mood-btn" data-mood="struggling" aria-label="Struggling">😢</button>
-          <button class="mood-btn" data-mood="hard" aria-label="Finding it hard">😕</button>
-          <button class="mood-btn" data-mood="ok" aria-label="Okay">😐</button>
-          <button class="mood-btn" data-mood="good" aria-label="Doing great">😊</button>
-          <button class="mood-btn" data-mood="great" aria-label="Excellent">😄</button>
+      <div id="historyCard"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-label">New Check-In</div>
+        <div class="list-card-meta" style="margin:8px 0 16px">A short, research-based survey about you — about 3 minutes. Read each statement and choose how much it describes you. Be honest — there's no right or wrong answer.</div>
+        <div class="auth-field">
+          <label for="waveSelect">Which check-in is this?</label>
+          <select id="waveSelect">
+            <option value="intake">Getting Started</option>
+            <option value="3_month">Three Months In</option>
+            <option value="6_month">Six Months In</option>
+            <option value="other">Just Checking In</option>
+          </select>
         </div>
-        <div class="auth-field" style="margin-top:16px">
-          <label for="reflectionText">Reflection (optional)</label>
-          <textarea id="reflectionText" placeholder="What's on your mind?"></textarea>
-        </div>
-        <div class="auth-msg" id="checkinMsg"></div>
-        <button class="auth-btn" id="submitCheckinBtn">Save Check-In</button>
       </div>
 
-      <div class="card" style="margin-bottom:24px; max-width:520px">
-        <div class="card-title" style="margin-bottom:2px">Add a task</div>
-        <div class="mood-prompt">Something to follow up on before your next check-in?</div>
-        <div class="auth-field" style="margin-top:12px">
-          <label for="taskTitle">Task</label>
-          <input type="text" id="taskTitle" placeholder="e.g. Finish the reading my mentor suggested">
-        </div>
-        <div class="auth-msg" id="taskMsg"></div>
-        <button class="auth-btn" id="addTaskBtn">Add Task</button>
+      <div class="card" style="margin-bottom:20px">
+        <div id="itemsList"></div>
       </div>
 
-      <div class="page-eyebrow" style="margin-bottom:12px">History</div>
-      <div id="checkinsList">
-        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading your check-ins…</div>
-      </div>
+      <div class="auth-msg" id="surveyMsg"></div>
+      <button class="auth-btn" id="submitSurveyBtn" style="max-width:280px">Save My Check-In</button>
+
+      <div id="resultsCard" style="margin-top:24px"></div>
     </div>
   </main>
 </div>
 
 <script>
-  // ── NAV ACTIVE + MOBILE DRAWER ──────────────────────────────
   const sidebarEl = document.getElementById('sidebar');
   const backdropEl = document.getElementById('sidebarBackdrop');
   function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
@@ -199,41 +186,17 @@
     sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
   });
   backdropEl?.addEventListener('click', closeDrawer);
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', closeDrawer);
-  });
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
 
-  // ── NOTIFICATION + PROFILE DROPDOWNS ─────────────────────────
-  const notifDropdown = document.getElementById('notifDropdown');
   const profileDropdown = document.getElementById('profileDropdown');
-  document.getElementById('notifBell')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    notifDropdown?.classList.toggle('show');
-    profileDropdown?.classList.remove('show');
-  });
   document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
     e.stopPropagation();
     profileDropdown?.classList.toggle('show');
-    notifDropdown?.classList.remove('show');
   });
-  document.addEventListener('click', () => {
-    notifDropdown?.classList.remove('show');
-    profileDropdown?.classList.remove('show');
-  });
+  document.addEventListener('click', () => { profileDropdown?.classList.remove('show'); });
   document.getElementById('signOutBtn')?.addEventListener('click', async () => {
-    try {
-      const db = await getDB();
-      await db.auth.signOut();
-    } catch (e) { console.warn('Sign out failed:', e); }
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
     window.location.href = 'https://www.inspirevision.org';
-  });
-
-  // ── SEARCH — routes to the resources page until a real search index exists ──
-  document.getElementById('topbarSearch')?.addEventListener('keydown', (e) => {
-    const q = e.target.value.trim();
-    if (e.key === 'Enter' && q) {
-      window.location.href = '/mentorship/resources.html?q=' + encodeURIComponent(q);
-    }
   });
 </script>
 
@@ -255,117 +218,145 @@
 <script>
   const $ = id => document.getElementById(id);
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
-  const MOOD_LABEL = { struggling:'😢 Finding it tough', hard:"😕 It's been challenging", ok:'😐 Getting through it', good:'😊 Doing great', great:'😄 Feeling excellent' };
+
+  // The EPOCH Measure of Adolescent Well-Being (Kern, Benson, Steinberg,
+  // & Steinberg, 2016, Psychological Assessment, 28, 586-597) — item
+  // wording, order, and the 5-point response scale are used verbatim
+  // from the published instrument. Do not reword items; altering
+  // validated item text invalidates the instrument's psychometrics.
+  const SCALE = ['Almost never', 'Sometimes', 'Often', 'Very often', 'Almost always'];
+  const EPOCH_ITEMS = [
+    { code: 'C1', domain: 'connectedness', text: 'When something good happens to me, I have people who I like to share the good news with.' },
+    { code: 'P1', domain: 'perseverance', text: 'I finish whatever I begin.' },
+    { code: 'O1', domain: 'optimism', text: 'I am optimistic about my future.' },
+    { code: 'H1', domain: 'happiness', text: 'I feel happy.' },
+    { code: 'E1', domain: 'engagement', text: 'When I do an activity, I enjoy it so much that I lose track of time.' },
+    { code: 'H2', domain: 'happiness', text: 'I have a lot of fun.' },
+    { code: 'E2', domain: 'engagement', text: 'I get completely absorbed in what I am doing.' },
+    { code: 'H3', domain: 'happiness', text: 'I love life.' },
+    { code: 'P2', domain: 'perseverance', text: 'I keep at my schoolwork until I am done with it.' },
+    { code: 'C2', domain: 'connectedness', text: 'When I have a problem, I have someone who will be there for me.' },
+    { code: 'E3', domain: 'engagement', text: 'I get so involved in activities that I forget about everything else.' },
+    { code: 'E4', domain: 'engagement', text: 'When I am learning something new, I lose track of how much time has passed.' },
+    { code: 'O2', domain: 'optimism', text: 'In uncertain times, I expect the best.' },
+    { code: 'C3', domain: 'connectedness', text: 'There are people in my life who really care about me.' },
+    { code: 'O3', domain: 'optimism', text: 'I think good things are going to happen to me.' },
+    { code: 'C4', domain: 'connectedness', text: 'I have friends that I really care about.' },
+    { code: 'P3', domain: 'perseverance', text: 'Once I make a plan to get something done, I stick to it.' },
+    { code: 'O4', domain: 'optimism', text: 'I believe that things will work out, no matter how difficult they seem.' },
+    { code: 'P4', domain: 'perseverance', text: 'I am a hard worker.' },
+    { code: 'H4', domain: 'happiness', text: 'I am a cheerful person.' },
+  ];
+  const DOMAIN_LABEL = { engagement: 'Engagement', perseverance: 'Perseverance', optimism: 'Optimism', connectedness: 'Connectedness', happiness: 'Happiness' };
+  const WAVE_LABEL = { intake: 'Getting Started', '3_month': 'Three Months In', '6_month': 'Six Months In', other: 'Check-In' };
+
+  function renderItems() {
+    $('itemsList').innerHTML = EPOCH_ITEMS.map((item, i) => `
+      <div class="epoch-item" data-code="${item.code}">
+        <div class="epoch-item-text">${i + 1}. ${escapeHtml(item.text)}</div>
+        <div class="epoch-scale">
+          ${SCALE.map((label, idx) => `
+            <div class="epoch-opt">
+              <input type="radio" name="item-${item.code}" value="${idx + 1}" id="item-${item.code}-${idx + 1}">
+              <label for="item-${item.code}-${idx + 1}">${label}</label>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  function domainMean(responses, domain) {
+    const codes = EPOCH_ITEMS.filter(i => i.domain === domain).map(i => i.code);
+    const vals = codes.map(c => responses[c]);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+
+  function renderResultProfile(row) {
+    const domains = ['engagement', 'perseverance', 'optimism', 'connectedness', 'happiness'];
+    return `
+      <div class="card">
+        <div class="card-label">${escapeHtml(WAVE_LABEL[row.wave] || row.wave)} — ${new Date(row.completed_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
+        <div style="margin-top:14px">
+          ${domains.map(d => {
+            const score = Number(row[d]);
+            const pct = ((score - 1) / 4) * 100;
+            return `
+            <div class="epoch-domain-row">
+              <div class="epoch-domain-label">${DOMAIN_LABEL[d]}</div>
+              <div class="mini-progress-bar" style="flex:1; margin:0"><div class="mini-progress-fill" style="width:${pct}%"></div></div>
+              <div class="epoch-domain-score">${score.toFixed(1)}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  function renderHistory(rows) {
+    const el = $('historyCard');
+    if (!rows.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="page-eyebrow" style="margin-bottom:12px">Your Wellbeing Profile</div>${rows.map(renderResultProfile).join('')}`;
+  }
 
   let dbClient = null;
   let currentUser = null;
-  let selectedMood = null;
 
-  document.querySelectorAll('.mood-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedMood = btn.dataset.mood;
+  async function loadHistory() {
+    const { data, error } = await dbClient.schema('mentorship').from('epoch_surveys')
+      .select('*').eq('student_id', currentUser.id).order('completed_at', { ascending: false }).limit(3);
+    if (error) { console.warn('Load wellbeing history failed:', error); return; }
+    renderHistory(data || []);
+    // Suggest the next logical wave — first time in, then 3-month, then 6-month.
+    const doneWaves = new Set((data || []).map(r => r.wave));
+    if (!doneWaves.has('intake')) $('waveSelect').value = 'intake';
+    else if (!doneWaves.has('3_month')) $('waveSelect').value = '3_month';
+    else if (!doneWaves.has('6_month')) $('waveSelect').value = '6_month';
+    else $('waveSelect').value = 'other';
+  }
+
+  $('submitSurveyBtn').addEventListener('click', async () => {
+    const responses = {};
+    let missing = 0;
+    EPOCH_ITEMS.forEach(item => {
+      const checked = document.querySelector(`input[name="item-${item.code}"]:checked`);
+      if (!checked) { missing++; return; }
+      responses[item.code] = Number(checked.value);
     });
-  });
-
-  function renderCheckins(rows) {
-    const list = $('checkinsList');
-    if (!rows.length) {
-      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div>No check-ins yet — save your first one above.</div>';
-      return;
-    }
-    list.innerHTML = rows.map(r => {
-      const date = new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'numeric', minute:'2-digit' });
-      return `
-        <div class="list-card">
-          <div class="list-card-top">
-            <div class="list-card-title">${MOOD_LABEL[r.mood] || r.mood}</div>
-            <span class="badge badge-muted">${date}</span>
-          </div>
-          ${r.reflection ? `<div class="list-card-desc">${escapeHtml(r.reflection)}</div>` : ''}
-        </div>`;
-    }).join('');
-  }
-
-  async function loadCheckins() {
-    try {
-      const { data, error } = await dbClient.schema('mentorship').from('check_ins')
-        .select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
-      if (error) { console.warn('Load check-ins failed:', error); renderCheckins([]); return; }
-      renderCheckins(data || []);
-    } catch (e) {
-      console.warn('Load check-ins failed:', e);
-      renderCheckins([]);
-    }
-  }
-
-  $('submitCheckinBtn')?.addEventListener('click', async () => {
-    const msg = $('checkinMsg');
-    if (!selectedMood) {
-      msg.textContent = "Pick how you're feeling first.";
+    const msg = $('surveyMsg');
+    if (missing) {
+      msg.textContent = `Please answer every statement — ${missing} left to go.`;
       msg.className = 'auth-msg show error';
       return;
     }
-    if (!currentUser) return;
-    const btn = $('submitCheckinBtn');
+    const domains = { engagement: domainMean(responses, 'engagement'), perseverance: domainMean(responses, 'perseverance'), optimism: domainMean(responses, 'optimism'), connectedness: domainMean(responses, 'connectedness'), happiness: domainMean(responses, 'happiness') };
+    const overall = Object.values(domains).reduce((a, b) => a + b, 0) / 5;
+
+    const btn = $('submitSurveyBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     try {
-      const { error } = await dbClient.schema('mentorship').from('check_ins').insert({
+      const { error } = await dbClient.schema('mentorship').from('epoch_surveys').insert({
         student_id: currentUser.id,
-        mood: selectedMood,
-        reflection: $('reflectionText').value.trim() || null,
+        wave: $('waveSelect').value,
+        responses,
+        engagement: domains.engagement.toFixed(2), perseverance: domains.perseverance.toFixed(2),
+        optimism: domains.optimism.toFixed(2), connectedness: domains.connectedness.toFixed(2),
+        happiness: domains.happiness.toFixed(2), overall: overall.toFixed(2),
       });
       if (error) {
         msg.textContent = error.message || 'Could not save your check-in.';
         msg.className = 'auth-msg show error';
-        btn.disabled = false; btn.textContent = 'Save Check-In';
+        btn.disabled = false; btn.textContent = 'Save My Check-In';
         return;
       }
-      msg.textContent = 'Saved ✓';
-      msg.className = 'auth-msg show success';
-      $('reflectionText').value = '';
-      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-      selectedMood = null;
-      btn.disabled = false; btn.textContent = 'Save Check-In';
-      await loadCheckins();
-      setTimeout(() => { msg.className = 'auth-msg'; }, 2500);
+      document.querySelectorAll('#itemsList input[type="radio"]:checked').forEach(r => { r.checked = false; });
+      msg.className = 'auth-msg';
+      btn.disabled = false; btn.textContent = 'Save My Check-In';
+      await loadHistory();
+      $('resultsCard').innerHTML = '<div class="empty-state"><div class="empty-state-icon">💙</div>Saved — thank you for being honest. Your profile is above.</div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      console.warn('Save check-in failed:', err);
+      console.warn('Save wellbeing survey failed:', err);
       msg.textContent = 'Something went wrong — please try again.';
       msg.className = 'auth-msg show error';
-      btn.disabled = false; btn.textContent = 'Save Check-In';
-    }
-  });
-
-  $('addTaskBtn')?.addEventListener('click', async () => {
-    const msg = $('taskMsg');
-    const title = $('taskTitle').value.trim();
-    if (!title) { msg.textContent = 'Write a task first.'; msg.className = 'auth-msg show error'; return; }
-    if (!currentUser) return;
-    const btn = $('addTaskBtn');
-    btn.disabled = true; btn.textContent = 'Adding…';
-    try {
-      const { error } = await dbClient.schema('mentorship').from('tasks').insert({
-        student_id: currentUser.id,
-        title,
-      });
-      if (error) {
-        msg.textContent = error.message || 'Could not add this task.';
-        msg.className = 'auth-msg show error';
-        btn.disabled = false; btn.textContent = 'Add Task';
-        return;
-      }
-      msg.textContent = 'Added ✓ — see it on your Dashboard.';
-      msg.className = 'auth-msg show success';
-      $('taskTitle').value = '';
-      btn.disabled = false; btn.textContent = 'Add Task';
-      setTimeout(() => { msg.className = 'auth-msg'; }, 2500);
-    } catch (err) {
-      console.warn('Add task failed:', err);
-      msg.textContent = 'Something went wrong — please try again.';
-      msg.className = 'auth-msg show error';
-      btn.disabled = false; btn.textContent = 'Add Task';
+      btn.disabled = false; btn.textContent = 'Save My Check-In';
     }
   });
 
@@ -383,10 +374,11 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
-      await loadCheckins();
+
+      renderItems();
+      await loadHistory();
     } catch (e) {
-      console.warn('Check-ins page init failed:', e);
-      renderCheckins([]);
+      console.warn('Wellbeing page init failed:', e);
     }
   })();
 </script>

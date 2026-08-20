@@ -100,6 +100,19 @@ exports.handler = async (event) => {
     const totalMentorApplicants = pendingMentors + approvedMentors + rejectedMentors;
     const sgNotStarted = Math.max(0, totalMentorApplicants - sgInProgress - sgPassed - sgFailed);
 
+    // EPOCH wellbeing surveys (mentorship_schema_v15) — aggregate only,
+    // never individual responses (see that table's RLS comment on why
+    // it's mentee-only, same privacy footing as Journal). This is the
+    // one validated outcome measure the platform has, from the "Twelve
+    // Months" research pass — averages per wave are the actual point of
+    // adopting it: can the programme show wellbeing moving, not just
+    // activity counts.
+    const { data: epochRows, error: epochErr } = await admin.schema('mentorship').from('epoch_surveys').select('wave, overall');
+    if (epochErr) throw epochErr;
+    const epochByWave = { intake: [], '3_month': [], '6_month': [] };
+    (epochRows || []).forEach(r => { if (epochByWave[r.wave]) epochByWave[r.wave].push(Number(r.overall)); });
+    const avgOf = arr => arr.length ? Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 100) / 100 : null;
+
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -111,6 +124,11 @@ exports.handler = async (event) => {
         engagement: { goals: goalsCount, checkIns: checkInsCount, journalEntries: journalCount },
         guardianConsent: { pending: gcPending, confirmed: gcConfirmed, missingRequest: gcMissing },
         mentorSafeguarding: { notStarted: sgNotStarted, inProgress: sgInProgress, passed: sgPassed, failed: sgFailed },
+        wellbeing: {
+          intakeCount: epochByWave.intake.length, intakeAvg: avgOf(epochByWave.intake),
+          threeMonthCount: epochByWave['3_month'].length, threeMonthAvg: avgOf(epochByWave['3_month']),
+          sixMonthCount: epochByWave['6_month'].length, sixMonthAvg: avgOf(epochByWave['6_month']),
+        },
       }),
     };
   } catch (error) {
