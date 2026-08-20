@@ -42,6 +42,7 @@
         <div class="page-eyebrow">Admin</div>
         <h1 class="page-title">Reports</h1>
       </div>
+      <button class="admin-signout-btn" id="adminSignOutBtn">Sign out</button>
     </div>
     <div id="content">
       <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
@@ -52,6 +53,13 @@
   <script>
     const $ = id => document.getElementById(id);
     const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    // See admin/index.html for why this button was added to every admin page.
+    $('adminSignOutBtn')?.addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.href = '/mentorship/login.html';
+    });
 
     function stat(value, label, warn) {
       return `<div class="rp-stat${warn ? ' warn' : ''}"><div class="rp-stat-value">${value}</div><div class="rp-stat-label">${escapeHtml(label)}</div></div>`;

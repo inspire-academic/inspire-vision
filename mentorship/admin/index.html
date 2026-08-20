@@ -54,6 +54,7 @@
         <div class="page-eyebrow">Admin</div>
         <h1 class="page-title">Mentorship Admin</h1>
       </div>
+      <button class="admin-signout-btn" id="adminSignOutBtn">Sign out</button>
     </div>
     <div id="content">
       <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
@@ -64,6 +65,15 @@
   <script>
     const $ = id => document.getElementById(id);
     const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    // Was previously missing from every admin page — logging in as admin
+    // stuck you there with no way to switch accounts, since login.html
+    // silently redirects a signed-in visitor straight back here.
+    $('adminSignOutBtn')?.addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.href = '/mentorship/login.html';
+    });
 
     function stat(value, label, warn) {
       return `<div class="ix-stat${warn ? ' warn' : ''}"><div class="ix-stat-value">${value}</div><div class="ix-stat-label">${escapeHtml(label)}</div></div>`;

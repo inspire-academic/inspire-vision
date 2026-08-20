@@ -53,6 +53,7 @@
         <div class="page-eyebrow">Admin</div>
         <h1 class="page-title">Mentor Matching</h1>
       </div>
+      <button class="admin-signout-btn" id="adminSignOutBtn">Sign out</button>
     </div>
     <div id="content">
       <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
@@ -65,6 +66,13 @@
     const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
     let sessionToken = null;
     let latestData = null;
+
+    // See admin/index.html for why this button was added to every admin page.
+    $('adminSignOutBtn')?.addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.href = '/mentorship/login.html';
+    });
 
     async function callAdminFn(body) {
       const res = await fetch('/.netlify/functions/admin-matching', {
