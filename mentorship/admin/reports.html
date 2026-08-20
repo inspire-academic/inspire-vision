@@ -111,6 +111,13 @@
           ${stat(d.engagement.journalEntries, 'Journal entries')}
         </div>
 
+        <div class="rp-section-title">Wellbeing Check-Ins (EPOCH, 1-5 avg)</div>
+        <div class="rp-grid">
+          ${stat(d.wellbeing.intakeAvg ?? '—', `Getting Started (n=${d.wellbeing.intakeCount})`)}
+          ${stat(d.wellbeing.threeMonthAvg ?? '—', `Three Months In (n=${d.wellbeing.threeMonthCount})`)}
+          ${stat(d.wellbeing.sixMonthAvg ?? '—', `Six Months In (n=${d.wellbeing.sixMonthCount})`)}
+        </div>
+
         <div class="rp-section-title">Guardian Consent (under-18 mentees)</div>
         <div class="rp-grid">
           ${stat(d.guardianConsent.confirmed, 'Confirmed')}
