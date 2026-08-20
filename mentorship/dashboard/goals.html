@@ -150,11 +150,12 @@
       </div>
 
       <div class="card" id="newGoalCard" style="display:none; margin-bottom:20px; max-width:520px">
-        <div class="card-title" style="margin-bottom:16px">Add a Goal</div>
+        <div class="card-title" style="margin-bottom:4px">Add a Goal</div>
+        <div class="list-card-meta" style="margin-bottom:16px">Not a number to hit — something to grow into. It's fine to adjust this as you go.</div>
         <div class="auth-msg" id="goalFormMsg"></div>
         <form id="newGoalForm">
-          <div class="auth-field"><label for="goalTitle">Title</label><input id="goalTitle" required></div>
-          <div class="auth-field"><label for="goalDesc">Description (optional)</label><textarea id="goalDesc"></textarea></div>
+          <div class="auth-field"><label for="goalTitle">What do you want to grow into?</label><input id="goalTitle" required placeholder="e.g. Someone who keeps their word"></div>
+          <div class="auth-field"><label for="goalDesc">Why does this matter to you right now? <span style="font-weight:400; opacity:.6">(optional)</span></label><textarea id="goalDesc"></textarea></div>
           <div class="auth-field">
             <label for="goalCategory">Category</label>
             <select id="goalCategory">
@@ -167,7 +168,7 @@
               <option value="personal" selected>Personal</option>
             </select>
           </div>
-          <div class="auth-field"><label for="goalTargetDate">Target date (optional)</label><input type="date" id="goalTargetDate"></div>
+          <div class="auth-field"><label for="goalTargetDate">Roughly by when? <span style="font-weight:400; opacity:.6">(optional — it's fine to move it)</span></label><input type="date" id="goalTargetDate"></div>
           <button type="submit" class="auth-btn" id="saveGoalBtn">Save Goal</button>
           <button type="button" class="auth-btn-secondary" id="cancelGoalBtn">Cancel</button>
         </form>
@@ -248,10 +249,19 @@
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
   const CATEGORY_LABEL = { spiritual:'Spiritual', intellectual:'Intellectual', physical:'Physical', social:'Social', emotional:'Emotional', character:'Character', personal:'Personal' };
 
+  // REAL, not SMART — from the "Twelve Months" research (MentorcliQ's
+  // explicit REAL-vs-SMART guidance for developmental mentoring). No
+  // numeric slider on purpose: three qualitative stages, each an honest
+  // check-in rather than a precise measurement, still updates
+  // progress_pct underneath since Growth Compass and other pages
+  // already depend on that number.
+  const STAGE_PCT = { just_started: 15, making_progress: 45, getting_close: 80 };
+  const STAGE_LABEL = { just_started: 'Just started', making_progress: 'Making real progress', getting_close: 'Getting close' };
+
   let dbClient = null;
   let currentUser = null;
 
-  function renderGoals(goals) {
+  function renderGoals(goals, latestCheckinByGoal) {
     const list = $('goalsList');
     if (!goals.length) {
       list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div>No goals yet — add your first one above.</div>';
@@ -262,6 +272,8 @@
       const dateLabel = g.target_date
         ? new Date(g.target_date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
         : 'No target date';
+      const latest = latestCheckinByGoal.get(g.id);
+      const active = g.status !== 'completed';
       return `
         <div class="list-card" data-id="${g.id}">
           <div class="list-card-top">
@@ -273,12 +285,33 @@
           <div class="list-card-meta">
             <span class="badge badge-muted">${CATEGORY_LABEL[g.category] || g.category}</span>
             <span>${dateLabel}</span>
-            <span>${pct}%</span>
+            <span>${latest ? STAGE_LABEL[latest.stage] || `${pct}%` : `${pct}%`}</span>
           </div>
+          ${latest?.reflection ? `<div class="list-card-desc" style="margin-top:8px; font-style:italic">"${escapeHtml(latest.reflection)}" <span style="opacity:.6; font-style:normal">— ${new Date(latest.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</span></div>` : ''}
           <div class="list-card-actions">
             ${g.is_priority ? '' : '<button class="list-card-btn set-priority-btn">Set as Priority</button>'}
-            ${g.status === 'completed' ? '<span class="badge badge-muted">Completed</span>' : '<button class="list-card-btn primary mark-complete-btn">Mark Complete</button>'}
+            ${active ? '<button class="list-card-btn checkin-toggle-btn">Check In</button><button class="list-card-btn primary mark-complete-btn">Mark Complete</button>' : '<span class="badge badge-muted">Completed</span>'}
           </div>
+          ${active ? `
+          <div class="checkin-form" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08)">
+            <div class="auth-field">
+              <label>How's this moving?</label>
+              <select class="checkin-stage">
+                <option value="" disabled selected>Choose one</option>
+                <option value="just_started">Just started</option>
+                <option value="making_progress">Making real progress</option>
+                <option value="getting_close">Getting close</option>
+              </select>
+            </div>
+            <div class="auth-field">
+              <label>What are you noticing or learning? <span style="font-weight:400; opacity:.6">(optional)</span></label>
+              <textarea class="checkin-reflection" placeholder="Anything you're learning about yourself as you work on this"></textarea>
+            </div>
+            <div class="list-card-actions">
+              <button class="list-card-btn primary checkin-save-btn">Save Check-In</button>
+              <button class="list-card-btn checkin-cancel-btn">Cancel</button>
+            </div>
+          </div>` : ''}
         </div>`;
     }).join('');
 
@@ -303,17 +336,56 @@
         } catch (err) { console.warn('Mark complete failed:', err); btn.disabled = false; btn.textContent = 'Mark Complete'; }
       });
     });
+    list.querySelectorAll('.checkin-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const form = e.target.closest('.list-card').querySelector('.checkin-form');
+        form.style.display = form.style.display === 'none' ? '' : 'none';
+      });
+    });
+    list.querySelectorAll('.checkin-cancel-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => { e.target.closest('.checkin-form').style.display = 'none'; });
+    });
+    list.querySelectorAll('.checkin-save-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const card = e.target.closest('.list-card');
+        const goalId = card.dataset.id;
+        const stage = card.querySelector('.checkin-stage').value;
+        if (!stage) { alert("Pick how it's moving before saving."); return; }
+        const reflection = card.querySelector('.checkin-reflection').value.trim();
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+          await dbClient.schema('mentorship').from('goal_check_ins').insert({
+            goal_id: goalId, student_id: currentUser.id, stage, reflection: reflection || null,
+          });
+          await dbClient.schema('mentorship').from('goals').update({ progress_pct: STAGE_PCT[stage] })
+            .eq('id', goalId).eq('student_id', currentUser.id);
+          await loadGoals();
+        } catch (err) {
+          console.warn('Save check-in failed:', err);
+          btn.disabled = false; btn.textContent = 'Save Check-In';
+        }
+      });
+    });
   }
 
   async function loadGoals() {
     try {
       const { data, error } = await dbClient.schema('mentorship').from('goals')
         .select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false });
-      if (error) { console.warn('Load goals failed:', error); renderGoals([]); return; }
-      renderGoals(data || []);
+      if (error) { console.warn('Load goals failed:', error); renderGoals([], new Map()); return; }
+      const goals = data || [];
+      const goalIds = goals.map(g => g.id);
+      let latestCheckinByGoal = new Map();
+      if (goalIds.length) {
+        const { data: checkins, error: ciError } = await dbClient.schema('mentorship').from('goal_check_ins')
+          .select('*').eq('student_id', currentUser.id).in('goal_id', goalIds).order('created_at', { ascending: false });
+        if (ciError) { console.warn('Load goal check-ins failed:', ciError); }
+        (checkins || []).forEach(c => { if (!latestCheckinByGoal.has(c.goal_id)) latestCheckinByGoal.set(c.goal_id, c); });
+      }
+      renderGoals(goals, latestCheckinByGoal);
     } catch (e) {
       console.warn('Load goals failed:', e);
-      renderGoals([]);
+      renderGoals([], new Map());
     }
   }
 
