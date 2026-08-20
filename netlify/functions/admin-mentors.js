@@ -28,12 +28,13 @@ const { getAdminClient, requireAdmin } = require('./_lib/adminAuth');
 // same constant) — no bundler in this repo, so it's duplicated rather
 // than shared. Used both to show progress on the pending list and, more
 // importantly, to actually block the 'approve' action below until a
-// mentor has done all four — a real gate, not just an admin's guess.
+// mentor has done all five — a real gate, not just an admin's guess.
 const REQUIRED_TRAINING_MODULE_SLUGS = [
   'safeguarding-basics',
   'active-listening',
   'boundaries-consistency',
   'using-the-platform',
+  'ask-dont-tell',
 ];
 
 async function listPendingMentors(admin) {
