@@ -23,15 +23,35 @@
 // is not something to leave open.
 const { getAdminClient, requireAdmin } = require('./_lib/adminAuth');
 
+// Source of truth for what "mentor training" means, mirrored in
+// mentor-onboarding/training.html (see that file's own comment on this
+// same constant) — no bundler in this repo, so it's duplicated rather
+// than shared. Used both to show progress on the pending list and, more
+// importantly, to actually block the 'approve' action below until a
+// mentor has done all four — a real gate, not just an admin's guess.
+const REQUIRED_TRAINING_MODULE_SLUGS = [
+  'safeguarding-basics',
+  'active-listening',
+  'boundaries-consistency',
+  'using-the-platform',
+];
+
 async function listPendingMentors(admin) {
-  const [{ data, error }, { data: checks, error: checksErr }] = await Promise.all([
+  const [{ data, error }, { data: checks, error: checksErr }, { data: training, error: trainingErr }] = await Promise.all([
     admin.schema('mentorship').from('mentor_applications')
       .select('*').eq('status', 'pending_review').order('created_at', { ascending: true }),
     admin.schema('mentorship').from('mentor_safeguarding_checks').select('*'),
+    admin.schema('mentorship').from('mentor_training_progress').select('mentor_id, module_slug'),
   ]);
   if (error) throw error;
   if (checksErr) throw checksErr;
+  if (trainingErr) throw trainingErr;
   const checkByMentor = new Map((checks || []).map(c => [c.mentor_id, c]));
+  const trainingByMentor = new Map();
+  (training || []).forEach(t => {
+    if (!trainingByMentor.has(t.mentor_id)) trainingByMentor.set(t.mentor_id, new Set());
+    trainingByMentor.get(t.mentor_id).add(t.module_slug);
+  });
   return (data || []).map(a => ({
     id: a.mentor_id,
     email: a.email,
@@ -40,6 +60,8 @@ async function listPendingMentors(admin) {
     created_at: a.created_at,
     safeguarding_status: checkByMentor.get(a.mentor_id)?.status || 'not_started',
     safeguarding_notes: checkByMentor.get(a.mentor_id)?.notes || '',
+    training_completed: (trainingByMentor.get(a.mentor_id) || new Set()).size,
+    training_total: REQUIRED_TRAINING_MODULE_SLUGS.length,
   }));
 }
 
@@ -92,6 +114,26 @@ exports.handler = async (event) => {
       if (fetchErr || !existing?.user) {
         return { statusCode: 404, body: JSON.stringify({ error: 'Mentor application not found' }) };
       }
+
+      // Real gate, not just an admin's judgment call — a mentor can't be
+      // approved until mentor-onboarding/training.html shows all four
+      // modules complete. Only checked on approve; rejecting never needed it.
+      if (action === 'approve') {
+        const { data: training, error: trainingErr } = await admin.schema('mentorship')
+          .from('mentor_training_progress').select('module_slug').eq('mentor_id', userId);
+        if (trainingErr) return { statusCode: 500, body: JSON.stringify({ error: trainingErr.message }) };
+        const completed = new Set((training || []).map(t => t.module_slug));
+        const missing = REQUIRED_TRAINING_MODULE_SLUGS.filter(slug => !completed.has(slug));
+        if (missing.length) {
+          return {
+            statusCode: 400,
+            body: JSON.stringify({
+              error: `This mentor hasn't finished mentor training yet — ${REQUIRED_TRAINING_MODULE_SLUGS.length - missing.length} of ${REQUIRED_TRAINING_MODULE_SLUGS.length} modules complete.`,
+            }),
+          };
+        }
+      }
+
       const newStatus = action === 'approve' ? 'approved' : 'rejected';
       // updateUserById replaces user_metadata wholesale — merge in the
       // existing fields so approving someone doesn't wipe their name,

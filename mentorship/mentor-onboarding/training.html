@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Mentorship | Mentor Training</title>
+  <meta name="description" content="Four short modules every mentor completes before being matched with a mentee.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body { padding: 48px 20px 80px; }
+    .mt-intro { font-size: 14px; color: rgba(244,246,249,.7); max-width: 62ch; margin-bottom: 24px; line-height: 1.6; }
+    .mt-progress-card { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .mt-progress-count { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; white-space: nowrap; }
+    .mt-done-banner {
+      background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.35); color: #86efac;
+      border-radius: 12px; padding: 16px 20px; font-size: 14px; margin-bottom: 24px; display: none;
+    }
+    .module-card { margin-bottom: 12px; }
+    .module-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+    .module-num { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; color: var(--mentorship-gold); margin-right: 10px; }
+    .module-body { margin-top: 14px; display: none; }
+    .module-card.open .module-body { display: block; }
+    .module-text { font-size: 14px; color: rgba(244,246,249,.75); line-height: 1.65; white-space: pre-line; margin-bottom: 16px; }
+    .module-chevron { transition: transform .15s; opacity: .5; }
+    .module-card.open .module-chevron { transform: rotate(90deg); }
+  </style>
+</head>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Mentor Onboarding</div>
+        <h1 class="page-title">Mentor Training</h1>
+      </div>
+      <button class="admin-signout-btn" id="signOutBtn">Sign out</button>
+    </div>
+
+    <div class="mt-intro" id="introText">
+      Four short modules — about fifteen minutes in total. Completing all four is what allows our team to
+      approve your application, so please go through each one honestly rather than skimming.
+    </div>
+
+    <div class="mt-done-banner" id="doneBanner">
+      🎉 Training complete — thank you. Your application is still under review; we'll email you as soon as
+      you're approved to be matched with a mentee.
+    </div>
+
+    <div class="card mt-progress-card">
+      <div class="card-label">Training Progress</div>
+      <div class="mt-progress-count" id="trainingCount">0/4</div>
+      <div class="mini-progress-bar" style="flex:1; margin:0" id="trainingBarWrap"><div class="mini-progress-fill" id="trainingBar" style="width:0%"></div></div>
+    </div>
+
+    <div id="modulesList"></div>
+  </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    // These four slugs are the source of truth for what "mentor training"
+    // means. netlify/functions/admin-mentors.js's REQUIRED_TRAINING_MODULE_SLUGS
+    // must stay in sync with this list — no bundler in this repo, so it's
+    // duplicated with this comment rather than shared, same pattern as
+    // other trust-boundary constants elsewhere in this codebase.
+    const MODULES = [
+      {
+        slug: 'safeguarding-basics',
+        title: 'Safeguarding Basics',
+        body: `Every conversation with a mentee should happen through this platform, not a personal phone number, social media, or a private messaging app — even if a mentee asks to move the conversation there first. This isn't about trust. It's about making sure there's always a record that protects both of you if anything is ever questioned.
+
+If a mentee ever tells you something that worries you — anything touching on self-harm, abuse, or feeling unsafe at home — you are not the person meant to resolve it, and you shouldn't try to carry it alone. Take it seriously, stay calm and non-judgmental with them in the moment, and contact the Inspire team directly and promptly afterwards. Session Notes are a private, useful record for your own memory, but they are not automatically reviewed by anyone — don't rely on writing something down as the same thing as raising it.
+
+When in doubt, raise it. A false alarm costs us five minutes. A missed one costs far more.`,
+      },
+      {
+        slug: 'active-listening',
+        title: 'Active Listening',
+        body: `The most common mistake a well-meaning mentor makes is rushing to fix. A teenager tells you something hard, and the instinct is to immediately offer advice, a solution, or a silver lining. Usually, what they actually needed first was to feel heard.
+
+Try reflecting back what you heard before responding to it: "It sounds like that really frustrated you" lands very differently from jumping straight to "here's what you should do." Ask open questions that can't be answered in one word — "what was that like for you?" instead of "are you okay?" And get comfortable with a pause. Silence after a hard sentence isn't a gap you need to fill — it's often the mentee deciding whether to say more.
+
+You'll give plenty of advice over time. Just let listening come first.`,
+      },
+      {
+        slug: 'boundaries-consistency',
+        title: 'Boundaries & Consistency',
+        body: `For a lot of young people in a mentoring programme, an inconsistent adult is exactly the pattern they've already lived through. The single most healing thing you can offer isn't wisdom — it's reliability. Show up when you say you will. Log every session, even the short or ordinary ones, through Sessions. If you need to reschedule, do it as early as you can.
+
+Keep the relationship inside the platform's channels, keep topics age-appropriate, and know the edge of your role. You are a mentor, not a therapist, a lawyer, or a crisis line — if a topic is clearly above what a mentor should be handling alone (a mental health crisis, a legal or family court matter, anything safeguarding-related), that's exactly when to refer up rather than try to carry it yourself. See the Safeguarding Basics module for how.
+
+Consistency and knowing your own edges aren't in tension with each other. They're the same skill.`,
+      },
+      {
+        slug: 'using-the-platform',
+        title: 'Using This Platform Well',
+        body: `A quick, practical tour of what you'll actually use:
+
+Sessions is where you log every meeting — date, and a status once it's done. Session Notes is your own private working record of what was discussed; it's never shown to your mentee, so keep it factual and useful to future-you, not performative. My Mentees shows your active pairing. Nudge Messages let you send a light, encouraging check-in between sessions — a genuine "thinking of you" or a nudge toward a goal, not a replacement for the real conversation in your next session.
+
+One thing worth knowing clearly: when a mentee submits "Ask for Help" or "Prayer & Support" on their side, it routes to our admin team's safeguarding queue — not to you directly. Don't assume you'll be automatically notified if a mentee reaches out that way. If something comes up in a session that concerns you, you're the one who needs to raise it (see Safeguarding Basics).`,
+      },
+    ];
+
+    let dbClient = null;
+    let currentUser = null;
+    let completedSlugs = new Set();
+
+    function renderModules() {
+      const list = $('modulesList');
+      list.innerHTML = MODULES.map((m, i) => {
+        const done = completedSlugs.has(m.slug);
+        return `
+        <div class="list-card module-card${done ? ' done' : ''}" data-slug="${m.slug}">
+          <div class="module-head" data-toggle>
+            <div class="list-card-title"><span class="module-num">${String(i + 1).padStart(2, '0')}</span>${escapeHtml(m.title)}</div>
+            <div style="display:flex; align-items:center; gap:10px">
+              ${done ? '<span class="badge badge-muted">✓ Complete</span>' : ''}
+              <svg class="module-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="module-text">${escapeHtml(m.body)}</div>
+            <div class="list-card-actions">
+              <button class="list-card-btn primary" data-complete ${done ? 'disabled' : ''}>${done ? 'Completed' : 'Mark as Read & Complete'}</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      list.querySelectorAll('[data-toggle]').forEach(head => {
+        head.addEventListener('click', () => head.closest('.module-card').classList.toggle('open'));
+      });
+      list.querySelectorAll('[data-complete]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (btn.disabled) return;
+          const card = btn.closest('.module-card');
+          const slug = card.dataset.slug;
+          btn.disabled = true; btn.textContent = 'Saving…';
+          const { error } = await dbClient.schema('mentorship').from('mentor_training_progress').upsert({
+            mentor_id: currentUser.id,
+            module_slug: slug,
+            completed_at: new Date().toISOString(),
+          }, { onConflict: 'mentor_id,module_slug' });
+          if (error) { console.warn('Save training progress failed:', error); btn.disabled = false; btn.textContent = 'Try Again'; return; }
+          completedSlugs.add(slug);
+          renderProgress();
+          renderModules();
+          list.querySelector(`[data-slug="${slug}"]`)?.classList.add('open');
+        });
+      });
+    }
+
+    function renderProgress() {
+      const total = MODULES.length;
+      const done = completedSlugs.size;
+      $('trainingCount').textContent = `${done}/${total}`;
+      $('trainingBar').style.width = `${Math.round((done / total) * 100)}%`;
+      $('doneBanner').style.display = done >= total ? 'block' : 'none';
+    }
+
+    $('signOutBtn')?.addEventListener('click', async () => {
+      try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
+      window.location.href = '/mentorship/login.html';
+    });
+
+    (async () => {
+      try {
+        dbClient = await getDB();
+        const { data: { user } } = await dbClient.auth.getUser();
+        if (!user || user.user_metadata?.mentorship_role !== 'mentor') { window.location.href = '/mentorship/login.html'; return; }
+        currentUser = user;
+
+        const { data, error } = await dbClient.schema('mentorship').from('mentor_training_progress')
+          .select('module_slug').eq('mentor_id', user.id);
+        if (error) console.warn('Load training progress failed:', error);
+        completedSlugs = new Set((data || []).map(r => r.module_slug));
+        renderProgress();
+        renderModules();
+      } catch (e) {
+        console.warn('Training page init failed:', e);
+        window.location.href = '/mentorship/login.html';
+      }
+    })();
+  </script>
+</body>
+</html>
