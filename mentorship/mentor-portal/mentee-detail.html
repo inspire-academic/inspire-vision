@@ -217,6 +217,18 @@
   const fmtDate = d => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const MOOD_LABEL = { struggling: '😢 Finding it tough', hard: "😕 It's been challenging", ok: '😐 Getting through it', good: '😊 Doing great', great: '😄 Feeling excellent' };
   const CATEGORY_LABEL = { urgent: 'Urgent', prayer: 'Prayer', general: 'Support' };
+  // dbClient/currentUser used to be IIFE-local (`const dbClient = ...`
+  // inside the init IIFE below), which left every top-level render
+  // function that referenced them — renderCommitmentBanner,
+  // renderPulseCard — throwing "dbClient is not defined" the moment
+  // their buttons were actually clicked, since a function's free
+  // variables resolve against where it was *defined*, not where it's
+  // *called* from. Declaring them here, at the same scope the render
+  // functions are defined in, and assigning (not redeclaring) inside
+  // the IIFE, matches the pattern already used correctly everywhere
+  // else in this codebase (pathways.html, dashboard/mentor.html, etc.).
+  let dbClient = null;
+  let currentUser = null;
 
   // From the "Twelve Months" research pass: matches that end within
   // ~3 months leave a mentee worse off than never having had a mentor
@@ -429,8 +441,9 @@
 
   (async () => {
     try {
-      const dbClient = await getDB();
+      dbClient = await getDB();
       const { data: { user } } = await dbClient.auth.getUser();
+      currentUser = user;
       const isApprovedMentor = user?.user_metadata?.mentorship_role === 'mentor' && user?.user_metadata?.mentor_status === 'approved';
       if (!user || !isApprovedMentor) { window.location.href = '/mentorship/login.html'; return; }
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
