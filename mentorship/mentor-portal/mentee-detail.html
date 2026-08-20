@@ -23,6 +23,12 @@
     .mp-tab.active { background: var(--mentorship-gold); color: #fff; border-color: var(--mentorship-gold); }
     .mp-section { display: none; }
     .mp-section.active { display: block; }
+    .commitment-banner {
+      background: rgba(184,92,26,.1); border: 1px solid rgba(184,92,26,.3); border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .commitment-banner-text { flex: 1; min-width: 220px; font-size: 13px; color: rgba(244,246,249,.85); line-height: 1.5; }
+    .commitment-banner-text b { color: #f4f6f9; }
   </style>
 </head>
 <body>
@@ -102,6 +108,8 @@
           <h1 class="page-title" id="menteeName">Progress</h1>
         </div>
       </div>
+
+      <div id="commitmentBanner"></div>
 
       <div class="mp-tabs" id="tabs">
         <button class="mp-tab active" data-tab="goals">Goals</button>
@@ -198,6 +206,32 @@
   const fmtDate = d => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const MOOD_LABEL = { struggling: '😢 Finding it tough', hard: "😕 It's been challenging", ok: '😐 Getting through it', good: '😊 Doing great', great: '😄 Feeling excellent' };
   const CATEGORY_LABEL = { urgent: 'Urgent', prayer: 'Prayer', general: 'Support' };
+
+  // From the "Twelve Months" research pass: matches that end within
+  // ~3 months leave a mentee worse off than never having had a mentor
+  // (Grossman & Rhodes 2002). Non-blocking on purpose — acknowledging
+  // is a real commitment, not a checkbox that gates access, and every
+  // pairing that existed before this shipped starts unacknowledged.
+  function renderCommitmentBanner(assignment) {
+    const el = $('commitmentBanner');
+    if (assignment.commitment_acknowledged_at) { el.innerHTML = ''; return; }
+    el.innerHTML = `
+      <div class="commitment-banner">
+        <div class="commitment-banner-text">
+          You're walking with <b>${escapeHtml(assignment.student_name)}</b> for at least
+          <b>${assignment.commitment_months || 12} months</b>. Research on youth mentoring is
+          consistent on this: a match that ends early can leave a young person worse off than
+          if they'd never had a mentor at all. Consistency is the thing that actually matters most.
+        </div>
+        <button class="list-card-btn primary" id="ackCommitmentBtn">Acknowledge &amp; Begin</button>
+      </div>`;
+    $('ackCommitmentBtn')?.addEventListener('click', async (e) => {
+      e.target.disabled = true; e.target.textContent = 'Saving…';
+      const { error } = await dbClient.schema('mentorship').rpc('acknowledge_mentor_commitment', { assignment_id: assignment.id });
+      if (error) { console.warn('Acknowledge commitment failed:', error); e.target.disabled = false; e.target.textContent = 'Acknowledge & Begin'; return; }
+      el.innerHTML = '';
+    });
+  }
 
   function renderGoals(rows) {
     const el = $('goalsList');
@@ -316,6 +350,7 @@
         return;
       }
       $('menteeName').textContent = assignment.student_name || 'Mentee Progress';
+      renderCommitmentBanner(assignment);
 
       const [goals, checkins, journal, help, messages] = await Promise.all([
         dbClient.schema('mentorship').from('goals').select('*').eq('student_id', studentId).order('created_at', { ascending: false }),

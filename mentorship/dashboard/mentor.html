@@ -148,6 +148,8 @@
         </div>
       </div>
 
+      <div id="closureCard"></div>
+
       <div id="mentorSummary">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
       </div>
@@ -234,6 +236,28 @@
 
   let dbClient = null;
   let currentUser = null;
+
+  // Until this session, this page never looked at mentor_assignments at
+  // all — a mentee whose pairing ended just saw stale session history
+  // with zero context. This is the mentee-facing half of the "Twelve
+  // Months" closure work: a real, warm acknowledgment instead of silence.
+  function renderClosureCard(assignment) {
+    const el = $('closureCard');
+    if (!assignment || assignment.status !== 'ended') { el.innerHTML = ''; return; }
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:20px; border-color: rgba(184,92,26,.3)">
+        <div class="card-label">A Chapter Has Closed</div>
+        <div class="card-title" style="font-size:18px; margin:8px 0">Your time with ${escapeHtml(assignment.mentor_name || 'your mentor')} has come to an end</div>
+        <div class="list-card-desc">
+          Whatever the reason, the time you both gave this mattered. If you'd like to keep going with a
+          new mentor, or just want to talk about how you're feeling, reach out — we're here.
+        </div>
+        <div class="list-card-actions" style="margin-top:14px">
+          <a class="list-card-btn primary" href="/mentorship/resources.html#help">Ask for Help</a>
+          <a class="list-card-btn" href="/mentorship/dashboard/journal.html">Write About It</a>
+        </div>
+      </div>`;
+  }
 
   function renderSummary(sessions) {
     const el = $('mentorSummary');
@@ -328,6 +352,17 @@
     }
   }
 
+  async function loadAssignment() {
+    try {
+      const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
+        .select('*').eq('student_id', currentUser.id).order('assigned_at', { ascending: false }).limit(1).maybeSingle();
+      if (error) { console.warn('Load assignment failed:', error); return; }
+      renderClosureCard(data);
+    } catch (e) {
+      console.warn('Load assignment failed:', e);
+    }
+  }
+
   async function loadSessions() {
     try {
       const { data, error } = await dbClient.schema('mentorship').from('sessions')
@@ -356,7 +391,7 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
-      await Promise.all([loadSessions(), loadMessages()]);
+      await Promise.all([loadSessions(), loadMessages(), loadAssignment()]);
     } catch (e) {
       console.warn('Mentor page init failed:', e);
       renderSummary([]);
