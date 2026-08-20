@@ -93,6 +93,7 @@
       content.innerHTML = pending.map(m => {
         const date = new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         const sg = m.safeguarding_status || 'not_started';
+        const trainingDone = (m.training_completed || 0) >= (m.training_total || 4);
         return `
           <div class="admin-app-card" data-id="${m.id}">
             <div class="admin-app-top">
@@ -100,6 +101,7 @@
                 <div class="admin-app-name">${escapeHtml(m.full_name || 'No name given')}</div>
                 <div class="admin-app-email">${escapeHtml(m.email)} · applied ${date}</div>
               </div>
+              <span class="sg-badge ${trainingDone ? 'sg-badge-passed' : 'sg-badge-in_progress'}">Training: ${m.training_completed || 0}/${m.training_total || 4}</span>
             </div>
             ${m.motivation ? `<div class="admin-app-motivation">${escapeHtml(m.motivation)}</div>` : ''}
             <div class="admin-app-actions">

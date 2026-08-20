@@ -100,7 +100,10 @@
           return;
         }
         // pending_review, or any other/unset status — never assume access.
-        showMsg("Your mentor application is still under review — we'll email you once it's approved.", 'success');
+        // Send them to mentor training instead of leaving them with nothing
+        // to do while they wait — completing it is also now a real gate on
+        // admin approval (see admin-mentors.js's REQUIRED_TRAINING_MODULE_SLUGS).
+        window.location.href = '/mentorship/mentor-onboarding/training.html';
         return;
       }
       if (role !== 'mentee') {
