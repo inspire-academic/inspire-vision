@@ -36,7 +36,8 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { action, mentorId, studentId, assignmentId } = JSON.parse(event.body || '{}');
+    const { action, mentorId, studentId, assignmentId, closureReason, closureNotes, closureMeetingHeld } = JSON.parse(event.body || '{}');
+    const VALID_CLOSURE_REASONS = ['completed_term', 'rematched', 'mentee_moved', 'mentor_stepped_down', 'not_a_good_fit', 'safeguarding_concern', 'other'];
 
     if (action === 'list') {
       const [users, { data: assignments, error: assignErr }, { data: applications, error: appErr }, { data: consents, error: consentErr }] = await Promise.all([
@@ -48,6 +49,40 @@ exports.handler = async (event) => {
       if (assignErr) throw assignErr;
       if (appErr) throw appErr;
       if (consentErr) throw consentErr;
+
+      // Match-health — from the "Twelve Months" research pass: the
+      // highest-leverage admin view found across every platform studied
+      // (Together Platform's "health monitor", MentorcliQ) wasn't more
+      // activity counts, it was surfacing SILENCE before a pairing
+      // quietly dies. green <=14 days since last session/message/
+      // check-in, amber 15-30, red >30 or no activity ever recorded.
+      const activeStudentIds = (assignments || []).map(a => a.student_id);
+      let healthByStudent = new Map();
+      if (activeStudentIds.length) {
+        const [{ data: sessions }, { data: messages }, { data: checkins }] = await Promise.all([
+          admin.schema('mentorship').from('sessions').select('student_id, scheduled_at').in('student_id', activeStudentIds),
+          admin.schema('mentorship').from('messages').select('student_id, created_at').in('student_id', activeStudentIds),
+          admin.schema('mentorship').from('check_ins').select('student_id, created_at').in('student_id', activeStudentIds),
+        ]);
+        const latestByStudent = new Map();
+        const bump = (studentId, ts) => {
+          if (!ts) return;
+          const t = new Date(ts).getTime();
+          const cur = latestByStudent.get(studentId);
+          if (!cur || t > cur) latestByStudent.set(studentId, t);
+        };
+        (sessions || []).forEach(s => bump(s.student_id, s.scheduled_at));
+        (messages || []).forEach(m => bump(m.student_id, m.created_at));
+        (checkins || []).forEach(c => bump(c.student_id, c.created_at));
+        const now = Date.now();
+        healthByStudent = new Map(activeStudentIds.map(id => {
+          const latest = latestByStudent.get(id);
+          if (!latest) return [id, 'red'];
+          const days = (now - latest) / 86400000;
+          return [id, days <= 14 ? 'green' : days <= 30 ? 'amber' : 'red'];
+        }));
+      }
+      const assignmentsWithHealth = (assignments || []).map(a => ({ ...a, health: healthByStudent.get(a.student_id) || 'red' }));
 
       const assignedStudentIds = new Set((assignments || []).map(a => a.student_id));
       // Picker reads mentor_applications (service-role-only writes), not
@@ -86,7 +121,7 @@ exports.handler = async (event) => {
           mentor_name: assignmentByStudent.get(u.id)?.mentor_name || null,
         }));
 
-      return { statusCode: 200, body: JSON.stringify({ mentors, unassignedMentees, allMentees, activeAssignments: assignments || [] }) };
+      return { statusCode: 200, body: JSON.stringify({ mentors, unassignedMentees, allMentees, activeAssignments: assignmentsWithHealth }) };
     }
 
     if (action === 'assign') {
@@ -116,9 +151,12 @@ exports.handler = async (event) => {
 
       // End any existing active assignment for this student first — the
       // unique index only stops two rows existing at once, it doesn't
-      // auto-close the old one.
+      // auto-close the old one. closure_reason is set automatically here
+      // (not admin-chosen) since this is a rematch, not the explicit
+      // "End Pairing" flow below — but it still records a real reason
+      // rather than leaving the column null.
       await admin.schema('mentorship').from('mentor_assignments')
-        .update({ status: 'ended', ended_at: new Date().toISOString() })
+        .update({ status: 'ended', ended_at: new Date().toISOString(), closure_reason: 'rematched' })
         .eq('student_id', studentId).eq('status', 'active');
 
       const { error: insertErr } = await admin.schema('mentorship').from('mentor_assignments').insert({
@@ -133,8 +171,22 @@ exports.handler = async (event) => {
 
     if (action === 'end') {
       if (!assignmentId) return { statusCode: 400, body: JSON.stringify({ error: 'Missing assignmentId' }) };
+      // Real gate, from the "Twelve Months" research: every closure
+      // standard studied (BBBS's Matchforce, MENTOR's EEPM Element 12)
+      // treats ending a match well as its own practice, not a silent
+      // status flip — an unplanned/unexplained ending is the actual
+      // mechanism of harm to the mentee, not just short duration alone.
+      if (!closureReason || !VALID_CLOSURE_REASONS.includes(closureReason)) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'A closure reason is required to end a pairing.' }) };
+      }
       const { error: endErr } = await admin.schema('mentorship').from('mentor_assignments')
-        .update({ status: 'ended', ended_at: new Date().toISOString() })
+        .update({
+          status: 'ended',
+          ended_at: new Date().toISOString(),
+          closure_reason: closureReason,
+          closure_notes: closureNotes || null,
+          closure_meeting_held: !!closureMeetingHeld,
+        })
         .eq('id', assignmentId);
       if (endErr) return { statusCode: 500, body: JSON.stringify({ error: endErr.message }) };
       return { statusCode: 200, body: JSON.stringify({ ok: true }) };

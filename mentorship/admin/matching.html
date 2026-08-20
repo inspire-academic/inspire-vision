@@ -44,6 +44,18 @@
       border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #f4f6f9; font-family: inherit;
     }
     .assign-arrow { opacity: .4; font-size: 16px }
+    .health-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+    .health-green { background: rgba(34,197,94,.15); color: #86efac; }
+    .health-amber { background: rgba(217,119,6,.18); color: #fbbf24; }
+    .health-red { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .closure-form { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; gap: 10px; }
+    .closure-form select, .closure-form input[type="text"] {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.13);
+      border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #f4f6f9; font-family: inherit;
+    }
+    .closure-form label { font-size: 12px; display: flex; align-items: center; gap: 6px; color: rgba(244,246,249,.8); }
+    .closure-form-actions { display: flex; gap: 8px }
+    .closure-form-actions .admin-btn-cancel { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(244,246,249,.7) }
   </style>
 </head>
 <body class="admin-body">
@@ -66,6 +78,15 @@
     const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
     let sessionToken = null;
     let latestData = null;
+    const HEALTH_LABEL = { green: 'Active', amber: 'Quiet', red: 'At risk' };
+    const CLOSURE_REASONS = [
+      ['completed_term', 'Completed the commitment term'],
+      ['mentee_moved', 'Mentee moved on / left the programme'],
+      ['mentor_stepped_down', 'Mentor stepped down'],
+      ['not_a_good_fit', "Wasn't a good fit"],
+      ['safeguarding_concern', 'Safeguarding concern'],
+      ['other', 'Other'],
+    ];
 
     // See admin/index.html for why this button was added to every admin page.
     $('adminSignOutBtn')?.addEventListener('click', async () => {
@@ -118,9 +139,25 @@
                 <div class="assign-row" style="justify-content:space-between">
                   <div>
                     <div class="admin-app-name">${escapeHtml(a.mentor_name)} → ${escapeHtml(a.student_name)}</div>
-                    <div class="admin-app-email">Paired ${new Date(a.assigned_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                    <div class="admin-app-email">
+                      Paired ${new Date(a.assigned_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      · <span class="health-badge health-${a.health}">${HEALTH_LABEL[a.health] || a.health}</span>
+                      ${a.commitment_acknowledged_at ? '' : ' · <span class="health-badge" style="background:rgba(255,255,255,.08);color:rgba(244,246,249,.6)">Commitment not yet acknowledged</span>'}
+                    </div>
                   </div>
-                  <button class="admin-btn admin-btn-reject" data-action="end">End Pairing</button>
+                  <button class="admin-btn admin-btn-reject" data-action="toggleEnd">End Pairing</button>
+                </div>
+                <div class="closure-form" style="display:none">
+                  <select class="closure-reason">
+                    <option value="" disabled selected>Why is this pairing ending?</option>
+                    ${CLOSURE_REASONS.map(([v, label]) => `<option value="${v}">${label}</option>`).join('')}
+                  </select>
+                  <label><input type="checkbox" class="closure-meeting"> A closure conversation/meeting was held</label>
+                  <input type="text" class="closure-notes" placeholder="Notes (optional)">
+                  <div class="closure-form-actions">
+                    <button class="admin-btn admin-btn-reject" data-action="confirmEnd">Confirm End Pairing</button>
+                    <button class="admin-btn admin-btn-cancel" data-action="cancelEnd">Cancel</button>
+                  </div>
                 </div>
               </div>`).join('')
         }`;
@@ -167,15 +204,33 @@
             await reload();
             return;
           }
-          const endBtn = e.target.closest('button[data-action="end"]');
-          if (endBtn) {
-            const card = endBtn.closest('.admin-app-card');
+          const toggleBtn = e.target.closest('button[data-action="toggleEnd"]');
+          if (toggleBtn) {
+            const form = toggleBtn.closest('.admin-app-card').querySelector('.closure-form');
+            form.style.display = form.style.display === 'none' ? '' : 'none';
+            return;
+          }
+          const cancelBtn = e.target.closest('button[data-action="cancelEnd"]');
+          if (cancelBtn) {
+            cancelBtn.closest('.closure-form').style.display = 'none';
+            return;
+          }
+          const confirmBtn = e.target.closest('button[data-action="confirmEnd"]');
+          if (confirmBtn) {
+            const card = confirmBtn.closest('.admin-app-card');
             const assignmentId = card.dataset.id;
-            endBtn.disabled = true; endBtn.textContent = 'Ending…';
-            const { status, data } = await callAdminFn({ action: 'end', assignmentId });
+            const closureReason = card.querySelector('.closure-reason').value;
+            if (!closureReason) {
+              alert('Please choose a reason before ending this pairing.');
+              return;
+            }
+            const closureMeetingHeld = card.querySelector('.closure-meeting').checked;
+            const closureNotes = card.querySelector('.closure-notes').value.trim();
+            confirmBtn.disabled = true; confirmBtn.textContent = 'Ending…';
+            const { status, data } = await callAdminFn({ action: 'end', assignmentId, closureReason, closureMeetingHeld, closureNotes });
             if (status !== 200) {
               alert(data.error || 'Could not end this pairing — please try again.');
-              endBtn.disabled = false; endBtn.textContent = 'End Pairing';
+              confirmBtn.disabled = false; confirmBtn.textContent = 'Confirm End Pairing';
               return;
             }
             await reload();
