@@ -1,0 +1,136 @@
+<title>Outreach Target List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#1b1e24; --ink-soft:#4b4f58; --paper:#eeece5; --paper-raised:#f7f5f0; --line:#cfcabd; --line-soft:#ddd9cd;
+  --brass:#9a6a2c; --brass-strong:#7d5420; --brass-tint:#f0e2cc;
+  --tier1:#7d5420; --tier1-tint:#f0e2cc;
+  --tier2:#3f6b4f; --tier2-tint:#dfe9e1;
+  --tier3:#3c5a78; --tier3-tint:#dce6ee;
+  --status-open:#a4491f; --status-open-tint:#f3ddd0;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --ink:#ece7dc; --ink-soft:#b7b0a0; --paper:#16181c; --paper-raised:#1e2126; --line:#37383c; --line-soft:#2b2d31;
+    --brass:#d3a25c; --brass-strong:#e7b96f; --brass-tint:#33291b;
+    --tier1:#e7b96f; --tier1-tint:#332a1a;
+    --tier2:#8fc4a2; --tier2-tint:#1c2b21;
+    --tier3:#8fb2d6; --tier3-tint:#1b2530;
+    --status-open:#e08a5c; --status-open-tint:#33221a;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#ece7dc; --ink-soft:#b7b0a0; --paper:#16181c; --paper-raised:#1e2126; --line:#37383c; --line-soft:#2b2d31;
+  --brass:#d3a25c; --brass-strong:#e7b96f; --brass-tint:#33291b;
+  --tier1:#e7b96f; --tier1-tint:#332a1a;
+  --tier2:#8fc4a2; --tier2-tint:#1c2b21;
+  --tier3:#8fb2d6; --tier3-tint:#1b2530;
+  --status-open:#e08a5c; --status-open-tint:#33221a;
+}
+*{box-sizing:border-box;}
+body{ margin:0; background:var(--paper); color:var(--ink); font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif; font-size:16px; line-height:1.55; }
+.wrap{ max-width:920px; margin:0 auto; padding:52px 26px 90px; }
+.eyebrow{ font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--brass-strong); margin-bottom:16px; }
+h1{ font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:2.2rem; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance; }
+.dek{ color:var(--ink-soft); max-width:64ch; margin:0 0 10px; font-size:16.5px; }
+.howto{
+  background:var(--paper-raised); border:1px solid var(--line-soft); border-radius:10px;
+  padding:16px 20px; margin:24px 0 40px; font-size:14.5px; color:var(--ink-soft);
+}
+.howto b{ color:var(--ink); }
+h2.tier-head{
+  display:flex; align-items:center; gap:12px; margin:44px 0 6px;
+  font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:1.3rem;
+}
+.tier-pill{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+  padding:3px 10px; border-radius:999px; font-weight:600;
+}
+.tier-pill.t1{ background:var(--tier1-tint); color:var(--tier1); }
+.tier-pill.t2{ background:var(--tier2-tint); color:var(--tier2); }
+.tier-pill.t3{ background:var(--tier3-tint); color:var(--tier3); }
+.tier-note{ color:var(--ink-soft); font-size:14.5px; margin:0 0 18px; max-width:68ch; }
+
+.table-scroll{ overflow-x:auto; border:1px solid var(--line-soft); border-radius:10px; }
+table{ width:100%; border-collapse:collapse; min-width:720px; background:var(--paper-raised); }
+th,td{ text-align:left; padding:11px 14px; border-bottom:1px solid var(--line-soft); font-size:14px; vertical-align:top; }
+th{ font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; background:transparent; }
+tr:last-child td{ border-bottom:none; }
+td.org{ font-weight:600; color:var(--ink); }
+td.why{ color:var(--ink-soft); }
+.status{
+  display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.04em;
+  padding:2px 9px; border-radius:999px; background:var(--status-open-tint); color:var(--status-open); white-space:nowrap;
+}
+a.src{ font-size:12px; color:var(--brass-strong); }
+
+footer.notes{ margin-top:60px; padding-top:20px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-soft); }
+footer.notes ul{ padding-left:1.2em; }
+footer.notes li{ margin-bottom:6px; }
+
+@media (max-width:560px){ .wrap{ padding:40px 18px 70px; } }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Outreach Target List — working draft, 22 Aug 2026</div>
+  <h1>Who we call first</h1>
+  <p class="dek">Real, publicly-verifiable UK organisations, sorted by how much of the £10k/month ladder one relationship can carry. Not a finished contact database — a starting map to work from.</p>
+
+  <div class="howto">
+    <b>How to use this:</b> Tier 1 is where the umbrella licence deals live — one conversation can be worth £2,000+/month. Tier 2 is national-scale, some as direct customers, some as distribution partners who reach hundreds of smaller groups at once. Tier 3 is the training-course track — faster, smaller, higher-volume, and grows organically out of every Tier 1/2 conversation rather than being cold-listed in advance. Every contact route below is publicly published; none are guessed or invented — verify current details before reaching out, since staff and inboxes change.
+  </div>
+
+  <h2 class="tier-head"><span class="tier-pill t1">Tier 1</span>Diocese &amp; network anchors</h2>
+  <p class="tier-note">The umbrella-licence targets — one deal here can outweigh ten individual church licences.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Organisation</th><th>Why it fits</th><th>Contact route</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="org">Diocese of Gloucester</td><td class="why">Already runs a free mentoring service for girls &amp; young women — a warm lead, not a cold pitch. They've already decided mentoring matters; the conversation is about doing it with better instrumentation.</td><td><a class="src" href="https://gloucester.anglican.org/2022/free-mentoring-service-for-girls-and-young-women/">gloucester.anglican.org</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Diocese of London — Children, Young People &amp; Families team</td><td class="why">Runs "Compassionate Communities" mentoring schemes and an active CYPF team with a published contact inbox.</td><td>cypf@london.anglican.org</td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Diocese of East Anglia — Ignite Team (Catholic)</td><td class="why">A dedicated youth team that already visits parishes/schools; a published, active inbox.</td><td>igniteteam@rcdea.org.uk</td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Diocese of Nottingham Youth Service</td><td class="why">Sends a professional youth-ministry team into parishes/schools plus a residential centre (The Briars) — an existing operational youth infrastructure to plug into.</td><td><a class="src" href="https://www.dioceseofnottingham.uk/departments/youth-service">dioceseofnottingham.uk</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Southwark Catholic Youth Service</td><td class="why">Archdiocese-wide youth service already running local parish groups and residential/Mission Team activity across a large Archdiocese.</td><td><a class="src" href="https://scys.org.uk/">scys.org.uk</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Diocese of Arundel &amp; Brighton — Youth Service</td><td class="why">Runs its own Youth Ministry Training Programme already — a natural fit to layer a mentoring platform underneath existing ministry training.</td><td><a class="src" href="https://www.abdiocese.org.uk/formation/youth-service">abdiocese.org.uk</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Methodist Church — Children, Youth &amp; Family Ministry (national)</td><td class="why">Central national office overseeing circuit-level youth work UK-wide; a single relationship here opens many circuits.</td><td><a class="src" href="https://www.methodist.org.uk/for-churches/ministries/children-youth-family-ministry/">methodist.org.uk</a></td><td><span class="status">Not contacted</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 class="tier-head"><span class="tier-pill t2">Tier 2</span>National youth-mentoring charities</h2>
+  <p class="tier-note">Larger, sector-facing organisations — some are potential direct customers for smaller programme cohorts, others (marked) are better approached as distribution or referral partners than as buyers.</p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Organisation</th><th>Why it fits</th><th>Contact route</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="org">Ambition (formerly Clubs for Young People)</td><td class="why">Membership body for ~3,500 youth organisations across the UK — <strong>distribution partner</strong>, not a direct buyer: one relationship could introduce Inspire to a huge number of Tier-3 targets at once.</td><td><a class="src" href="https://en.wikipedia.org/wiki/Ambition_(charity)">via national directory</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Mentoring Plus (Bath &amp; NE Somerset)</td><td class="why">Independent mentoring charity, ages 5–25, facing exactly the "keep a match alive past three months" problem this platform is built around.</td><td><a class="src" href="https://mentoringplus.net/">mentoringplus.net</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">London Youth — Mentoring Support Programme</td><td class="why">Federation of London youth clubs running its own mentoring support programme; regional scale, real budget line already earmarked for mentoring.</td><td><a class="src" href="https://londonyouth.org/mentoring-support-programme/">londonyouth.org</a></td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">Theos6 / Mentoring XLM (East Devon)</td><td class="why">A live example of the exact target profile: six denominations already co-running a volunteer mentoring project with trained mentors, no software layer yet.</td><td>via diocesan/circuit contact</td><td><span class="status">Not contacted</span></td></tr>
+      <tr><td class="org">National Youth Agency (NYA)</td><td class="why"><strong>Sector body</strong>, not a buyer — best approached for endorsement/standards alignment, which strengthens every Tier 1 conversation.</td><td><a class="src" href="https://en.wikipedia.org/wiki/National_Youth_Agency">nya.org.uk</a></td><td><span class="status">Not contacted</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 class="tier-head"><span class="tier-pill t3">Tier 3</span>Individual churches &amp; circuits</h2>
+  <p class="tier-note">The training-course track. There are thousands of these — not worth enumerating cold. This tier fills itself in as a byproduct of every Tier 1/2 conversation (a diocese or national body can point straight at its own affiliated parishes/circuits), so the working list starts empty on purpose and grows from real referrals, not a cold list.</p>
+
+  <footer class="notes">
+    Sources consulted for this list —
+    <ul>
+      <li><a href="https://gloucester.anglican.org/2022/free-mentoring-service-for-girls-and-young-women/">Diocese of Gloucester mentoring service</a></li>
+      <li><a href="https://www.london.anglican.org/church-and-parish-support/children-and-youth-ministry/">Diocese of London CYPF</a></li>
+      <li><a href="https://www.rcdea.org.uk/youth/">Diocese of East Anglia Youth Ministry</a></li>
+      <li><a href="https://www.dioceseofnottingham.uk/departments/youth-service">Diocese of Nottingham Youth Service</a></li>
+      <li><a href="https://scys.org.uk/">Southwark Catholic Youth Service</a></li>
+      <li><a href="https://www.abdiocese.org.uk/formation/youth-service">Diocese of Arundel &amp; Brighton Youth Service</a></li>
+      <li><a href="https://www.methodist.org.uk/for-churches/ministries/children-youth-family-ministry/">Methodist Church Children, Youth &amp; Family Ministry</a></li>
+      <li><a href="https://mentoringplus.net/">Mentoring Plus</a></li>
+      <li><a href="https://londonyouth.org/mentoring-support-programme/">London Youth Mentoring Support Programme</a></li>
+    </ul>
+    None of the contact details above are personal names — they're published organisational routes. Confirm each is still current before sending anything.
+  </footer>
+</div>

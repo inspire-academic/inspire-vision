@@ -1,0 +1,81 @@
+<title>Ready to Mentor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#1b1e24; --ink-soft:#4b4f58; --paper:#eeece5; --paper-raised:#f7f5f0; --line:#cfcabd; --line-soft:#ddd9cd;
+  --brass:#9a6a2c; --brass-strong:#7d5420; --brass-tint:#f0e2cc;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --ink:#ece7dc; --ink-soft:#b7b0a0; --paper:#16181c; --paper-raised:#1e2126; --line:#37383c; --line-soft:#2b2d31;
+    --brass:#d3a25c; --brass-strong:#e7b96f; --brass-tint:#33291b;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#ece7dc; --ink-soft:#b7b0a0; --paper:#16181c; --paper-raised:#1e2126; --line:#37383c; --line-soft:#2b2d31;
+  --brass:#d3a25c; --brass-strong:#e7b96f; --brass-tint:#33291b;
+}
+*{box-sizing:border-box;}
+body{ margin:0; background:var(--paper); color:var(--ink); font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif; font-size:16.5px; line-height:1.6; }
+.wrap{ max-width:760px; margin:0 auto; padding:56px 26px 90px; }
+.eyebrow{ font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--brass-strong); margin-bottom:16px; }
+h1{ font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:2.6rem; margin:0 0 16px; letter-spacing:-.01em; text-wrap:balance; }
+.dek{ color:var(--ink-soft); max-width:56ch; font-size:18px; margin:0 0 30px; }
+.price-row{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:36px; }
+.pcard{ border:1px solid var(--line-soft); background:var(--paper-raised); border-radius:10px; padding:18px 20px; flex:1; min-width:200px; }
+.pcard .tier{ font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); }
+.pcard .amt{ font-family:"Fraunces",serif; font-weight:600; font-size:1.7rem; margin:4px 0; }
+.pcard .amt span{ font-size:.8rem; font-weight:400; color:var(--ink-soft); }
+.pcard p{ font-size:13.5px; color:var(--ink-soft); margin:6px 0 0; }
+h2{ font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:1.3rem; margin:38px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line-soft); }
+.module{ display:grid; grid-template-columns:44px 1fr; gap:16px; padding:16px 0; border-bottom:1px solid var(--line-soft); }
+.module:last-child{ border-bottom:none; }
+.module .n{ font-family:"IBM Plex Mono",monospace; color:var(--brass); font-size:1.1rem; font-weight:600; }
+.module h3{ font-family:"Fraunces",serif; font-weight:600; font-size:1.05rem; margin:0 0 6px; }
+.module p{ margin:0; color:var(--ink-soft); font-size:15px; }
+.list{ padding-left:1.3em; margin:0 0 10px; }
+.list li{ margin-bottom:8px; }
+.note{
+  background:var(--brass-tint); border-radius:8px; padding:16px 18px; margin:22px 0; font-size:14.5px;
+}
+.note b{ display:block; font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--brass-strong); margin-bottom:6px; }
+footer{ margin-top:50px; padding-top:20px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-soft); }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Standalone CPD Course — Draft Packaging</div>
+  <h1>Ready to Mentor</h1>
+  <p class="dek">A short, safeguarding-first training course for anyone about to mentor a young person — built from the same curriculum that already gates mentor approval on the Inspire platform, sold on its own to churches and youth organisations who aren't ready to adopt the whole system yet.</p>
+
+  <div class="price-row">
+    <div class="pcard"><div class="tier">Individual</div><div class="amt">£35<span> one-time</span></div><p>Self-paced, five modules, certificate of completion.</p></div>
+    <div class="pcard"><div class="tier">Organisation (unlimited staff)</div><div class="amt">£350<span> one-time</span></div><p>One licence, every mentor/volunteer at that organisation, progress visible to their coordinator.</p></div>
+  </div>
+
+  <h2>Who it's for</h2>
+  <p>Church youth leaders, volunteer mentors, and small charities running a mentoring or pastoral-care relationship with a young person — anyone who wants to do it properly but has no budget or readiness yet for a full platform.</p>
+
+  <h2>The five modules</h2>
+  <div class="module"><div class="n">01</div><div><h3>Safeguarding Basics</h3><p>Why every conversation with a young person needs a record, how to respond calmly to a disclosure, and the one rule that matters most: when in doubt, raise it.</p></div></div>
+  <div class="module"><div class="n">02</div><div><h3>Active Listening</h3><p>The most common mistake a well-meaning mentor makes is rushing to fix. How to reflect back, ask open questions, and get comfortable with silence.</p></div></div>
+  <div class="module"><div class="n">03</div><div><h3>Boundaries &amp; Consistency</h3><p>For a young person who has already lived through inconsistent adults, reliability is the intervention. Where a mentor's role ends and a referral should begin.</p></div></div>
+  <div class="module"><div class="n">04</div><div><h3>Using a Platform Well</h3><p>(Adapted per buyer.) Practical habits for logging sessions and keeping useful private notes, whatever tool the organisation uses.</p></div></div>
+  <div class="module"><div class="n">05</div><div><h3>Ask, Don't Tell</h3><p>Why the instinct to hand over a solution the moment you spot one is almost always the wrong move — and the four questions that make a young person do the thinking instead.</p></div></div>
+
+  <div class="note">
+    <b>What still needs building</b>
+    This packaging is ready to sell from — the content already exists and works inside the platform's mentor onboarding. What doesn't exist yet is a standalone way to buy and access it without becoming a full platform mentor: a simple checkout, and an access path that unlocks just the training modules. That's a small, well-scoped build, not a redesign — worth doing once the pricing and positioning above are confirmed.
+  </div>
+
+  <h2>Why this exists</h2>
+  <ul class="list">
+    <li>Lower price, lower friction, much faster to close than a platform licence — a real revenue line while bigger conversations mature.</li>
+    <li>Every buyer is a warm lead into the full platform — an organisation that pays for mentor training has already told us mentoring quality matters to them.</li>
+    <li>It's genuinely useful on its own, independent of any sales motive — the same reason it was built as a real training gate inside the platform in the first place.</li>
+  </ul>
+
+  <footer>Draft for review — pricing and module 4's "platform" framing should be confirmed before this becomes a live sales page.</footer>
+</div>
