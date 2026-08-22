@@ -1,0 +1,386 @@
+<title>Twelve Months</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F4F8;
+    --surface: #FFFFFF;
+    --surface-2: #E7EBF2;
+    --text: #101B2E;
+    --text-dim: #52596B;
+    --text-faint: #7B8296;
+    --border: #D7DCE6;
+    --navy: #0A1628;
+    --gold: #B85C1A;
+    --gold-bright: #D97706;
+    --gold-wash: rgba(184,92,26,.08);
+    --risk: #B4232F;
+    --risk-wash: rgba(180,35,47,.08);
+    --risk-wash-strong: rgba(180,35,47,.12);
+    --tier-1: #7A6A9E;
+    --tier-2: #2E7D6B;
+    --tier-3: #3B5A8C;
+    --tier-4: #8A6D1F;
+    --shadow: 0 1px 2px rgba(16,27,46,.06), 0 8px 24px -12px rgba(16,27,46,.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A1628; --surface: #101E33; --surface-2: #17273F;
+      --text: #F4F6F9; --text-dim: #AEB8C9; --text-faint: #7C879C;
+      --border: rgba(255,255,255,.12); --navy: #0A1628;
+      --gold: #D97706; --gold-bright: #F0A438; --gold-wash: rgba(217,119,6,.12);
+      --risk: #F0616D; --risk-wash: rgba(240,97,109,.14); --risk-wash-strong: rgba(240,97,109,.2);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A1628; --surface: #101E33; --surface-2: #17273F;
+    --text: #F4F6F9; --text-dim: #AEB8C9; --text-faint: #7C879C;
+    --border: rgba(255,255,255,.12); --navy: #0A1628;
+    --gold: #D97706; --gold-bright: #F0A438; --gold-wash: rgba(217,119,6,.12);
+    --risk: #F0616D; --risk-wash: rgba(240,97,109,.14); --risk-wash-strong: rgba(240,97,109,.2);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 64px 24px 110px; }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; margin: 0; }
+  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  a { color: var(--gold); }
+
+  .masthead { padding-bottom: 36px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  h1.title { font-size: clamp(40px, 7vw, 64px); font-weight: 600; font-optical-sizing: auto; max-width: 10ch; }
+  .dek { font-size: 18px; color: var(--text-dim); max-width: 58ch; margin-top: 18px; line-height: 1.6; }
+  .meta { margin-top: 22px; font-size: 12.5px; color: var(--text-faint); display: flex; gap: 18px; flex-wrap: wrap; }
+
+  section { margin-top: 60px; }
+  h2.section-title { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .section-dek { color: var(--text-dim); font-size: 15px; max-width: 64ch; margin-bottom: 26px; }
+
+  /* the finding */
+  .finding {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 34px 36px; box-shadow: var(--shadow);
+  }
+  .finding-stat { display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 22px; }
+  .finding-num { font-family: 'Fraunces', serif; font-weight: 700; }
+  .finding-num .big { font-size: 44px; display: block; line-height: 1; color: var(--risk); }
+  .finding-num .lbl { font-size: 12.5px; font-weight: 600; color: var(--text-faint); font-family: 'Plus Jakarta Sans'; text-transform: uppercase; letter-spacing: .05em; }
+  .finding-quote { font-family: 'Fraunces', serif; font-size: clamp(19px, 2.4vw, 23px); font-weight: 500; line-height: 1.5; max-width: 46ch; text-wrap: balance; margin-bottom: 14px; }
+  .finding-cite { font-size: 13px; color: var(--text-faint); }
+
+  /* non-negotiables */
+  .nn-card {
+    background: var(--risk-wash); border: 1px solid var(--risk-wash-strong); border-left: 3px solid var(--risk);
+    border-radius: 10px; padding: 20px 22px; margin-bottom: 12px;
+  }
+  .nn-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 16.5px; margin-bottom: 6px; }
+  .nn-why { font-size: 14px; color: var(--text-dim); margin-bottom: 10px; }
+  .nn-meta { font-size: 12px; color: var(--text-faint); display: flex; flex-direction: column; gap: 4px; }
+  .nn-meta .k { font-weight: 700; }
+
+  /* tiers */
+  .tier { margin-bottom: 46px; }
+  .tier-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .tier-when { font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; white-space: nowrap; }
+  .tier-name { font-size: 20px; font-weight: 600; }
+  .tier-rationale { color: var(--text-dim); font-size: 14.5px; max-width: 62ch; margin: 8px 0 20px; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 680px) { .cards { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; box-shadow: var(--shadow); border-top: 3px solid var(--tier-c, var(--gold)); }
+  .card-name { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 16.5px; margin-bottom: 7px; }
+  .card-pitch { font-size: 13.5px; color: var(--text-dim); margin-bottom: 13px; }
+  .card-meta { font-size: 12.5px; color: var(--text-faint); display: flex; flex-direction: column; gap: 5px; }
+  .card-meta .k { font-weight: 700; color: var(--text-dim); }
+  .card-meta code { font-size: 11.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  /* avoid */
+  .avoid-card { display: flex; gap: 14px; align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .avoid-card:last-child { border-bottom: none; }
+  .avoid-x { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--risk); flex-shrink: 0; width: 24px; }
+  .avoid-name { font-weight: 700; font-size: 14.5px; margin-bottom: 3px; }
+  .avoid-why { font-size: 13.5px; color: var(--text-dim); }
+
+  /* framework map table */
+  .fw-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .fw-table th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); padding: 0 14px 10px 0; border-bottom: 1px solid var(--border); }
+  .fw-table td { padding: 14px 14px 14px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .fw-table tr:last-child td { border-bottom: none; }
+  .fw-domain { font-weight: 700; font-family: 'Fraunces', serif; }
+  .fw-framework { color: var(--gold); font-weight: 600; white-space: nowrap; }
+  .table-scroll { overflow-x: auto; }
+
+  /* closing */
+  .closing { margin-top: 60px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 30px 32px; box-shadow: var(--shadow); }
+  .closing h2 { font-size: 19px; font-weight: 600; margin-bottom: 12px; }
+  .closing p { font-size: 14.5px; color: var(--text-dim); max-width: 66ch; }
+  .closing p + p { margin-top: 12px; }
+  .closing b { color: var(--text); }
+
+  /* sources */
+  .sources { margin-top: 56px; }
+  .src-group { margin-bottom: 20px; }
+  .src-group-label { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+  .src-list { font-size: 12.5px; color: var(--text-faint); line-height: 1.9; }
+  .src-list a { color: var(--text-dim); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; }
+  .src-list a:hover { color: var(--gold); text-decoration-color: var(--gold); }
+
+  ::selection { background: var(--gold-wash); }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="eyebrow">Inspire Mentorship — Five-Thread Research Synthesis</div>
+    <h1 class="title">Twelve Months</h1>
+    <div class="dek">
+      Five parallel research agents spent this session studying how the world's best mentoring
+      programmes — nonprofit, professional, faith-based, academic, and software — actually operate.
+      They converged, independently, on the same uncomfortable finding: the thing that determines
+      whether mentoring changes a young person's life isn't the app, the curriculum, or the badges.
+      It's whether the relationship survives long enough to matter, and how well it ends if it doesn't.
+      Everything below is organized around getting that right first.
+    </div>
+    <div class="meta">
+      <span>Synthesized 2026-08-20</span>
+      <span>5 agents · 68 tool calls · 25+ named organizations and studies</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="finding">
+      <div class="finding-stat">
+        <div class="finding-num"><span class="big">~3 mo</span><span class="lbl">match dies → measurable harm</span></div>
+        <div class="finding-num"><span class="big">12 mo</span><span class="lbl">threshold where real gains appear</span></div>
+        <div class="finding-num"><span class="big">1,138</span><span class="lbl">youth in the study</span></div>
+      </div>
+      <div class="finding-quote">A youth mentoring match that ends within about three months leaves that young person measurably worse off — in scholastic competence and self-worth — than if they'd never been matched with a mentor at all.</div>
+      <div class="finding-cite">Grossman &amp; Rhodes, "The Test of Time: Predictors and Effects of Duration in Youth Mentoring Relationships," <i>American Journal of Community Psychology</i>, 2002 — a randomized study of 1,138 Big Brothers Big Sisters youth. Matches lasting 12+ months showed the broadest, largest gains; the youth most likely to end up in a short-lived match (older, referred rather than self-selected, with histories of abuse) are statistically the most vulnerable to this harm.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Non-negotiables</h2>
+    <div class="section-dek">Four things every research thread this session converged on independently — not aspirational, not nice-to-have. Getting these wrong doesn't just underperform, it can actively hurt the young people Inspire Mentorship exists to serve.</div>
+
+    <div class="nn-card">
+      <div class="nn-name">A real minimum-commitment policy before matching</div>
+      <div class="nn-why">Mentors (and guardians) explicitly agree to roughly a year — the threshold below which Grossman &amp; Rhodes found harm outweighs benefit. Inspire Mentorship currently has no minimum-commitment policy at all; a pairing can end whenever, via a single "End Pairing" click in <code>admin/matching.html</code>.</div>
+      <div class="nn-meta"><span><span class="k">Backed by:</span> Grossman &amp; Rhodes 2002; MENTOR's Elements of Effective Practice (community-based: 1 calendar year, school-based: 1 academic year)</span></div>
+    </div>
+
+    <div class="nn-card">
+      <div class="nn-name">A structured closure process — not a silent fade-out</div>
+      <div class="nn-why">Every major standard treats "ending well" as its own formal practice area, because an abrupt, unplanned ending is the actual mechanism of harm — not duration by itself. BBBS requires a logged closure meeting, closure reason, and (where possible) a closure letter. MENTOR's EEPM dedicates a full element to "Relationship Celebration and Program Exit."</div>
+      <div class="nn-meta"><span><span class="k">Backed by:</span> BBBS Matchforce closure workflow; MENTOR EEPM Element 12; Kupersmidt et al. on predictors of premature match closure</span></div>
+    </div>
+
+    <div class="nn-card">
+      <div class="nn-name">Mid-relationship health checks that can trigger intervention</div>
+      <div class="nn-why">Inspire has plenty of activity data already — sessions logged, check-ins, goals — but nothing that flags a quietly-failing pairing before it collapses. EEPM's benchmark is contact with a responsible adult at least twice in the first month, then monthly, checking specifically for safety, relationship quality, and perceived impact — a script, not an ad hoc glance.</div>
+      <div class="nn-meta"><span><span class="k">Backed by:</span> MENTOR EEPM Standard 5 (Monitoring &amp; Support); Together Platform's "match health monitor" pattern in production mentoring software</span></div>
+    </div>
+
+    <div class="nn-card">
+      <div class="nn-name">Mentor training at or above the ~6-hour best-practice bar, pre-match</div>
+      <div class="nn-why">EEPM's baseline is 2 hours minimum; 6+ hours is cited as the promising/best-practice threshold. Training quality and duration are directly correlated with match length in field studies — the exact lever this session's pilot mentor-training gate already pulls, just not yet at this depth.</div>
+      <div class="nn-meta"><span><span class="k">Backed by:</span> MENTOR EEPM Element 3; IRT Inc. adherence study linking training quality to match length; ICF/Google g2g on what training content should actually cover</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">The roadmap</h2>
+    <div class="section-dek">Four tiers, each building on the last. The non-negotiables above are the floor everything else stands on — nothing in these tiers substitutes for them.</div>
+
+    <div class="tier">
+      <div class="tier-head">
+        <span class="tier-when" style="background:color-mix(in srgb, var(--tier-1) 16%, transparent); color:var(--tier-1)">First — Structure the relationship</span>
+        <span class="tier-name">Make every session count, not just log it</span>
+      </div>
+      <div class="tier-rationale">Right now a session is a date and a status. The professional-coaching world's entire discipline is about what happens inside the hour — Inspire's session notes are private and mentor-only, with nothing forcing rigor.</div>
+      <div class="cards">
+        <div class="card" style="--tier-c:var(--tier-1)">
+          <div class="card-name">A GROW-based session template</div>
+          <div class="card-pitch">Four required fields on every session note — the mentee's goal for this session, current reality/obstacles, options discussed, and a committed next action with a date — instead of a blank text box.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> Sir John Whitmore's GROW model; ICF's core coaching competencies; Together Platform's published agenda template</span><span><span class="k">Builds on:</span> <code>mentor-portal/session-notes.html</code></span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-1)">
+          <div class="card-name">"Review last commitment" auto-carry</div>
+          <div class="card-pitch">A new session note auto-populates the previous session's "next action" before the mentor can write anything new — sessions open by revisiting what was promised, never starting cold.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> universal practice across Together Platform, Google g2g, and OSKAR's "Review" step</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-1)">
+          <div class="card-name">A coaching-technique training module</div>
+          <div class="card-pitch">A fifth module for the mentor training course, separate from safeguarding — active listening, powerful/open questions, and explicitly not giving advice in the first five minutes.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> ICF Core Competencies; Google g2g's "solution empowerment" training; Chronus Institute's communication-skills course</span><span><span class="k">Builds on:</span> the 4-module course shipped this session</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-1)">
+          <div class="card-name">REAL goals, not SMART, for character growth</div>
+          <div class="card-pitch">Re-frame <code>goals.html</code> around Relevant, Experimental, Aspirational, Learning-based goals for character/identity domains — SMART's rigid "Measurable" distorts goals like "grow in resilience."</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> MentorcliQ's explicit REAL-vs-SMART guidance for developmental mentoring</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier">
+      <div class="tier-head">
+        <span class="tier-when" style="background:color-mix(in srgb, var(--tier-2) 16%, transparent); color:var(--tier-2)">Then — Measure what's real</span>
+        <span class="tier-name">Know if it's actually working, before it's too late to fix</span>
+      </div>
+      <div class="tier-rationale">Inspire tracks a lot of raw activity and zero validated outcome or relationship-quality data. This is the tier that lets the platform honestly answer "is this working" instead of assuming it.</div>
+      <div class="cards">
+        <div class="card" style="--tier-c:var(--tier-2)">
+          <div class="card-name">A match-health traffic light</div>
+          <div class="card-pitch">A Postgres view computing days-since-last-session, -message, and -check-in per pairing, rendered as a green/amber/red badge on <code>admin/matching.html</code> — the single highest-leverage admin feature found across every platform studied.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> Together Platform's "health monitor"; MentorcliQ's outcome-tied dashboards</span><span><span class="k">Builds on:</span> existing <code>sessions</code>, <code>messages</code>, <code>check_ins</code> tables — no new infrastructure</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-2)">
+          <div class="card-name">A quarterly two-sided relationship-quality pulse</div>
+          <div class="card-pitch">A short survey both mentor and mentee take — trust, closeness, consistency — modelled loosely on the field's validated Strength of Relationship scales, feeding <code>admin/reports.html</code> as a trend, not a one-off.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> Rhodes's Youth/Mentor Strength of Relationship (SOR) scales, normed on 5,222 BBBS dyads</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-2)">
+          <div class="card-name">One validated outcome instrument</div>
+          <div class="card-pitch">Adopt a short, real instrument at intake/3-month/6-month — e.g. the EPOCH Measure of Adolescent Well-Being or the PALS Academic Efficacy subscale — instead of relying only on the self-rated Growth Compass.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> the OJJDP-funded National Mentoring Resource Center's Measurement Guidance Toolkit</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-2)">
+          <div class="card-name">An in-conversation 1-to-10 pulse question</div>
+          <div class="card-pitch">Mentors ask "where do you feel you are on this goal, 1-10, and what would move you one point?" at the start of a logged session — a two-second check that also becomes structured trend data for free.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> the OSKAR coaching model's "Scale" step</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier">
+      <div class="tier-head">
+        <span class="tier-when" style="background:color-mix(in srgb, var(--tier-3) 16%, transparent); color:var(--tier-3)">Next — Deepen the content</span>
+        <span class="tier-name">Give the other five domains what Character already has</span>
+      </div>
+      <div class="tier-rationale">The Character Growth Pathway shipped this session. Each remaining domain deserves its own real, named framework underneath it, rather than one framework stretched across all six — see the framework map below.</div>
+      <div class="cards">
+        <div class="card" style="--tier-c:var(--tier-3)">
+          <div class="card-name">A rising-sophistication lesson structure</div>
+          <div class="card-pitch">Each pathway returns to its core themes at greater depth across three tiers (early / mid / older teen) rather than being "finished" once — the same topic, more sophisticated each time.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> CASEL's developmental sequencing across grade bands</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-3)">
+          <div class="card-name">A shared-interest matching questionnaire</div>
+          <div class="card-pitch">A "Strength of Match" style score computed from the same Know Me / Strengths / Life Wheel data already collected at onboarding, surfaced as a ranked shortlist in <code>admin/matching.html</code> — human still decides.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> iMentor's Matching Preference questionnaire; Chronus's customizable MatchIQ; Mentorloop's transparent-reasoning match suggestions</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-3)">
+          <div class="card-name">Keep the pathway linear</div>
+          <div class="card-pitch">Resist the temptation to turn Growth Pathways into a branching "choose your own path" tree — Duolingo tried exactly that and reversed it in 2022 after it measurably hurt completion.</div>
+          <div class="card-meta"><span><span class="k">Evidence:</span> Duolingo's November 2022 branching-to-linear reversal</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier">
+      <div class="tier-head">
+        <span class="tier-when" style="background:color-mix(in srgb, var(--tier-4) 16%, transparent); color:var(--tier-4)">Longer term — Family &amp; community</span>
+        <span class="tier-name">The differentiator competitors can't copy</span>
+      </div>
+      <div class="tier-rationale">None of the commercial mentoring platforms studied need a guardian-facing view — they're built for adults mentoring adults. For a programme built around minors, that gap is Inspire's to own.</div>
+      <div class="cards">
+        <div class="card" style="--tier-c:var(--tier-4)">
+          <div class="card-name">A guardian progress portal</div>
+          <div class="card-pitch">A read-only view scoped to the existing guardian-consent relationship — sessions attended, goals met — without exposing a word of the private Journal. The single highest-ROI feature no competitor platform in this research offers.</div>
+          <div class="card-meta"><span><span class="k">Builds on:</span> <code>mentorship.guardian_consents</code>, already captured at signup</span></div>
+        </div>
+        <div class="card" style="--tier-c:var(--tier-4)">
+          <div class="card-name">Small, assignment-scoped group touchpoints</div>
+          <div class="card-pitch">Occasional cohort gatherings for mentees at the same pathway stage — not an open forum, a small non-searchable group reusing the same assignment-gated RLS pattern already proven for session notes and messages.</div>
+          <div class="card-meta"><span><span class="k">Modelled on:</span> Young Life &amp; Cru's 1:1-primary-with-periodic-group pattern</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">What the research says not to build</h2>
+    <div class="section-dek">Restraint is part of the playbook too — three places where the ambitious-sounding option is the wrong one right now.</div>
+
+    <div class="avoid-card">
+      <div class="avoid-x">✕</div>
+      <div>
+        <div class="avoid-name">An open peer community</div>
+        <div class="avoid-why">No commercial mentoring platform studied publishes a youth-safe community pattern — their "communities" are adult professional cohorts. Current research on protecting minors online is explicit that moderation alone, without age-verification and pre-publish moderation, isn't sufficient. Given minors in the system and no dedicated moderation team, an open or lightly-moderated feed isn't defensible right now — the "small, assignment-scoped group" above is the safer version of the same idea.</div>
+      </div>
+    </div>
+    <div class="avoid-card">
+      <div class="avoid-x">✕</div>
+      <div>
+        <div class="avoid-name">Full algorithmic auto-matching</div>
+        <div class="avoid-why">Every platform studied — even ones marketed as "AI matching" — keeps a human admin as the final decision-maker. This actually validates Inspire's current admin-approval matching model; it doesn't need an ML engine, just better inputs to the human decision.</div>
+      </div>
+    </div>
+    <div class="avoid-card">
+      <div class="avoid-x">✕</div>
+      <div>
+        <div class="avoid-name">Forcing SMART goals onto identity/character growth</div>
+        <div class="avoid-why">Rigid measurability is the wrong lens for goals like "grow in resilience" — it's why the REAL framework exists as a deliberate alternative for developmental, not transactional, mentoring.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Framework map for the next five pathways</h2>
+    <div class="section-dek">Character already draws on Character.org's principles. Each remaining Growth Compass domain gets its own best-fit framework, rather than one framework stretched thin across all six.</div>
+    <div class="table-scroll">
+      <table class="fw-table">
+        <thead><tr><th>Domain</th><th>Framework</th><th>Why this one</th></tr></thead>
+        <tbody>
+          <tr><td class="fw-domain">Emotional</td><td class="fw-framework">CASEL — self-awareness &amp; self-management</td><td>The field's most rigorously sequenced SEL framework; splits cleanly across Inspire's Emotional/Social pair.</td></tr>
+          <tr><td class="fw-domain">Social</td><td class="fw-framework">CASEL — social awareness, relationship skills, decision-making</td><td>Same framework, other three competencies — keeps the two domains coherent as one system.</td></tr>
+          <tr><td class="fw-domain">Spiritual</td><td class="fw-framework">Fuller Youth Institute's Sticky Faith</td><td>Its "5:1" adult-network idea and "doubt isn't toxic, silence is" principle translate to non-devotional reflection prompts — scripture content stays in the separate Faith module.</td></tr>
+          <tr><td class="fw-domain">Intellectual</td><td class="fw-framework">Search Institute — Commitment to Learning assets</td><td>Youth-development-native (achievement motivation, engagement, bonding to learning) rather than school-curriculum-native.</td></tr>
+          <tr><td class="fw-domain">Physical</td><td class="fw-framework">Search Institute — Boundaries &amp; Time-Use assets</td><td>The weakest-covered domain across every framework surveyed; borrowed structurally (sleep, screens, structured activity) rather than importing a fitness curriculum.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="closing">
+    <h2>Where this leaves the pilot already shipped</h2>
+    <p>The Character pathway and the real mentor-training gate built this session turn out to be exactly the right first move in hindsight — training quality is one of the few levers every research thread agreed predicts match length, and match length is the one number the whole evidence base says matters most. That's not a coincidence worth being smug about; it's a reason to keep the same discipline going into what's next.</p>
+    <p><b>If only one more thing gets built next, make it the minimum-commitment policy and closure process.</b> Everything else in this playbook — better sessions, better measurement, richer content, a guardian view — only compounds if the relationship survives long enough for any of it to matter. Twelve months, not features, is the actual product.</p>
+  </div>
+
+  <div class="sources">
+    <h2 class="section-title">Sources</h2>
+    <div class="src-group">
+      <div class="src-group-label">Duration &amp; evidence base</div>
+      <div class="src-list">
+        Grossman &amp; Rhodes, "The Test of Time" (2002), <i>AJCP</i> — <a href="https://onlinelibrary.wiley.com/doi/10.1023/A:1014680827552">Wiley</a> · DuBois et al. meta-analyses (2002, 2011) — <a href="https://onlinelibrary.wiley.com/doi/abs/10.1023/A:1014628810714">2002</a>, <a href="https://journals.sagepub.com/doi/10.1177/1529100611414806">2011</a> · Rhodes's mentoring-relationship model — <a href="https://onlinelibrary.wiley.com/doi/10.1002/jcop.20124">JCP 2006</a> · MENTOR's Elements of Effective Practice, 5th ed. — <a href="https://eepm.mentoring.org/">eepm.mentoring.org</a> · National Mentoring Resource Center Measurement Guidance Toolkit — <a href="https://nationalmentoringresourcecenter.org/resource/measurement-guidance-toolkit/">link</a>
+      </div>
+    </div>
+    <div class="src-group">
+      <div class="src-group-label">Nonprofit sector playbooks</div>
+      <div class="src-list">Big Brothers Big Sisters of America · iMentor · Communities In Schools (MDRC RCT) · UK's Foundations (formerly EIF, successor to the Mentoring &amp; Befriending Foundation)</div>
+    </div>
+    <div class="src-group">
+      <div class="src-group-label">Professional coaching methodology</div>
+      <div class="src-list">
+        Whitmore's GROW model — <a href="https://www.performanceconsultants.com/resources/the-grow-model/">Performance Consultants</a> · OSKAR model — <a href="https://www.mindtools.com/agrk092/the-oskar-coaching-framework/">Mindtools</a> · ICF Core Competencies — <a href="https://coachingfederation.org/credentialing/coaching-competencies/icf-core-competencies/">ICF</a> · Google's g2g peer-coaching program — <a href="https://rework.withgoogle.com/intl/en/guides/coaching-for-everyone-the-amplified-impact-of-peer-coaching">re:Work</a> · MentorcliQ on REAL vs. SMART goals — <a href="https://www.mentorcliq.com/blog/create-mentorship-goals-mentoring-programs">link</a>
+      </div>
+    </div>
+    <div class="src-group">
+      <div class="src-group-label">Faith &amp; character frameworks</div>
+      <div class="src-list">
+        Young Life's Head-Heart-Hands — <a href="https://discipleship.younglife.org/lessons-and-devos/head-heart-hands/">link</a> · Cru's Pathways — <a href="https://www.cru.org/us/en/train-and-grow/help-others-grow/collaborative-discipleship/pathways.html">link</a> · Fuller Youth Institute's Sticky Faith — <a href="https://fulleryouthinstitute.org/stickyfaith">link</a> · CASEL Framework — <a href="https://casel.org/fundamentals-of-sel/what-is-the-casel-framework/">link</a> · Character.org's 11 Principles — <a href="https://members.character.org/11-principles-framework">link</a> · Search Institute's 40 Developmental Assets — <a href="https://searchinstitute.org/developmental-assets">link</a> · Lerner's Five Cs of Positive Youth Development
+      </div>
+    </div>
+    <div class="src-group">
+      <div class="src-group-label">Platform &amp; product design</div>
+      <div class="src-list">
+        Chronus, Mentorloop, Together Platform, MentorcliQ, PushFar — vendor documentation · Duolingo's 2022 branching-to-linear reversal — <a href="https://medium.com/@salamprem49/duolingo-streak-system-detailed-breakdown-design-flow-886f591c953f">write-up</a> · Research on protecting minors online — <a href="https://arxiv.org/pdf/2502.06985">arXiv:2502.06985</a>
+      </div>
+    </div>
+  </div>
+
+</div>
