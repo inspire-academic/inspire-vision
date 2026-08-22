@@ -458,9 +458,10 @@
       // so a failure here just leaves a message showing "New" a bit longer.
       const unread = (data || []).filter(m => !m.read_at);
       if (unread.length) {
-        await Promise.all(unread.map(m =>
-          dbClient.schema('mentorship').rpc('mark_message_read', { message_id: m.id }).catch(() => {})
-        ));
+        await Promise.all(unread.map(async m => {
+          try { await dbClient.schema('mentorship').rpc('mark_message_read', { message_id: m.id }); }
+          catch (e) { /* best-effort — a message just shows "New" a bit longer */ }
+        }));
       }
     } catch (e) {
       console.warn('Load messages failed:', e);
