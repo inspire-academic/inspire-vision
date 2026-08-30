@@ -354,7 +354,7 @@
       <p class="hero-desc">Advancing knowledge through world-class education, discovery, and research that prepares minds to lead and innovate.</p>
       <div class="hero-btns">
         <a href="#programs" class="btn-primary">Explore Our Programs ↓</a>
-        <a href="#" class="btn-outline-white">
+        <a href="#" class="btn-outline-white" onclick="event.preventDefault(); openWatchStory();">
           <span style="width:28px;height:28px;border:1.5px solid currentColor;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
             <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><path d="M0 0l10 6-10 6V0z"/></svg>
           </span>
@@ -497,6 +497,7 @@
   </footer>
 
   <script src="assets/nav.js"></script>
+  <script src="assets/watch-story.js" defer></script>
   <script>
     renderNav('Our Pillars', [
       { label: 'Our Pillars', href: 'index.html#pillars' },

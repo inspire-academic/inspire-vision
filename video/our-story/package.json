@@ -1,0 +1,27 @@
+{
+  "name": "inspire-vision-our-story",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build-time-only Remotion project that renders the 'Our Story' brand film. Not part of the deployed static site.",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts OurStory out/our-story-master.mp4 --codec=h264 --crf=18",
+    "vo": "node scripts/generate-vo.mjs",
+    "bed": "node scripts/generate-bed.mjs",
+    "shield": "node scripts/prepare-shield.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.518",
+    "@remotion/google-fonts": "^4.0.518",
+    "@remotion/renderer": "^4.0.518",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.518"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "sharp": "^0.35.4",
+    "typescript": "^5.5.4"
+  }
+}

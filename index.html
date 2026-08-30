@@ -776,6 +776,7 @@
   <!-- NAV -->
   <div id="iv-nav"></div>
   <script src="assets/nav.js"></script>
+  <script src="assets/watch-story.js" defer></script>
   <script>
     renderNav();
     // Inject dropdown + Begin Your Journey btn after renderNav
@@ -829,7 +830,7 @@
       <p class="hero-desc">A movement dedicated to raising men and women of character, competence, wisdom, and purpose who will shape the future of their communities, nations, and the world.</p>
       <div class="hero-btns">
         <a href="#pillars" class="btn-primary">Explore the Vision →</a>
-        <a href="#" class="btn-outline-white">
+        <a href="#" class="btn-outline-white" onclick="event.preventDefault(); openWatchStory();">
           <span style="width:28px;height:28px;border:1.5px solid currentColor;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
             <svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><path d="M0 0l10 6-10 6V0z"/></svg>
           </span>
@@ -1047,7 +1048,7 @@
       </div>
       <div class="footer-col">
         <h4>About</h4>
-        <ul><li><a href="#">Our Story</a></li><li><a href="#">Our Team</a></li><li><a href="#">Our Values</a></li></ul>
+        <ul><li><a href="#" onclick="event.preventDefault(); openWatchStory();">Our Story</a></li><li><a href="#">Our Team</a></li><li><a href="#">Our Values</a></li></ul>
       </div>
       <div class="footer-col">
         <h4>Our Pillars</h4>
