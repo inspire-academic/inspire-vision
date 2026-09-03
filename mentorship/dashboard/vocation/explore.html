@@ -264,6 +264,11 @@
 
   function renderFamilies() {
     const list = $('familiesList');
+    // Reacting rebuilds the whole list (counts/chip states change per
+    // profile), which would otherwise silently collapse every open family
+    // section on each click — annoying when reacting to several careers in
+    // the same family. Preserve which ones were open across the rebuild.
+    const openFamilyIds = new Set(Array.from(list.querySelectorAll('.voc-section.open')).map(el => el.dataset.family));
     list.innerHTML = families.map(f => {
       const famProfiles = profiles.filter(p => p.family_id === f.id);
       const reactedCount = famProfiles.filter(p => reactionsByProfile[p.id]).length;
@@ -301,6 +306,9 @@
         </div>`;
     }).join('');
 
+    list.querySelectorAll('.voc-section').forEach(el => {
+      if (openFamilyIds.has(el.dataset.family)) el.classList.add('open');
+    });
     list.querySelectorAll('[data-toggle]').forEach(head => {
       head.addEventListener('click', () => head.closest('.voc-section').classList.toggle('open'));
     });
