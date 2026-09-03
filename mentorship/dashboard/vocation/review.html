@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review | Vocation & Life Pathways | Inspire Mentorship</title>
+  <meta name="description" content="Stage 7 of Vocation & Life Pathways — direction can mature without becoming drift.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .voc-two-col { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
+    @media (min-width: 860px) { .voc-two-col { grid-template-columns: 1fr 1fr; } }
+
+    .voc-select { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; margin-bottom: 10px; }
+    .voc-textarea, .voc-input { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; margin-bottom: 10px; }
+    .voc-textarea { min-height: 90px; resize: vertical; }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+
+    .voc-timeline { border-left: 2px solid var(--mentorship-gold); padding-left: 18px; }
+    .voc-timeline-item { position: relative; margin-bottom: 22px; }
+    .voc-timeline-item:last-child { margin-bottom: 0; }
+    .voc-timeline-item::before { content: ''; position: absolute; left: -23px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--mentorship-gold); }
+    .voc-timeline-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--mentorship-gold); margin-bottom: 4px; }
+    .voc-timeline-statement { font-size: 13px; color: var(--text, #f4f6f9); font-style: italic; margin-bottom: 6px; line-height: 1.5; }
+    .voc-timeline-reflection { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.7)); line-height: 1.5; }
+    .voc-timeline-mentor { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.7)); line-height: 1.5; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
+    .voc-timeline-mentor strong { color: var(--mentorship-gold); }
+
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 4px; }
+    .voc-gate-card { margin-top: 24px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentorship</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">My Growth</div>
+      <a class="nav-item" href="/mentorship/dashboard/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M9 18h9"/></svg>
+        My Journey
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/goals.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Goals & Plan
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/growth-compass.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Growth Compass
+      </a>
+      <a class="nav-item active" href="/mentorship/dashboard/vocation/index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
+        Vocation & Life Pathways <span class="badge badge-muted" style="margin-left:6px;font-size:9px">NEW</span>
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/pathways.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        Growth Pathways
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Check-Ins
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/journal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Journal
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+    </nav>
+
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">You were made for more.</div>
+        <div class="sidebar-cta-title">We walk with you.<br>You become who<br>God created.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">Review the evidence, notice what changed, and adjust the plan deliberately.</div>
+      </div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Stage 7 · Review</div>
+          <h1 class="page-title">Direction can mature without becoming drift.</h1>
+        </div>
+      </div>
+
+      <div id="stepperWrap" class="vocation-stage-stepper"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+          Every few months, pause and look back honestly. What's changed? What new evidence do you have? Each review
+          is saved permanently, so you can always see how your thinking has developed over time.
+        </p>
+      </div>
+
+      <div class="voc-two-col">
+        <div class="card">
+          <div class="card-label">Start a New Review</div>
+          <label class="voc-field-label" style="margin-top:8px">Review type</label>
+          <select class="voc-select" id="reviewType">
+            <option value="3_month">3-Month Review</option>
+            <option value="6_month">6-Month Review</option>
+            <option value="12_month">12-Month / Annual Review</option>
+            <option value="custom">Custom Review</option>
+          </select>
+          <label class="voc-field-label">What has changed since your last review? What new evidence do you have?</label>
+          <textarea class="voc-textarea" id="reviewReflection" placeholder="e.g. My interest in electrical systems has become stronger. New evidence: an engineering workplace visit, an improved Maths grade..."></textarea>
+          <button class="list-card-btn primary" id="submitReviewBtn">Save This Review</button>
+          <div class="voc-save-note" id="reviewSaveNote"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Version History</div>
+          <div id="reviewTimeline" class="voc-timeline" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="card voc-gate-card">
+        <div class="card-label">Ready to move forward?</div>
+        <div class="card-title" style="margin-bottom:8px">Mark Review ready for mentor sign-off</div>
+        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Save at least one review before this stage is ready for your mentor's sign-off.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
+
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation(); notifDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation(); profileDropdown?.classList.toggle('show'); notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => { notifDropdown?.classList.remove('show'); profileDropdown?.classList.remove('show'); });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+</script>
+
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+
+<script src="/assets/supabase.js"></script>
+<script src="/mentorship/js/vocation-stage.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+  const REVIEW_TYPE_LABELS = { '3_month': '3-Month Review', '6_month': '6-Month Review', '12_month': 'Annual Review', 'custom': 'Custom Review' };
+
+  let dbClient = null;
+  let currentUser = null;
+  let progressByStage = {};
+  let reviews = [];
+
+  function renderTimeline() {
+    const sorted = [...reviews].sort((a, b) => new Date(b.review_date) - new Date(a.review_date));
+    $('reviewTimeline').innerHTML = sorted.map(r => `
+      <div class="voc-timeline-item">
+        <div class="voc-timeline-label">${fmtDate(r.review_date)} · ${escapeHtml(REVIEW_TYPE_LABELS[r.review_type] || r.review_type)}</div>
+        ${r.working_statement_snapshot ? `<div class="voc-timeline-statement">&ldquo;${escapeHtml(r.working_statement_snapshot)}&rdquo;</div>` : ''}
+        ${r.mentee_reflection ? `<div class="voc-timeline-reflection">${escapeHtml(r.mentee_reflection)}</div>` : ''}
+        ${r.mentor_summary ? `<div class="voc-timeline-mentor"><strong>Mentor:</strong> ${escapeHtml(r.mentor_summary)}</div>` : ''}
+      </div>`).join('') || '<div class="voc-empty">No reviews saved yet — your first review will appear here.</div>';
+  }
+
+  function updateGate() {
+    const ready = reviews.length >= 1;
+    const btn = $('markReadyBtn');
+    btn.disabled = !ready;
+    $('gateHint').textContent = ready
+      ? 'You have saved at least one review. You can mark this stage ready for your mentor\'s sign-off.'
+      : 'Save at least one review before this stage is ready for your mentor\'s sign-off.';
+  }
+
+  $('submitReviewBtn')?.addEventListener('click', async () => {
+    const mentee_reflection = $('reviewReflection').value.trim();
+    if (!mentee_reflection) return;
+    const btn = $('submitReviewBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const [statementRes, hypRes] = await Promise.all([
+      dbClient.schema('mentorship').from('vocation_working_statement').select('statement').eq('student_id', currentUser.id).maybeSingle(),
+      dbClient.schema('mentorship').from('vocation_pathway_hypotheses').select('*').eq('student_id', currentUser.id).eq('status', 'active'),
+    ]);
+
+    const payload = {
+      student_id: currentUser.id,
+      review_type: $('reviewType').value,
+      review_date: new Date().toISOString().slice(0, 10),
+      working_statement_snapshot: statementRes.data?.statement || null,
+      stage_snapshot: progressByStage,
+      hypotheses_snapshot: hypRes.data || [],
+      mentee_reflection,
+    };
+    const { data, error } = await dbClient.schema('mentorship').from('vocation_reviews').insert(payload).select().single();
+    btn.disabled = false; btn.textContent = 'Save This Review';
+    if (error) { console.warn('Save review failed:', error); $('reviewSaveNote').textContent = 'Could not save — please try again.'; return; }
+
+    reviews.push(data);
+    $('reviewReflection').value = '';
+    $('reviewSaveNote').textContent = 'Review saved — this becomes a permanent part of your history.';
+    await markStageInProgress(dbClient, currentUser.id, 'review');
+    renderTimeline();
+    updateGate();
+  });
+
+  $('markReadyBtn')?.addEventListener('click', async () => {
+    const btn = $('markReadyBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'review');
+    if (error) { console.warn('Mark ready failed:', error); btn.textContent = 'Try Again'; btn.disabled = false; return; }
+    progressByStage.review = { status: 'ready_for_review' };
+    renderStageStepper($('stepperWrap'), progressByStage, 'review');
+    btn.textContent = 'Marked Ready for Review ✓';
+  });
+
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
+      else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      await upsertStageProgress(dbClient, user.id, 'review');
+
+      const [progressRes, reviewsRes] = await Promise.all([
+        dbClient.schema('mentorship').from('vocation_stage_progress').select('stage, status').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_reviews').select('*').eq('student_id', user.id).order('review_date', { ascending: false }),
+      ]);
+
+      progressByStage = Object.fromEntries((progressRes.data || []).map(r => [r.stage, r]));
+      reviews = reviewsRes.data || [];
+
+      renderStageStepper($('stepperWrap'), progressByStage, 'review');
+      renderTimeline();
+      updateGate();
+    } catch (e) {
+      console.warn('Review page init failed:', e);
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test | Vocation & Life Pathways | Inspire Mentorship</title>
+  <meta name="description" content="Stage 3 of Vocation & Life Pathways — experience corrects imagination.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .voc-section { margin-bottom: 14px; }
+    .voc-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+    .voc-section-num { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; color: var(--mentorship-gold); margin-right: 10px; }
+    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.55)); margin-top: 4px; font-weight: 400; }
+    .voc-section-body { margin-top: 16px; display: none; }
+    .voc-section.open .voc-section-body { display: block; }
+    .voc-chevron { transition: transform .15s; opacity: .5; flex-shrink: 0; }
+    .voc-section.open .voc-chevron { transform: rotate(90deg); }
+
+    .voc-entry-item { padding: 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 10px; }
+    .voc-entry-title { font-size: 13px; font-weight: 700; color: var(--text, #f4f6f9); margin-bottom: 4px; }
+    .voc-entry-meta { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.5)); margin-bottom: 6px; }
+    .voc-entry-body { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.75)); line-height: 1.5; }
+
+    .voc-textarea, .voc-input, .voc-select {
+      width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13));
+      border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9);
+      box-sizing: border-box; margin-bottom: 10px;
+    }
+    .voc-textarea { min-height: 64px; resize: vertical; }
+    .voc-select { appearance: auto; }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+    .voc-form-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+    @media (min-width: 720px) { .voc-form-grid.two { grid-template-columns: 1fr 1fr; gap: 0 12px; } }
+
+    .voc-quote-card { background: var(--card-bg2, rgba(255,255,255,.04)); border-left: 3px solid var(--mentorship-gold); padding: 18px 20px; border-radius: 10px; font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5; color: var(--text, #f4f6f9); font-style: italic; }
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
+    .voc-gate-card { margin-top: 24px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentorship</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">My Growth</div>
+      <a class="nav-item" href="/mentorship/dashboard/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M9 18h9"/></svg>
+        My Journey
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/goals.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Goals & Plan
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/growth-compass.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Growth Compass
+      </a>
+      <a class="nav-item active" href="/mentorship/dashboard/vocation/index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
+        Vocation & Life Pathways <span class="badge badge-muted" style="margin-left:6px;font-size:9px">NEW</span>
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/pathways.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        Growth Pathways
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Check-Ins
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/journal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Journal
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+    </nav>
+
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">You were made for more.</div>
+        <div class="sidebar-cta-title">We walk with you.<br>You become who<br>God created.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">A career can sound attractive from a distance. Now gather evidence from reality.</div>
+      </div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Stage 3 · Test</div>
+          <h1 class="page-title">Experience corrects imagination.</h1>
+        </div>
+      </div>
+
+      <div id="stepperWrap" class="vocation-stage-stepper"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+          A career can sound attractive from a distance. Now gather real evidence — talk to someone who does the
+          work, get exposure to a real workplace, and try a small version of the work yourself.
+        </p>
+      </div>
+
+      <div id="sectionsList"></div>
+
+      <div class="voc-quote-card" style="margin-bottom:20px">
+        "Don't ask only, 'Do I like the idea of this?' Ask, 'What happened when I met the reality of it?'"
+      </div>
+
+      <div class="card voc-gate-card">
+        <div class="card-label">Ready to move forward?</div>
+        <div class="card-title" style="margin-bottom:8px">Mark Test ready for mentor review</div>
+        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Log at least one conversation, one workplace exposure and one mini experiment before this stage is ready for your mentor to review.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
+
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation(); notifDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation(); profileDropdown?.classList.toggle('show'); notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => { notifDropdown?.classList.remove('show'); profileDropdown?.classList.remove('show'); });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+</script>
+
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+
+<script src="/assets/supabase.js"></script>
+<script src="/mentorship/js/vocation-stage.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+  let dbClient = null;
+  let currentUser = null;
+  let progressByStage = {};
+  let conversations = [];
+  let exposures = [];
+  let experiments = [];
+
+  async function logEvidence(sectionKey, title, evidenceType) {
+    const { error } = await dbClient.schema('mentorship').from('vocation_evidence_items')
+      .insert({ student_id: currentUser.id, stage: 'test', section_key: sectionKey, title, evidence_type: evidenceType });
+    if (error) console.warn('Log evidence failed:', error);
+  }
+
+  // ── Conversations ───────────────────────────────────────────
+  function renderConversations() {
+    const list = conversations.map(c => `
+      <div class="voc-entry-item">
+        <div class="voc-entry-title">${escapeHtml(c.person_role)}</div>
+        <div class="voc-entry-meta">${fmtDate(c.conversation_date)}</div>
+        ${c.key_takeaways ? `<div class="voc-entry-body"><strong>Key takeaways:</strong> ${escapeHtml(c.key_takeaways)}</div>` : ''}
+        ${c.changed_my_thinking ? `<div class="voc-entry-body" style="margin-top:6px"><strong>Changed my thinking:</strong> ${escapeHtml(c.changed_my_thinking)}</div>` : ''}
+      </div>`).join('') || '<div class="voc-empty">No conversations logged yet.</div>';
+    return `
+      <div>${list}</div>
+      <label class="voc-field-label">Who did you speak with?</label>
+      <input class="voc-input" id="convRole" placeholder="e.g. Electrical Engineer, family friend">
+      <div class="voc-form-grid two">
+        <div><label class="voc-field-label">Date</label><input class="voc-input" id="convDate" type="date"></div>
+      </div>
+      <label class="voc-field-label">Prep notes — what did you plan to ask?</label>
+      <textarea class="voc-textarea" id="convPrep" placeholder="What questions do you want answered?"></textarea>
+      <label class="voc-field-label">Questions you actually asked</label>
+      <textarea class="voc-textarea" id="convQuestions"></textarea>
+      <label class="voc-field-label">Key takeaways</label>
+      <textarea class="voc-textarea" id="convTakeaways"></textarea>
+      <label class="voc-field-label">Did it change your thinking?</label>
+      <textarea class="voc-textarea" id="convChanged"></textarea>
+      <button class="list-card-btn" id="addConvBtn">+ Log Conversation</button>`;
+  }
+  function wireConversations(container) {
+    container.querySelector('#addConvBtn')?.addEventListener('click', async () => {
+      const person_role = container.querySelector('#convRole').value.trim();
+      if (!person_role) return;
+      const payload = {
+        student_id: currentUser.id,
+        person_role,
+        conversation_date: container.querySelector('#convDate').value || null,
+        prep_notes: container.querySelector('#convPrep').value.trim() || null,
+        questions_asked: container.querySelector('#convQuestions').value.trim() || null,
+        key_takeaways: container.querySelector('#convTakeaways').value.trim() || null,
+        changed_my_thinking: container.querySelector('#convChanged').value.trim() || null,
+      };
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_conversations').insert(payload).select().single();
+      if (error) { console.warn('Add conversation failed:', error); return; }
+      conversations.push(data);
+      await logEvidence('test.conversations', `Conversation: ${person_role}`, 'conversation');
+      await markStageInProgress(dbClient, currentUser.id, 'test');
+      renderSection('conversations');
+      updateGate();
+    });
+  }
+
+  // ── Workplace Exposures ─────────────────────────────────────
+  const EXPOSURE_TYPES = ['visit', 'work_experience', 'shadowing', 'volunteering', 'workshop', 'open_day', 'careers_event', 'virtual'];
+  function renderExposures() {
+    const list = exposures.map(x => `
+      <div class="voc-entry-item">
+        <div class="voc-entry-title">${escapeHtml((x.exposure_type || '').replace(/_/g, ' '))}${x.organisation_type ? ' — ' + escapeHtml(x.organisation_type) : ''}</div>
+        <div class="voc-entry-meta">${fmtDate(x.exposure_date)}${x.interest_change ? ' · Interest ' + escapeHtml(x.interest_change) : ''}</div>
+        ${x.reflection ? `<div class="voc-entry-body">${escapeHtml(x.reflection)}</div>` : ''}
+      </div>`).join('') || '<div class="voc-empty">No workplace exposures logged yet.</div>';
+    const typeOptions = EXPOSURE_TYPES.map(t => `<option value="${t}">${t.replace(/_/g, ' ')}</option>`).join('');
+    return `
+      <div>${list}</div>
+      <div class="voc-form-grid two">
+        <div><label class="voc-field-label">Type</label><select class="voc-select" id="expType"><option value="">Select…</option>${typeOptions}</select></div>
+        <div><label class="voc-field-label">Date</label><input class="voc-input" id="expDate" type="date"></div>
+      </div>
+      <label class="voc-field-label">Organisation type (not the name — e.g. "independent garage")</label>
+      <input class="voc-input" id="expOrg" placeholder="e.g. independent garage, NHS hospital, small design studio">
+      <label class="voc-field-label">What did the activity involve?</label>
+      <textarea class="voc-textarea" id="expActivity"></textarea>
+      <label class="voc-field-label">What did you observe?</label>
+      <textarea class="voc-textarea" id="expObserved"></textarea>
+      <label class="voc-field-label">Reflection</label>
+      <textarea class="voc-textarea" id="expReflection"></textarea>
+      <label class="voc-field-label">Did it change your interest?</label>
+      <select class="voc-select" id="expInterestChange">
+        <option value="">Not sure yet</option>
+        <option value="increased">Increased</option>
+        <option value="unchanged">Unchanged</option>
+        <option value="decreased">Decreased</option>
+      </select>
+      <button class="list-card-btn" id="addExpBtn">+ Log Workplace Exposure</button>`;
+  }
+  function wireExposures(container) {
+    container.querySelector('#addExpBtn')?.addEventListener('click', async () => {
+      const exposure_type = container.querySelector('#expType').value;
+      const organisation_type = container.querySelector('#expOrg').value.trim();
+      if (!exposure_type && !organisation_type) return;
+      const payload = {
+        student_id: currentUser.id,
+        exposure_type: exposure_type || null,
+        organisation_type: organisation_type || null,
+        exposure_date: container.querySelector('#expDate').value || null,
+        activity_description: container.querySelector('#expActivity').value.trim() || null,
+        what_i_observed: container.querySelector('#expObserved').value.trim() || null,
+        reflection: container.querySelector('#expReflection').value.trim() || null,
+        interest_change: container.querySelector('#expInterestChange').value || null,
+      };
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_workplace_exposures').insert(payload).select().single();
+      if (error) { console.warn('Add exposure failed:', error); return; }
+      exposures.push(data);
+      await logEvidence('test.exposures', `${(exposure_type || 'Exposure').replace(/_/g, ' ')}${organisation_type ? ': ' + organisation_type : ''}`, 'workplace_exposure');
+      await markStageInProgress(dbClient, currentUser.id, 'test');
+      renderSection('exposures');
+      updateGate();
+    });
+  }
+
+  // ── Mini Experiments ────────────────────────────────────────
+  function renderExperiments() {
+    const list = experiments.map(x => `
+      <div class="voc-entry-item">
+        <div class="voc-entry-title">${escapeHtml(x.hypothesis)} <span class="badge badge-muted" style="margin-left:6px">${escapeHtml(x.status)}</span></div>
+        ${x.conclusion ? `<div class="voc-entry-body"><strong>Conclusion:</strong> ${escapeHtml(x.conclusion)}</div>` : ''}
+      </div>`).join('') || '<div class="voc-empty">No experiments logged yet.</div>';
+    return `
+      <div>${list}</div>
+      <label class="voc-field-label">Hypothesis — what are you testing?</label>
+      <textarea class="voc-textarea" id="expmtHypothesis" placeholder="e.g. I think I would enjoy diagnosing faults more than routine repetitive work."></textarea>
+      <label class="voc-field-label">Activity — the small version of the work you'll try</label>
+      <textarea class="voc-textarea" id="expmtActivity"></textarea>
+      <label class="voc-field-label">Expected learning</label>
+      <textarea class="voc-textarea" id="expmtExpected"></textarea>
+      <label class="voc-field-label">Reflection (once tried)</label>
+      <textarea class="voc-textarea" id="expmtReflection"></textarea>
+      <label class="voc-field-label">Conclusion</label>
+      <textarea class="voc-textarea" id="expmtConclusion"></textarea>
+      <label class="voc-field-label">Status</label>
+      <select class="voc-select" id="expmtStatus">
+        <option value="planned">Planned</option>
+        <option value="in_progress">In Progress</option>
+        <option value="complete">Complete</option>
+      </select>
+      <button class="list-card-btn" id="addExpmtBtn">+ Log Experiment</button>`;
+  }
+  function wireExperiments(container) {
+    container.querySelector('#addExpmtBtn')?.addEventListener('click', async () => {
+      const hypothesis = container.querySelector('#expmtHypothesis').value.trim();
+      if (!hypothesis) return;
+      const status = container.querySelector('#expmtStatus').value || 'planned';
+      const payload = {
+        student_id: currentUser.id,
+        hypothesis,
+        activity: container.querySelector('#expmtActivity').value.trim() || null,
+        expected_learning: container.querySelector('#expmtExpected').value.trim() || null,
+        reflection: container.querySelector('#expmtReflection').value.trim() || null,
+        conclusion: container.querySelector('#expmtConclusion').value.trim() || null,
+        status,
+        started_at: status !== 'planned' ? new Date().toISOString() : null,
+        completed_at: status === 'complete' ? new Date().toISOString() : null,
+      };
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_experiments').insert(payload).select().single();
+      if (error) { console.warn('Add experiment failed:', error); return; }
+      experiments.push(data);
+      await logEvidence('test.experiments', hypothesis.slice(0, 80), 'experiment');
+      await markStageInProgress(dbClient, currentUser.id, 'test');
+      renderSection('experiments');
+      updateGate();
+    });
+  }
+
+  const SECTIONS = [
+    { key: 'conversations', num: '01', title: 'Professional Conversation', sub: 'Speak with someone already doing the work. Capture what surprised you.', render: renderConversations, wire: wireConversations, count: () => conversations.length },
+    { key: 'exposures', num: '02', title: 'Workplace Exposure', sub: 'Shadow, visit, volunteer or attend a credible experience.', render: renderExposures, wire: wireExposures, count: () => exposures.length },
+    { key: 'experiments', num: '03', title: 'Mini Experiment', sub: 'Try a small version of the work. Build, fix, explain, design or investigate.', render: renderExperiments, wire: wireExperiments, count: () => experiments.length },
+  ];
+
+  function renderSection(key) {
+    const s = SECTIONS.find(x => x.key === key);
+    const body = document.querySelector(`[data-section-body="${key}"]`);
+    if (!body || !s) return;
+    body.innerHTML = s.render();
+    s.wire(body);
+    const sectionEl = body.closest('.voc-section');
+    const complete = s.count() > 0;
+    sectionEl.classList.toggle('voc-complete', complete);
+    const doneMark = sectionEl.querySelector('[data-done-mark]');
+    if (doneMark) doneMark.style.display = complete ? '' : 'none';
+    const countEl = sectionEl.querySelector('[data-count]');
+    if (countEl) countEl.textContent = `${s.count()} logged`;
+  }
+
+  function renderAllSections() {
+    const list = $('sectionsList');
+    list.innerHTML = SECTIONS.map(s => `
+      <div class="list-card voc-section" data-section="${s.key}">
+        <div class="voc-section-head" data-toggle>
+          <div>
+            <div class="list-card-title"><span class="voc-section-num">${s.num}</span>${escapeHtml(s.title)}</div>
+            <div class="voc-section-sub">${escapeHtml(s.sub)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <span class="voc-section-sub" data-count>0 logged</span>
+            <span class="badge badge-complete" data-done-mark style="display:none">✓</span>
+            <svg class="voc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <div class="voc-section-body" data-section-body="${s.key}"></div>
+      </div>`).join('');
+
+    list.querySelectorAll('[data-toggle]').forEach(head => {
+      head.addEventListener('click', () => head.closest('.voc-section').classList.toggle('open'));
+    });
+    SECTIONS.forEach(s => renderSection(s.key));
+  }
+
+  function updateGate() {
+    const ready = SECTIONS.every(s => s.count() > 0);
+    const btn = $('markReadyBtn');
+    btn.disabled = !ready;
+    $('gateHint').textContent = ready
+      ? 'You have real evidence in all three categories. You can mark this stage ready for your mentor.'
+      : `Log at least one entry in each category before this stage is ready for review (${SECTIONS.filter(s => s.count() === 0).map(s => s.title).join(', ')} still empty).`;
+  }
+
+  $('markReadyBtn')?.addEventListener('click', async () => {
+    const btn = $('markReadyBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'test');
+    if (error) { console.warn('Mark ready failed:', error); btn.textContent = 'Try Again'; btn.disabled = false; return; }
+    progressByStage.test = { status: 'ready_for_review' };
+    renderStageStepper($('stepperWrap'), progressByStage, 'test');
+    btn.textContent = 'Marked Ready for Review ✓';
+  });
+
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
+      else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      await upsertStageProgress(dbClient, user.id, 'test');
+
+      const [progressRes, convRes, expRes, expmtRes] = await Promise.all([
+        dbClient.schema('mentorship').from('vocation_stage_progress').select('stage, status').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_conversations').select('*').eq('student_id', user.id).order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('vocation_workplace_exposures').select('*').eq('student_id', user.id).order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('vocation_experiments').select('*').eq('student_id', user.id).order('created_at', { ascending: false }),
+      ]);
+
+      progressByStage = Object.fromEntries((progressRes.data || []).map(r => [r.stage, r]));
+      conversations = convRes.data || [];
+      exposures = expRes.data || [];
+      experiments = expmtRes.data || [];
+
+      renderStageStepper($('stepperWrap'), progressByStage, 'test');
+      renderAllSections();
+      updateGate();
+
+      const firstEmpty = SECTIONS.find(s => s.count() === 0);
+      const target = firstEmpty || SECTIONS[0];
+      document.querySelector(`[data-section="${target.key}"]`)?.classList.add('open');
+    } catch (e) {
+      console.warn('Test page init failed:', e);
+    }
+  })();
+</script>
+</body>
+</html>

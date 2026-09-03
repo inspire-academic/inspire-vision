@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Profile | Vocation & Life Pathways | Inspire Mentorship</title>
+  <meta name="description" content="A single career profile within Stage 2 of Vocation & Life Pathways.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .voc-back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted, rgba(244,246,249,.7)); text-decoration: none; margin-bottom: 14px; }
+    .voc-back-link:hover { color: var(--mentorship-gold); }
+    .voc-placeholder-badge { display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgba(217,119,6,.15); color: var(--mentorship-gold); border: 1px solid rgba(217,119,6,.3); margin-bottom: 12px; }
+    .voc-lens-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 8px; }
+    @media (min-width: 720px) { .voc-lens-grid { grid-template-columns: 1fr 1fr; } }
+    .voc-lens-card { padding: 14px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; }
+    .voc-lens-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--mentorship-gold); margin-bottom: 6px; }
+    .voc-lens-text { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.78)); line-height: 1.55; }
+    .voc-route-item { padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 8px; }
+    .voc-route-item strong { color: var(--text, #f4f6f9); text-transform: capitalize; }
+    .voc-route-item span { color: var(--text-soft, rgba(244,246,249,.55)); font-size: 12px; }
+    .voc-subject-chip { display: inline-block; padding: 5px 12px; border-radius: 999px; background: var(--card-bg2, rgba(255,255,255,.06)); border: 1px solid var(--border-md, rgba(255,255,255,.14)); font-size: 12px; margin: 0 6px 6px 0; }
+    .voc-lm-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.06)); font-size: 13px; }
+    .voc-lm-row:last-child { border-bottom: none; }
+    .voc-lm-key { color: var(--text-soft, rgba(244,246,249,.55)); text-transform: capitalize; }
+    .voc-lm-source { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 8px; }
+
+    .voc-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #f4f6f9); font-size: 13px; cursor: pointer; transition: border-color .1s, background .1s; }
+    .voc-chip.on-strong { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
+    .voc-chip.on-maybe { background: rgba(217,119,6,.2); border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
+    .voc-chip.on-save { background: rgba(59,130,246,.18); border-color: #60a5fa; color: #60a5fa; }
+    .voc-chip.on-not { background: rgba(255,255,255,.06); border-color: var(--border-md, rgba(255,255,255,.2)); color: var(--text-soft, rgba(244,246,249,.5)); text-decoration: line-through; }
+    .voc-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .voc-textarea { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; min-height: 90px; resize: vertical; }
+    .voc-textarea:disabled { opacity: .5; cursor: not-allowed; }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 6px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentorship</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">My Growth</div>
+      <a class="nav-item" href="/mentorship/dashboard/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M9 18h9"/></svg>
+        My Journey
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/goals.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Goals & Plan
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/growth-compass.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Growth Compass
+      </a>
+      <a class="nav-item active" href="/mentorship/dashboard/vocation/index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
+        Vocation & Life Pathways <span class="badge badge-muted" style="margin-left:6px;font-size:9px">NEW</span>
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/pathways.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        Growth Pathways
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Check-Ins
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/journal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Journal
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+    </nav>
+
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">You were made for more.</div>
+        <div class="sidebar-cta-title">We walk with you.<br>You become who<br>God created.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">One possibility, examined closely.</div>
+      </div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <a class="voc-back-link" href="explore.html">← Back to Explore</a>
+
+      <div id="profileWrap">
+        <div class="voc-empty" style="font-size:14px">Loading career profile…</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
+
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation(); notifDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation(); profileDropdown?.classList.toggle('show'); notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => { notifDropdown?.classList.remove('show'); profileDropdown?.classList.remove('show'); });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+</script>
+
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+
+<script src="/assets/supabase.js"></script>
+<script src="/mentorship/js/vocation-stage.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+  let dbClient = null;
+  let currentUser = null;
+  let profile = null;
+  let family = null;
+  let reactionRow = null;
+
+  const REACTION_LABELS = {
+    strong_interest: 'Strong Interest',
+    maybe: 'Maybe',
+    save_for_exploration: 'Save for Later',
+    not_for_me: 'Not For Me',
+  };
+  const REACTION_ORDER = ['strong_interest', 'maybe', 'save_for_exploration', 'not_for_me'];
+  const reactionChipClass = value => ({ strong_interest: 'on-strong', maybe: 'on-maybe', save_for_exploration: 'on-save', not_for_me: 'on-not' }[value] || '');
+
+  const saveNotesDebounced = debounceAutosave(async (notes) => {
+    if (!reactionRow) return;
+    const { error } = await dbClient.schema('mentorship').from('vocation_career_reactions')
+      .update({ notes, updated_at: new Date().toISOString() }).eq('id', reactionRow.id);
+    if (error) console.warn('Save notes failed:', error);
+  }, 700);
+
+  async function setReaction(value) {
+    if (reactionRow && reactionRow.reaction === value) {
+      const { error } = await dbClient.schema('mentorship').from('vocation_career_reactions').delete().eq('id', reactionRow.id);
+      if (error) { console.warn('Remove reaction failed:', error); return; }
+      reactionRow = null;
+    } else {
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_career_reactions')
+        .upsert({ student_id: currentUser.id, career_profile_id: profile.id, reaction: value, notes: reactionRow?.notes || null, updated_at: new Date().toISOString() }, { onConflict: 'student_id,career_profile_id' })
+        .select().single();
+      if (error) { console.warn('Set reaction failed:', error); return; }
+      reactionRow = data;
+    }
+    await markStageInProgress(dbClient, currentUser.id, 'explore');
+    renderReactionControls();
+  }
+
+  function renderReactionControls() {
+    const chips = REACTION_ORDER.map(val =>
+      `<button class="voc-chip${reactionRow?.reaction === val ? ' ' + reactionChipClass(val) : ''}" data-reaction-btn data-value="${val}">${REACTION_LABELS[val]}</button>`
+    ).join('');
+    $('reactionChips').innerHTML = chips;
+    $('reactionChips').querySelectorAll('[data-reaction-btn]').forEach(btn => {
+      btn.addEventListener('click', () => setReaction(btn.dataset.value));
+    });
+    const notesEl = $('notesTextarea');
+    notesEl.disabled = !reactionRow;
+    notesEl.placeholder = reactionRow ? 'What stands out to you about this one? What would you want to test?' : 'Pick a reaction above first, then add your notes.';
+  }
+
+  function renderProfile() {
+    const isPlaceholder = profile.is_placeholder_data;
+    const routes = (profile.entry_routes || []).map(r => `
+      <div class="voc-route-item">
+        <strong>${escapeHtml((r.route || '').replace(/_/g, ' '))}</strong> — ${escapeHtml(r.detail || '')}
+        ${r.typical_duration ? `<span> · ${escapeHtml(r.typical_duration)}</span>` : ''}
+      </div>`).join('') || '<div class="voc-empty">No entry routes recorded yet.</div>';
+
+    const subjects = (profile.typical_subjects || []).map(s => `<span class="voc-subject-chip">${escapeHtml(s)}</span>`).join('') || '<span class="voc-empty">Not specified.</span>';
+
+    const lm = profile.labour_market || {};
+    const lmRows = Object.keys(lm).length
+      ? Object.entries(lm).map(([k, v]) => `<div class="voc-lm-row"><span class="voc-lm-key">${escapeHtml(k.replace(/_/g, ' '))}</span><span>${escapeHtml(String(v))}</span></div>`).join('')
+      : '<div class="voc-empty">No labour-market data recorded yet.</div>';
+
+    $('profileWrap').innerHTML = `
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">${escapeHtml(family?.name || 'Explore')}</div>
+          <h1 class="page-title">${escapeHtml(profile.title)}</h1>
+        </div>
+      </div>
+      ${isPlaceholder ? '<div class="voc-placeholder-badge">Illustrative example — not yet a live data source</div><br>' : ''}
+      <div class="card" style="margin-bottom:20px">
+        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.78)); line-height:1.6; margin:0 0 12px">${escapeHtml(profile.summary || '')}</p>
+        ${profile.day_in_life ? `<p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); line-height:1.6; margin:0"><strong style="color:var(--text,#f4f6f9)">A day in the life:</strong> ${escapeHtml(profile.day_in_life)}</p>` : ''}
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-label">Four Lenses</div>
+        <div class="voc-lens-grid">
+          <div class="voc-lens-card"><div class="voc-lens-label">Love</div><div class="voc-lens-text">${escapeHtml(profile.love_notes || 'Not specified.')}</div></div>
+          <div class="voc-lens-card"><div class="voc-lens-label">Ability</div><div class="voc-lens-text">${escapeHtml(profile.ability_notes || 'Not specified.')}</div></div>
+          <div class="voc-lens-card"><div class="voc-lens-label">Service</div><div class="voc-lens-text">${escapeHtml(profile.service_notes || 'Not specified.')}</div></div>
+          <div class="voc-lens-card"><div class="voc-lens-label">Viability</div><div class="voc-lens-text">${escapeHtml(profile.viability_notes || 'Not specified.')}</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-label">Entry Routes</div>
+        <div style="margin:10px 0">${routes}</div>
+        <div class="card-label" style="margin-top:14px">Typical Subjects</div>
+        <div style="margin-top:8px">${subjects}</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-label">Labour Market</div>
+        <div style="margin-top:8px">${lmRows}</div>
+        ${profile.labour_market_source ? `<div class="voc-lm-source">Source: ${escapeHtml(profile.labour_market_source)}${profile.labour_market_updated_at ? ' · ' + escapeHtml(profile.labour_market_updated_at) : ''}</div>` : ''}
+      </div>
+
+      <div class="card">
+        <div class="card-label">Your Reaction</div>
+        <div class="voc-chip-grid" id="reactionChips" style="margin-top:10px"></div>
+        <label class="voc-field-label">Notes</label>
+        <textarea class="voc-textarea" id="notesTextarea">${escapeHtml(reactionRow?.notes || '')}</textarea>
+        <div class="voc-save-note">Saved automatically.</div>
+      </div>`;
+
+    renderReactionControls();
+    $('notesTextarea').addEventListener('input', (e) => saveNotesDebounced(e.target.value));
+  }
+
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
+      else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      if (!slug) { $('profileWrap').innerHTML = '<div class="card">No career profile specified.</div>'; return; }
+
+      const { data: profileData, error: profileErr } = await dbClient.schema('mentorship').from('vocation_career_profiles').select('*').eq('slug', slug).maybeSingle();
+      if (profileErr || !profileData) { $('profileWrap').innerHTML = '<div class="card">That career profile could not be found.</div>'; return; }
+      profile = profileData;
+
+      const [familyRes, reactionRes] = await Promise.all([
+        dbClient.schema('mentorship').from('vocation_career_families').select('*').eq('id', profile.family_id).maybeSingle(),
+        dbClient.schema('mentorship').from('vocation_career_reactions').select('*').eq('student_id', user.id).eq('career_profile_id', profile.id).maybeSingle(),
+      ]);
+      family = familyRes.data;
+      reactionRow = reactionRes.data;
+
+      renderProfile();
+    } catch (e) {
+      console.warn('Career profile page init failed:', e);
+    }
+  })();
+</script>
+</body>
+</html>

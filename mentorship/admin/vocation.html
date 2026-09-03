@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspire Mentorship | Vocation & Life Pathways</title>
+  <meta name="description" content="Programme-wide Vocation & Life Pathways stats.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    body.admin-body {
+      background: var(--mentorship-navy);
+      color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .admin-wrap { max-width: 800px; margin: 0 auto }
+    .rp-section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--mentorship-gold); margin: 28px 0 12px }
+    .rp-section-title:first-of-type { margin-top: 0 }
+    .rp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .rp-stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 18px 20px; }
+    .rp-stat.warn { border-color: rgba(239,68,68,.5); }
+    .rp-stat-value { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+    .rp-stat.warn .rp-stat-value { color: #fca5a5; }
+    .rp-stat-label { font-size: 12px; opacity: .6; }
+
+    .vc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .vc-table th, .vc-table td { text-align: center; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .vc-table th { opacity: .55; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: 10px; }
+    .vc-table td:first-child, .vc-table th:first-child { text-align: left; font-weight: 700; }
+    .vc-table-wrap { overflow-x: auto; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 12px 16px; }
+  </style>
+</head>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow">Admin</div>
+        <h1 class="page-title">Vocation & Life Pathways</h1>
+      </div>
+      <button class="admin-signout-btn" id="adminSignOutBtn">Sign out</button>
+    </div>
+    <div id="content">
+      <div class="empty-state"><div class="empty-state-icon">⏳</div>Checking access…</div>
+    </div>
+  </div>
+
+  <script src="/assets/supabase.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+    $('adminSignOutBtn')?.addEventListener('click', async () => {
+      const db = await getDB();
+      await db.auth.signOut();
+      window.location.href = '/mentorship/login.html';
+    });
+
+    function stat(value, label, warn) {
+      return `<div class="rp-stat${warn ? ' warn' : ''}"><div class="rp-stat-value">${value}</div><div class="rp-stat-label">${escapeHtml(label)}</div></div>`;
+    }
+
+    const STAGE_LABELS = { discover: 'Discover', explore: 'Explore', test: 'Test', discern: 'Discern', design: 'Design', present: 'Present', review: 'Review' };
+    const STATUS_LABELS = { not_started: 'Not Started', in_progress: 'In Progress', ready_for_review: 'Ready', mentor_reviewed: 'Reviewed', complete: 'Complete' };
+
+    function render(d) {
+      const content = $('content');
+      const stageRows = Object.entries(d.stageDistribution).map(([stage, counts]) => `
+        <tr>
+          <td>${escapeHtml(STAGE_LABELS[stage] || stage)}</td>
+          ${Object.keys(STATUS_LABELS).map(s => `<td>${counts[s] || 0}</td>`).join('')}
+        </tr>`).join('');
+
+      content.innerHTML = `
+        <div class="rp-section-title">Programme Health</div>
+        <div class="rp-grid">
+          ${stat(d.activeParticipants, 'Active Participants')}
+          ${stat(d.readyForReviewBacklog, 'Ready for Mentor Review', d.readyForReviewBacklog > 0)}
+          ${stat(d.stalledCount, 'Stalled 30+ Days', d.stalledCount > 0)}
+          ${stat(d.fullyCompleteCount, 'Fully Complete Journeys')}
+        </div>
+
+        <div class="rp-section-title">Stage Distribution</div>
+        <div class="vc-table-wrap">
+          <table class="vc-table">
+            <thead><tr><th>Stage</th>${Object.values(STATUS_LABELS).map(l => `<th>${l}</th>`).join('')}</tr></thead>
+            <tbody>${stageRows}</tbody>
+          </table>
+        </div>
+
+        <div class="rp-section-title">Engagement</div>
+        <div class="rp-grid">
+          ${stat(d.careerReactionsTotal, 'Career Reactions Logged')}
+          ${stat(d.familiesExploredCount, 'Career Families Explored')}
+          ${stat(d.hypothesesActiveCount, 'Active Pathway Hypotheses')}
+          ${stat(d.reviewsTotal, 'Reviews Saved')}
+        </div>
+      `;
+    }
+
+    (async () => {
+      const content = $('content');
+      try {
+        const db = await getDB();
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) { window.location.href = '/mentorship/login.html'; return; }
+
+        const res = await fetch('/.netlify/functions/admin-vocation-reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body: JSON.stringify({}),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) { window.location.href = '/mentorship/login.html'; return; }
+        if (res.status === 403) {
+          content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>You\'re not authorized to view this page.</div>';
+          return;
+        }
+        if (res.status !== 200) {
+          content.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div>${escapeHtml(data.error || 'Something went wrong loading these stats.')}</div>`;
+          return;
+        }
+        render(data);
+      } catch (e) {
+        console.warn('Vocation admin page failed:', e);
+        content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div>Something went wrong — please try again.</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

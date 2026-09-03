@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocation & Life Pathways Report | Inspire Mentorship</title>
+  <meta name="description" content="A parent-facing report on a young person's Vocation & Life Pathways journey.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy: #0A1628; --gold: #B85C1A; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; background: #f4f2ec; color: #1a1a1a; min-height: 100vh; }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    .toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    .toolbar button { background: var(--navy); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .report-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,.08); padding: 40px; }
+    .r-cover { text-align: center; padding: 12px 0 32px; border-bottom: 3px solid var(--gold); margin-bottom: 28px; }
+    .r-eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 8px; }
+    .r-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+    .r-meta { font-size: 13px; color: #667; }
+    .r-intro { font-size: 14px; color: #444; line-height: 1.6; background: #f7f6f2; border-radius: 8px; padding: 16px 18px; margin-bottom: 28px; }
+    .r-section { margin-bottom: 26px; page-break-inside: avoid; }
+    .r-section-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: var(--navy); border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 12px; }
+    .r-statement { font-style: italic; font-size: 15px; color: #333; background: #f7f6f2; border-left: 4px solid var(--gold); padding: 12px 16px; border-radius: 6px; }
+    .r-stage-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    .r-stage-row .status { color: var(--gold); font-weight: 700; text-transform: capitalize; }
+    .r-item { font-size: 13px; color: #333; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    .r-item strong { color: var(--navy); }
+    .r-empty { font-size: 13px; color: #888; font-style: italic; }
+    .r-note { background: #eef2f7; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; font-size: 13px; color: #1a1a1a; }
+    .state-card { max-width: 480px; margin: 80px auto; background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,.08); padding: 40px; text-align: center; }
+    .state-card .icon { font-size: 36px; margin-bottom: 12px; }
+    .state-card h1 { font-family: 'Fraunces', serif; font-size: 19px; margin: 0 0 10px; color: var(--navy); }
+    .state-card p { color: #555; font-size: 14px; line-height: 1.6; margin: 0; }
+
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none; }
+      .report-card { box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="toolbar"><button id="printBtn" style="display:none">Print / Save as PDF</button></div>
+    <div id="pageContent">
+      <div class="state-card"><div class="icon">⏳</div><h1>Loading report…</h1><p>One moment while we load this journey.</p></div>
+    </div>
+  </div>
+
+<script>
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''; }
+
+  const STAGE_LABELS = { discover: 'Discover', explore: 'Explore', test: 'Test', discern: 'Discern', design: 'Design', present: 'Present', review: 'Review' };
+  const STATUS_LABELS = { not_started: 'Not Started', in_progress: 'In Progress', ready_for_review: 'Ready for Review', mentor_reviewed: 'Mentor Reviewed', complete: 'Complete' };
+
+  function renderState(icon, title, message) {
+    document.getElementById('pageContent').innerHTML = `
+      <div class="state-card"><div class="icon">${icon}</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(message)}</p></div>`;
+  }
+
+  function renderReport(data) {
+    const stageRows = Object.entries(STAGE_LABELS).map(([key, label]) => {
+      const status = (data.stageProgress.find(p => p.stage === key) || {}).status || 'not_started';
+      return `<div class="r-stage-row"><span>${label}</span><span class="status">${STATUS_LABELS[status]}</span></div>`;
+    }).join('');
+
+    const interests = data.careerInterests.length
+      ? data.careerInterests.map(c => `<div class="r-item"><strong>${escapeHtml(c.title)}</strong>${c.family ? ' — ' + escapeHtml(c.family) : ''} <span style="text-transform:capitalize">(${escapeHtml((c.reaction || '').replace(/_/g, ' '))})</span></div>`).join('')
+      : '<div class="r-empty">No career interests recorded yet.</div>';
+
+    const hypotheses = data.hypotheses.length
+      ? data.hypotheses.map(h => `<div class="r-item"><strong>${escapeHtml(h.label)}</strong>${h.category ? ' — ' + escapeHtml(h.category) : ''}${h.why_it_fits ? '<br>' + escapeHtml(h.why_it_fits) : ''}</div>`).join('')
+      : '<div class="r-empty">No active pathway hypotheses yet.</div>';
+
+    const pp = data.pathwayPlan || {};
+    const pathwaySection = (pp.preferred_pathway?.title || pp.alternative_pathway?.title)
+      ? `${pp.preferred_pathway?.title ? `<div class="r-item"><strong>Preferred:</strong> ${escapeHtml(pp.preferred_pathway.title)}${pp.preferred_pathway.description ? ' — ' + escapeHtml(pp.preferred_pathway.description) : ''}</div>` : ''}
+         ${pp.alternative_pathway?.title ? `<div class="r-item"><strong>Alternative:</strong> ${escapeHtml(pp.alternative_pathway.title)}${pp.alternative_pathway.description ? ' — ' + escapeHtml(pp.alternative_pathway.description) : ''}</div>` : ''}`
+      : '<div class="r-empty">No pathway plan yet.</div>';
+
+    const actionItems = data.actionPlanItems.length
+      ? data.actionPlanItems.map(i => `<div class="r-item"><strong>${escapeHtml(i.title)}</strong> — ${escapeHtml((i.plan_type || '').replace(/_/g, ' '))}${i.target_date ? ' · ' + fmtDate(i.target_date) : (i.target_period_text ? ' · ' + escapeHtml(i.target_period_text) : '')} <span style="text-transform:capitalize">(${escapeHtml(i.status)})</span></div>`).join('')
+      : '<div class="r-empty">No action plan items yet.</div>';
+
+    const evidence = data.evidence.length
+      ? data.evidence.slice(0, 20).map(e => `<div class="r-item"><strong>${escapeHtml(e.title)}</strong> — ${escapeHtml((e.evidence_type || '').replace(/_/g, ' '))}</div>`).join('')
+      : '<div class="r-empty">No evidence logged yet.</div>';
+
+    const mentorNotes = data.mentorNotes.length
+      ? data.mentorNotes.map(n => `<div class="r-note">${escapeHtml(n.note)}</div>`).join('')
+      : '<div class="r-empty">No mentor notes shared yet.</div>';
+
+    const reviews = data.reviews.length
+      ? data.reviews.slice(0, 5).map(r => `<div class="r-item"><strong>${fmtDate(r.review_date)}</strong>${r.mentee_reflection ? ' — ' + escapeHtml(r.mentee_reflection) : ''}</div>`).join('')
+      : '<div class="r-empty">No reviews saved yet.</div>';
+
+    document.getElementById('pageContent').innerHTML = `
+      <div class="report-card">
+        <div class="r-cover">
+          <div class="r-eyebrow">A Report For You, From Your Young Person</div>
+          <div class="r-title">${escapeHtml(data.studentName)}'s Vocation &amp; Life Pathways Journey</div>
+          <div class="r-meta">Generated ${fmtDate(data.generatedAt)}</div>
+        </div>
+        <div class="r-intro">
+          This shows where ${escapeHtml(data.studentName)} is in Inspire Mentorship's Vocation &amp; Life Pathways
+          programme — a guided, developmental process of discovering strengths, exploring possible futures, testing
+          real-world assumptions and building an evidence-based (not fixed) plan for adulthood. Nothing here is a
+          verdict — everything is a hypothesis still being tested.
+        </div>
+        <div class="r-section"><div class="r-section-title">Current Working Statement of Vocation</div><div class="r-statement">${data.workingStatement ? escapeHtml(data.workingStatement) : 'No working statement written yet.'}</div></div>
+        <div class="r-section"><div class="r-section-title">Journey Progress</div>${stageRows}</div>
+        <div class="r-section"><div class="r-section-title">Career Interests</div>${interests}</div>
+        <div class="r-section"><div class="r-section-title">Active Pathway Hypotheses</div>${hypotheses}</div>
+        <div class="r-section"><div class="r-section-title">Pathway Plan</div>${pathwaySection}</div>
+        <div class="r-section"><div class="r-section-title">Action Plan</div>${actionItems}</div>
+        <div class="r-section"><div class="r-section-title">Evidence Gathered</div>${evidence}</div>
+        <div class="r-section"><div class="r-section-title">Notes From The Mentor</div>${mentorNotes}</div>
+        <div class="r-section"><div class="r-section-title">Review History</div>${reviews}</div>
+      </div>`;
+    document.getElementById('printBtn').style.display = 'inline-block';
+  }
+
+  (async () => {
+    const token = new URLSearchParams(window.location.search).get('token');
+    if (!token) { renderState('⚠️', 'Missing report link', 'This link is missing information and cannot be used.'); return; }
+    try {
+      const res = await fetch('/.netlify/functions/vocation-parent-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      if (!res.ok) { renderState('⚠️', 'Could not load report', data.error || 'This report link may be invalid, revoked or expired.'); return; }
+      renderReport(data);
+    } catch (e) {
+      console.error('parent-report load failed:', e);
+      renderState('⚠️', 'Something went wrong', 'Please try again shortly, or contact us if the problem continues.');
+    }
+  })();
+
+  document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

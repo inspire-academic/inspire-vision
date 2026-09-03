@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inspire Mentorship | Resources</title>
-  <meta name="description" content="Guidance and support for your journey — emotional wellbeing, study skills, faith and character, and how to get help.">
+  <title>Vocation & Life Pathways | Inspire Mentorship</title>
+  <meta name="description" content="Discover your strengths, explore possible futures, test your assumptions and build a credible pathway into adulthood.">
   <meta name="theme-color" content="#0A1628">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,24 +13,25 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .voc-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .voc-stat-card .card-title { font-size: 26px; }
+    .voc-two-col { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 860px) { .voc-two-col { grid-template-columns: 1.4fr 1fr; } }
+    .voc-mentor-note { border-left: 3px solid var(--mentorship-gold); }
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
+  </style>
 </head>
 <body>
 <div class="app">
-  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebar">
     <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
       <div class="brand-shield">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
-        </svg>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/></svg>
       </div>
-      <div>
-        <div class="brand-text-top">Inspire</div>
-        <div class="brand-text-sub">Mentorship</div>
-      </div>
+      <div><div class="brand-text-top">Inspire</div><div class="brand-text-sub">Mentorship</div></div>
     </a>
-
     <nav class="sidebar-nav">
       <div class="nav-section-label">My Growth</div>
       <a class="nav-item" href="/mentorship/dashboard/">
@@ -49,11 +50,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Growth Compass
       </a>
-      <a class="nav-item" href="/mentorship/dashboard/wellbeing.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        My Wellbeing
-      </a>
-      <a class="nav-item" href="/mentorship/dashboard/vocation/index.html">
+      <a class="nav-item active" href="/mentorship/dashboard/vocation/index.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
         Vocation & Life Pathways <span class="badge badge-muted" style="margin-left:6px;font-size:9px">NEW</span>
       </a>
@@ -69,38 +66,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
         Journal
       </a>
-      <a class="nav-item active" href="/mentorship/resources.html">
+      <a class="nav-item" href="/mentorship/resources.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
         Resources
       </a>
-      <a class="nav-item" href="/mentorship/journey.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-        Challenges
-      </a>
-      <a class="nav-item" href="/mentorship/journey.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/></svg>
-        Achievements
-      </a>
-
-      <div class="nav-section-label">Support & Connect</div>
-      <a class="nav-item" href="/mentorship/dashboard/mentor.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        My Mentor
-      </a>
-      <a class="nav-item active" href="/mentorship/resources.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2.1-2.5 4"/><path d="M12 17h.01"/></svg>
-        Ask for Help
-      </a>
-      <a class="nav-item" href="/mentorship/dashboard/prayer-support.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-        Prayer & Support
-      </a>
-      <a class="nav-item" href="/mentorship/stories.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Community
-      </a>
     </nav>
-
     <div class="sidebar-cta">
       <div class="sidebar-cta-bg"></div>
       <div class="sidebar-cta-content">
@@ -110,7 +80,6 @@
       </div>
     </div>
   </aside>
-  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
   <main class="main">
     <header class="topbar">
       <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
@@ -118,11 +87,7 @@
       </button>
       <div class="topbar-welcome">
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
-        <div class="topbar-sub">Everything here exists to help you grow — use whatever's useful.</div>
-      </div>
-      <div class="topbar-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="topbarSearch" placeholder="Search anything…" aria-label="Search">
+        <div class="topbar-sub">Keep going — your future is taking shape.</div>
       </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
@@ -148,61 +113,43 @@
     </header>
 
     <div class="content">
-
       <div class="page-header">
         <div>
-          <div class="page-eyebrow">My Growth</div>
-          <h1 class="page-title">Resources</h1>
+          <div class="page-eyebrow">Mentorship & Formation</div>
+          <h1 class="page-title">Vocation & Life Pathways</h1>
         </div>
       </div>
 
-      <div class="list-card">
-        <div class="list-card-top"><div class="list-card-title">💙 Emotional Wellbeing</div></div>
-        <div class="list-card-desc">
-          It's okay to not be okay. Naming how you feel is the first step to working through it —
-          that's exactly what Check-Ins are for. If something feels heavier than you can carry alone,
-          reaching out isn't weakness, it's wisdom.
-        </div>
-        <div class="list-card-actions">
-          <a class="list-card-btn" href="/mentorship/dashboard/check-in.html">Do a Check-In</a>
-          <a class="list-card-btn primary" href="/mentorship/resources.html#help">Ask for Help</a>
-        </div>
-      </div>
-
-      <div class="list-card">
-        <div class="list-card-top"><div class="list-card-title">📚 Study &amp; Growth Skills</div></div>
-        <div class="list-card-desc">
-          Progress beats perfection. Break big goals into small, specific steps — "revise for 20 minutes"
-          beats "get better at maths" every time. Your Goals &amp; Plan page is built exactly for this:
-          set the small step, track it, and let momentum do the rest.
-        </div>
-        <div class="list-card-actions">
-          <a class="list-card-btn" href="/mentorship/dashboard/goals.html">Go to Goals &amp; Plan</a>
+      <div class="card" style="margin-bottom:20px">
+        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0 0 14px">
+          Discover your strengths, explore possible futures, test your assumptions and build a credible pathway
+          into adulthood. Nothing here is a verdict — everything is evidence you're gathering about yourself and
+          the world, one step at a time.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="list-card-btn primary" id="continueBtn" href="/mentorship/dashboard/vocation/discover.html">Continue Your Journey →</a>
+          <a class="list-card-btn" href="/mentorship/dashboard/vocation/report.html">View Report</a>
         </div>
       </div>
 
-      <div class="list-card">
-        <div class="list-card-top"><div class="list-card-title">✨ Faith &amp; Character</div></div>
-        <div class="list-card-desc">
-          Character is built in the small, unseen moments — showing up when no one's watching,
-          keeping a promise when it's inconvenient, choosing honesty when a shortcut is easier.
-          Your Journal is a private space to process what you're learning, no matter how small it feels.
-        </div>
-        <div class="list-card-actions">
-          <a class="list-card-btn" href="/mentorship/dashboard/journal.html">Open Journal</a>
-        </div>
+      <div id="stepperWrap" class="vocation-stage-stepper"></div>
+
+      <div class="voc-stat-grid">
+        <div class="card voc-stat-card"><div class="card-label">Evidence Collected</div><div class="card-title" id="statEvidence">0</div></div>
+        <div class="card voc-stat-card"><div class="card-label">Career Families Explored</div><div class="card-title" id="statFamilies">0</div></div>
+        <div class="card voc-stat-card"><div class="card-label">Pathways Being Compared</div><div class="card-title" id="statHypotheses">0</div></div>
+        <div class="card voc-stat-card"><div class="card-label">Mentor Notes Shared</div><div class="card-title" id="statNotes">0</div></div>
       </div>
 
-      <div class="list-card" id="help">
-        <div class="list-card-top"><div class="list-card-title">🤝 Getting Support</div></div>
-        <div class="list-card-desc">
-          You don't have to figure everything out alone. Your mentor is there to walk with you —
-          and if you ever need to talk to someone urgently, please reach out to a trusted adult,
-          your mentor, or local emergency services. This platform is here to support you, not replace real help.
+      <div class="voc-two-col">
+        <div class="card">
+          <div class="card-label">Your Current Working Statement</div>
+          <div class="card-title" style="margin-bottom:8px">Vocation Statement</div>
+          <div id="statementText" class="voc-empty">You haven't written a working statement of vocation yet — you'll get to this in Discern.</div>
         </div>
-        <div class="list-card-actions">
-          <a class="list-card-btn" href="/mentorship/dashboard/mentor.html">My Mentor</a>
-          <a class="list-card-btn" href="/mentorship/dashboard/prayer-support.html">Prayer &amp; Support</a>
+        <div class="card voc-mentor-note">
+          <div class="card-label">From Your Mentor</div>
+          <div id="mentorNoteText" class="voc-empty">No shared notes from your mentor yet.</div>
         </div>
       </div>
     </div>
@@ -210,7 +157,6 @@
 </div>
 
 <script>
-  // ── NAV ACTIVE + MOBILE DRAWER ──────────────────────────────
   const sidebarEl = document.getElementById('sidebar');
   const backdropEl = document.getElementById('sidebarBackdrop');
   function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
@@ -219,44 +165,17 @@
     sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
   });
   backdropEl?.addEventListener('click', closeDrawer);
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', closeDrawer);
-  });
-
-  // ── NOTIFICATION + PROFILE DROPDOWNS ─────────────────────────
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
   const notifDropdown = document.getElementById('notifDropdown');
   const profileDropdown = document.getElementById('profileDropdown');
-  document.getElementById('notifBell')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    notifDropdown?.classList.toggle('show');
-    profileDropdown?.classList.remove('show');
-  });
-  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    profileDropdown?.classList.toggle('show');
-    notifDropdown?.classList.remove('show');
-  });
-  document.addEventListener('click', () => {
-    notifDropdown?.classList.remove('show');
-    profileDropdown?.classList.remove('show');
-  });
+  document.getElementById('notifBell')?.addEventListener('click', (e) => { e.stopPropagation(); notifDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show'); });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown?.classList.toggle('show'); notifDropdown?.classList.remove('show'); });
+  document.addEventListener('click', () => { notifDropdown?.classList.remove('show'); profileDropdown?.classList.remove('show'); });
   document.getElementById('signOutBtn')?.addEventListener('click', async () => {
-    try {
-      const db = await getDB();
-      await db.auth.signOut();
-    } catch (e) { console.warn('Sign out failed:', e); }
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
     window.location.href = 'https://www.inspirevision.org';
   });
-
-  // ── SEARCH — routes to the resources page until a real search index exists ──
-  document.getElementById('topbarSearch')?.addEventListener('keydown', (e) => {
-    const q = e.target.value.trim();
-    if (e.key === 'Enter' && q) {
-      window.location.href = '/mentorship/resources.html?q=' + encodeURIComponent(q);
-    }
-  });
 </script>
-
 <script>
   (function () {
     const html = document.documentElement;
@@ -272,13 +191,17 @@
 </script>
 
 <script src="/assets/supabase.js"></script>
+<script src="/mentorship/js/vocation-stage.js"></script>
 <script>
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
   (async () => {
     try {
-      const db = await getDB();
-      const { data: { user } } = await db.auth.getUser();
+      const dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
       if (!user) { window.location.href = '/mentorship/login.html'; return; }
-      const $ = id => document.getElementById(id);
+
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
       const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
       $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
@@ -287,8 +210,47 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      const [progressRes, evidenceRes, reactionsRes, hypothesesRes, notesRes, statementRes] = await Promise.all([
+        dbClient.schema('mentorship').from('vocation_stage_progress').select('stage, status').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_evidence_items').select('id', { count: 'exact', head: true }).eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_career_reactions').select('id', { count: 'exact', head: true }).eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_pathway_hypotheses').select('id', { count: 'exact', head: true }).eq('student_id', user.id).eq('status', 'active'),
+        dbClient.schema('mentorship').from('vocation_observation_recaps').select('note, created_at').eq('student_id', user.id).order('created_at', { ascending: false }).limit(1),
+        dbClient.schema('mentorship').from('vocation_working_statement').select('statement').eq('student_id', user.id).maybeSingle(),
+      ]);
+
+      const progressByStage = Object.fromEntries((progressRes.data || []).map(r => [r.stage, r]));
+      renderStageStepper($('stepperWrap'), progressByStage, null);
+
+      $('statEvidence').textContent = evidenceRes.count ?? 0;
+      $('statFamilies').textContent = reactionsRes.count ?? 0;
+      $('statHypotheses').textContent = hypothesesRes.count ?? 0;
+
+      const allNotes = await dbClient.schema('mentorship').from('vocation_observation_recaps').select('id', { count: 'exact', head: true }).eq('student_id', user.id);
+      $('statNotes').textContent = allNotes.count ?? 0;
+
+      if (notesRes.data && notesRes.data.length) {
+        $('mentorNoteText').textContent = notesRes.data[0].note;
+        $('mentorNoteText').classList.remove('voc-empty');
+      }
+
+      if (statementRes.data && statementRes.data.statement) {
+        $('statementText').textContent = statementRes.data.statement;
+        $('statementText').classList.remove('voc-empty');
+      }
+
+      // Continue button routes to the first not-yet-complete stage.
+      const stages = window.VOCATION_STAGES;
+      const nextStage = stages.find(s => {
+        const st = (progressByStage[s.key] || {}).status || 'not_started';
+        return st !== 'complete';
+      }) || stages[0];
+      $('continueBtn').href = nextStage.href;
+      const hasAnyProgress = Object.keys(progressByStage).length > 0;
+      $('continueBtn').textContent = hasAnyProgress ? 'Continue Where You Left Off →' : 'Start Your Journey →';
     } catch (e) {
-      console.warn('Resources page auth init failed:', e);
+      console.warn('Vocation dashboard init failed:', e);
     }
   })();
 </script>
