@@ -30,7 +30,25 @@ const privatePages = [
   '/mentorship/admin/mentees.html',
   '/mentorship/admin/safeguarding.html',
   '/mentorship/admin/reports.html',
+  '/mentorship/dashboard/vocation/index.html',
+  '/mentorship/dashboard/vocation/discover.html',
+  '/mentorship/dashboard/vocation/explore.html',
+  '/mentorship/dashboard/vocation/explore-career.html',
+  '/mentorship/dashboard/vocation/test.html',
+  '/mentorship/dashboard/vocation/discern.html',
+  '/mentorship/dashboard/vocation/design.html',
+  '/mentorship/dashboard/vocation/present.html',
+  '/mentorship/dashboard/vocation/review.html',
+  '/mentorship/dashboard/vocation/report.html',
+  '/mentorship/mentor-portal/vocation-mentees.html',
+  '/mentorship/mentor-portal/vocation-review.html',
+  '/mentorship/admin/vocation.html',
 ];
+
+// mentorship/parent-report.html is deliberately NOT in this list — it's the
+// one page in the module that's public by design (token-gated, not
+// session-gated; see vocation-report-generation.spec.js for its own
+// no-token/bad-token coverage).
 
 test.describe('Unauthenticated visitors are redirected to login', () => {
   for (const path of privatePages) {

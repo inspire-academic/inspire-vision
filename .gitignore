@@ -7,3 +7,7 @@ node_modules
 # Playwright test output
 test-results
 playwright-report
+
+# Saved login sessions for the Vocation & Life Pathways specs — real
+# Supabase session tokens, must never be committed.
+tests/.auth
