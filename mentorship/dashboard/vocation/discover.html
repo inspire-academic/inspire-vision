@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover | Vocation & Life Pathways | Inspire Mentorship</title>
+  <meta name="description" content="Stage 1 of Vocation & Life Pathways — understand who you are before exploring what you might become.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .voc-section { margin-bottom: 14px; }
+    .voc-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+    .voc-section-num { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; color: var(--mentorship-gold); margin-right: 10px; }
+    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.55)); margin-top: 4px; font-weight: 400; }
+    .voc-section-body { margin-top: 16px; display: none; }
+    .voc-section.open .voc-section-body { display: block; }
+    .voc-chevron { transition: transform .15s; opacity: .5; flex-shrink: 0; }
+    .voc-section.open .voc-chevron { transform: rotate(90deg); }
+    .voc-section.voc-complete { opacity: .85; }
+
+    .voc-rating-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); }
+    .voc-rating-row:last-child { border-bottom: none; }
+    .voc-rating-text { font-size: 14px; color: var(--text, #f4f6f9); flex: 1; }
+    .voc-dots { display: flex; gap: 6px; flex-shrink: 0; }
+    .voc-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-md, rgba(255,255,255,.18)); background: transparent; cursor: pointer; padding: 0; transition: background .1s, border-color .1s; }
+    .voc-dot.on { background: var(--mentorship-gold); border-color: var(--mentorship-gold); }
+
+    .voc-textarea, .voc-input {
+      width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13));
+      border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9);
+      box-sizing: border-box; margin-bottom: 10px;
+    }
+    .voc-textarea { min-height: 70px; resize: vertical; }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+
+    .voc-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .voc-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #f4f6f9); font-size: 13px; cursor: pointer; transition: border-color .1s, background .1s; }
+    .voc-chip.on { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
+
+    .voc-values-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .voc-value-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; cursor: grab; user-select: none; }
+    .voc-value-rank { font-family: 'Fraunces', serif; font-weight: 700; color: var(--mentorship-gold); width: 20px; text-align: center; flex-shrink: 0; }
+    .voc-value-item.dragging { opacity: .4; }
+
+    .voc-evidence-list { margin-bottom: 12px; }
+    .voc-evidence-item { padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
+    .voc-evidence-item strong { color: var(--text, #f4f6f9); }
+    .voc-evidence-item span { color: var(--text-soft, rgba(244,246,249,.55)); }
+
+    .voc-nominee-item { padding: 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 10px; }
+
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 4px; }
+    .voc-gate-card { margin-top: 24px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentorship</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">My Growth</div>
+      <a class="nav-item" href="/mentorship/dashboard/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M9 18h9"/></svg>
+        My Journey
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/goals.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Goals & Plan
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/growth-compass.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Growth Compass
+      </a>
+      <a class="nav-item active" href="/mentorship/dashboard/vocation/index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
+        Vocation & Life Pathways <span class="badge badge-muted" style="margin-left:6px;font-size:9px">NEW</span>
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/pathways.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        Growth Pathways
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Check-Ins
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/journal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Journal
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+    </nav>
+
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">You were made for more.</div>
+        <div class="sidebar-cta-title">We walk with you.<br>You become who<br>God created.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">You do not need your whole life figured out. Start by learning to read yourself well.</div>
+      </div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Stage 1 · Discover</div>
+          <h1 class="page-title">Who am I becoming?</h1>
+        </div>
+      </div>
+
+      <div id="stepperWrap" class="vocation-stage-stepper"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+          Your first task is not choosing a job. It is learning to notice yourself honestly — what makes you come alive,
+          what you may be good at, what you value, and what kinds of difficulty you're willing to carry. Nothing here
+          produces a verdict. Everything here becomes evidence for later.
+        </p>
+      </div>
+
+      <div id="sectionsList"></div>
+
+      <div class="card voc-gate-card">
+        <div class="card-label">Ready to move forward?</div>
+        <div class="card-title" style="margin-bottom:8px">Mark Discover ready for mentor review</div>
+        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Complete all seven sections and add at least one piece of evidence before this stage is ready for your mentor to review.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
+
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation(); notifDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation(); profileDropdown?.classList.toggle('show'); notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => { notifDropdown?.classList.remove('show'); profileDropdown?.classList.remove('show'); });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+</script>
+
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+
+<script src="/assets/supabase.js"></script>
+<script src="/mentorship/js/vocation-stage.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+
+  let dbClient = null;
+  let currentUser = null;
+  let progressByStage = {};
+  let reflections = {}; // section_key -> payload
+  let evidenceItems = []; // rows from vocation_evidence_items
+  let nominees = []; // rows from vocation_external_nominees
+
+  // ── Section content (a representative MVP set from the brief's much
+  // longer suggested lists — easy to extend, not exhaustive by design,
+  // per the "don't overload with dozens of questions at once" direction).
+  const ALIVE_STATEMENTS = [
+    'I enjoy solving problems with a clear answer.',
+    'I like making, fixing or improving physical things.',
+    'I enjoy explaining difficult ideas to others.',
+    'I like taking the lead when a group is stuck.',
+    'I lose track of time when I’m deep in a creative project.',
+    'I enjoy investigating how something actually works.',
+  ];
+  const STRENGTH_AREAS = [
+    'Analytical reasoning', 'Numerical ability', 'Verbal communication', 'Spatial reasoning',
+    'Practical / mechanical ability', 'Creativity', 'Scientific curiosity', 'Problem solving',
+    'Organisation & attention to detail', 'Interpersonal sensitivity', 'Teaching / explaining',
+    'Persuasion', 'Leadership', 'Entrepreneurship', 'Persistence', 'Craftsmanship',
+    'Systems thinking', 'Technology confidence', 'Visual / design ability',
+  ];
+  const VALUE_ITEMS = [
+    'Financial security', 'Helping others', 'Creativity', 'Intellectual challenge', 'Independence',
+    'Stability', 'Flexibility', 'Family time', 'Leadership', 'Craftsmanship & mastery',
+    'Community impact', 'Faithfulness / integrity', 'Lifelong learning',
+  ];
+  const ENVIRONMENT_PAIRS = [
+    ['Indoors', 'Outdoors'], ['Desk-based', 'Physically active'], ['Predictable', 'Varied'],
+    ['Structured', 'Autonomous'], ['Individual work', 'Team work'], ['Practical', 'Theoretical'],
+    ['Leading', 'Supporting'], ['Fast-paced', 'Deep focus'],
+  ];
+  const HARD_THINGS = [
+    'Years of formal study', 'Physical work', 'Early starts', 'Carrying real responsibility',
+    'Living with uncertainty', 'Competition', 'Public speaking', 'Repeated practice to build mastery',
+    'Long projects with delayed reward', 'Starting at the bottom and working up',
+  ];
+  const CHARACTER_QUALITIES = [
+    'Reliability', 'Discipline', 'Courage', 'Patience', 'Humility', 'Honesty',
+    'Teachability', 'Resilience', 'Initiative', 'Self-control', 'Compassion', 'Consistency',
+  ];
+
+  const SECTIONS = [
+    { key: 'discover.alive', num: '01', title: 'What Makes Me Come Alive?', sub: 'Rate each statement from real experience — not who you think you ought to be.' },
+    { key: 'discover.strengths', num: '02', title: 'Strengths & Evidence', sub: 'Self-report is a starting point, not proof. Attach real evidence where you can.' },
+    { key: 'discover.nominees', num: '03', title: 'What Do Other People See In Me?', sub: 'Ask 2-3 trusted people, then record what you heard back.' },
+    { key: 'discover.values', num: '04', title: 'Values', sub: 'Drag to rank what matters most to you right now — there are no wrong answers.' },
+    { key: 'discover.environment', num: '05', title: 'Preferred Working Environment', sub: 'Slide toward whichever side feels closer to true for you.' },
+    { key: 'discover.hard_things', num: '06', title: 'The Hard Things I Am Willing To Do', sub: 'Every meaningful path contains difficulty. What kind feels worth enduring?' },
+    { key: 'discover.character', num: '07', title: 'Character & Formation', sub: 'What kind of person must I become to carry the future I want?' },
+  ];
+
+  const saveReflectionDebounced = debounceAutosave(async (sectionKey, payload) => {
+    reflections[sectionKey] = payload;
+    await saveReflection(dbClient, currentUser.id, sectionKey, payload);
+    await markStageInProgress(dbClient, currentUser.id, 'discover');
+    updateGate();
+  }, 700);
+
+  // ── 01: Alive ratings ──────────────────────────────────────
+  function renderAlive() {
+    const payload = reflections['discover.alive'] || { ratings: {}, notes: '' };
+    const rows = ALIVE_STATEMENTS.map((stmt, i) => {
+      const score = payload.ratings[i] || 0;
+      const dots = [1, 2, 3, 4, 5].map(n =>
+        `<button class="voc-dot${n <= score ? ' on' : ''}" data-alive-dot data-stmt="${i}" data-score="${n}" aria-label="${n} of 5"></button>`
+      ).join('');
+      return `<div class="voc-rating-row"><div class="voc-rating-text">${escapeHtml(stmt)}</div><div class="voc-dots">${dots}</div></div>`;
+    }).join('');
+    return `
+      ${rows}
+      <div style="margin-top:16px">
+        <label class="voc-field-label">What themes are you noticing about yourself so far?</label>
+        <textarea class="voc-textarea" id="aliveNotes" placeholder="e.g. I keep coming back to practical problem-solving and technology...">${escapeHtml(payload.notes || '')}</textarea>
+      </div>`;
+  }
+  function wireAlive(container) {
+    const payload = reflections['discover.alive'] || { ratings: {}, notes: '' };
+    container.querySelectorAll('[data-alive-dot]').forEach(dot => {
+      dot.addEventListener('click', () => {
+        payload.ratings[dot.dataset.stmt] = Number(dot.dataset.score);
+        renderSection('discover.alive');
+        saveReflectionDebounced('discover.alive', payload);
+      });
+    });
+    container.querySelector('#aliveNotes')?.addEventListener('input', (e) => {
+      payload.notes = e.target.value;
+      saveReflectionDebounced('discover.alive', payload);
+    });
+  }
+
+  // ── 02: Strengths + evidence ───────────────────────────────
+  function renderStrengths() {
+    const payload = reflections['discover.strengths'] || { selected: [] };
+    const chips = STRENGTH_AREAS.map(area =>
+      `<button class="voc-chip${payload.selected.includes(area) ? ' on' : ''}" data-strength-chip="${escapeHtml(area)}">${escapeHtml(area)}</button>`
+    ).join('');
+    const evidenceHtml = evidenceItems.filter(e => e.section_key === 'discover.strengths').map(e => `
+      <div class="voc-evidence-item"><strong>${escapeHtml(e.title)}</strong>${e.description ? ' — ' + escapeHtml(e.description) : ''} <span>(${escapeHtml(e.evidence_type || 'evidence')})</span></div>
+    `).join('') || '<div class="voc-save-note">No evidence added yet.</div>';
+    return `
+      <label class="voc-field-label">Where do you think you might be strong? (self-report — a starting point, not proof)</label>
+      <div class="voc-chip-grid">${chips}</div>
+      <label class="voc-field-label">Evidence notebook — grades, projects, awards, teacher or mentor comments</label>
+      <div class="voc-evidence-list" id="strengthsEvidenceList">${evidenceHtml}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <input class="voc-input" id="evTitle" placeholder="e.g. Physics coursework — strong systems thinking" style="flex:2; min-width:200px; margin-bottom:0">
+        <input class="voc-input" id="evType" placeholder="Type (grade, project, comment...)" style="flex:1; min-width:140px; margin-bottom:0">
+      </div>
+      <button class="list-card-btn" id="addEvidenceBtn" style="margin-top:8px">+ Add Evidence</button>`;
+  }
+  function wireStrengths(container) {
+    const payload = reflections['discover.strengths'] || { selected: [] };
+    container.querySelectorAll('[data-strength-chip]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const area = chip.dataset.strengthChip;
+        const idx = payload.selected.indexOf(area);
+        if (idx === -1) payload.selected.push(area); else payload.selected.splice(idx, 1);
+        renderSection('discover.strengths');
+        saveReflectionDebounced('discover.strengths', payload);
+      });
+    });
+    container.querySelector('#addEvidenceBtn')?.addEventListener('click', async () => {
+      const title = container.querySelector('#evTitle').value.trim();
+      const evidence_type = container.querySelector('#evType').value.trim() || 'other';
+      if (!title) return;
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_evidence_items')
+        .insert({ student_id: currentUser.id, stage: 'discover', section_key: 'discover.strengths', title, evidence_type })
+        .select().single();
+      if (error) { console.warn('Add evidence failed:', error); return; }
+      evidenceItems.push(data);
+      await markStageInProgress(dbClient, currentUser.id, 'discover');
+      renderSection('discover.strengths');
+      updateGate();
+    });
+  }
+
+  // ── 03: External nominees ──────────────────────────────────
+  function renderNominees() {
+    const listHtml = nominees.map(n => `
+      <div class="voc-nominee-item">
+        <div style="font-weight:700; font-size:14px; margin-bottom:4px">${escapeHtml(n.name)} <span class="voc-save-note" style="display:inline">(${escapeHtml(n.relationship)})</span></div>
+        <div style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.75))">${escapeHtml(n.mentee_summary || 'No summary yet.')}</div>
+      </div>`).join('') || '<div class="voc-save-note">No one added yet — ask 2-3 trusted people, then add what you heard back.</div>';
+    return `
+      <p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); margin-bottom:12px">
+        Ask people like a parent, teacher, mentor, coach or relative: what do people repeatedly ask you for help with?
+        What strength do adults often notice in you? When have you surprised yourself?
+      </p>
+      <div id="nomineesList">${listHtml}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px">
+        <input class="voc-input" id="nomName" placeholder="Their name" style="flex:1; min-width:120px; margin-bottom:0">
+        <input class="voc-input" id="nomRelationship" placeholder="Relationship (teacher, coach...)" style="flex:1; min-width:140px; margin-bottom:0">
+      </div>
+      <textarea class="voc-textarea" id="nomSummary" placeholder="What did they say?"></textarea>
+      <button class="list-card-btn" id="addNomineeBtn">+ Add What They Said</button>`;
+  }
+  function wireNominees(container) {
+    container.querySelector('#addNomineeBtn')?.addEventListener('click', async () => {
+      const name = container.querySelector('#nomName').value.trim();
+      const relationship = container.querySelector('#nomRelationship').value.trim();
+      const mentee_summary = container.querySelector('#nomSummary').value.trim();
+      if (!name || !relationship) return;
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_external_nominees')
+        .insert({ student_id: currentUser.id, name, relationship, mentee_summary: mentee_summary || null })
+        .select().single();
+      if (error) { console.warn('Add nominee failed:', error); return; }
+      nominees.push(data);
+      // Nominees count toward "discover.nominees" completion via reflections marker
+      await saveReflection(dbClient, currentUser.id, 'discover.nominees', { count: nominees.length });
+      reflections['discover.nominees'] = { count: nominees.length };
+      await markStageInProgress(dbClient, currentUser.id, 'discover');
+      renderSection('discover.nominees');
+      updateGate();
+    });
+  }
+
+  // ── 04: Values ranking ─────────────────────────────────────
+  function renderValues() {
+    const payload = reflections['discover.values'] || { ranked: VALUE_ITEMS.slice(0, 8) };
+    const items = payload.ranked.map((v, i) => `
+      <div class="voc-value-item" draggable="true" data-value="${escapeHtml(v)}">
+        <span class="voc-value-rank">${i + 1}</span>${escapeHtml(v)}
+      </div>`).join('');
+    return `
+      <p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); margin-bottom:12px">Drag to reorder — top is most important to you right now.</p>
+      <div class="voc-values-list" id="valuesList">${items}</div>`;
+  }
+  function wireValues(container) {
+    const payload = reflections['discover.values'] || { ranked: VALUE_ITEMS.slice(0, 8) };
+    const list = container.querySelector('#valuesList');
+    let dragEl = null;
+    list?.querySelectorAll('.voc-value-item').forEach(item => {
+      item.addEventListener('dragstart', () => { dragEl = item; item.classList.add('dragging'); });
+      item.addEventListener('dragend', () => { item.classList.remove('dragging'); });
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!dragEl || dragEl === item) return;
+        const rect = item.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < rect.height / 2;
+        list.insertBefore(dragEl, before ? item : item.nextSibling);
+      });
+      item.addEventListener('drop', () => {
+        const order = Array.from(list.querySelectorAll('.voc-value-item')).map(el => el.dataset.value);
+        payload.ranked = order;
+        list.querySelectorAll('.voc-value-item').forEach((el, i) => { el.querySelector('.voc-value-rank').textContent = i + 1; });
+        saveReflectionDebounced('discover.values', payload);
+      });
+    });
+  }
+
+  // ── 05: Environment sliders (binary chip toggle per pair) ──
+  function renderEnvironment() {
+    const payload = reflections['discover.environment'] || { picks: {} };
+    const rows = ENVIRONMENT_PAIRS.map(([a, b], i) => {
+      const pick = payload.picks[i];
+      return `
+        <div class="voc-rating-row">
+          <button class="voc-chip${pick === 'a' ? ' on' : ''}" data-env="${i}" data-side="a">${escapeHtml(a)}</button>
+          <span class="voc-save-note" style="flex-shrink:0">vs</span>
+          <button class="voc-chip${pick === 'b' ? ' on' : ''}" data-env="${i}" data-side="b">${escapeHtml(b)}</button>
+        </div>`;
+    }).join('');
+    return rows;
+  }
+  function wireEnvironment(container) {
+    const payload = reflections['discover.environment'] || { picks: {} };
+    container.querySelectorAll('[data-env]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        payload.picks[btn.dataset.env] = btn.dataset.side;
+        renderSection('discover.environment');
+        saveReflectionDebounced('discover.environment', payload);
+      });
+    });
+  }
+
+  // ── 06: Hard things tolerance ───────────────────────────────
+  function renderHardThings() {
+    const payload = reflections['discover.hard_things'] || { ratings: {} };
+    const rows = HARD_THINGS.map((thing, i) => {
+      const score = payload.ratings[i] || 0;
+      const dots = [1, 2, 3, 4, 5].map(n =>
+        `<button class="voc-dot${n <= score ? ' on' : ''}" data-hard-dot data-item="${i}" data-score="${n}" aria-label="${n} of 5"></button>`
+      ).join('');
+      return `<div class="voc-rating-row"><div class="voc-rating-text">${escapeHtml(thing)}</div><div class="voc-dots">${dots}</div></div>`;
+    }).join('');
+    return `<p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); margin-bottom:8px">Rate how willing you are to endure each, 1 (not at all) to 5 (very willing).</p>${rows}`;
+  }
+  function wireHardThings(container) {
+    const payload = reflections['discover.hard_things'] || { ratings: {} };
+    container.querySelectorAll('[data-hard-dot]').forEach(dot => {
+      dot.addEventListener('click', () => {
+        payload.ratings[dot.dataset.item] = Number(dot.dataset.score);
+        renderSection('discover.hard_things');
+        saveReflectionDebounced('discover.hard_things', payload);
+      });
+    });
+  }
+
+  // ── 07: Character & formation ──────────────────────────────
+  function renderCharacter() {
+    const payload = reflections['discover.character'] || { selected: [], reflection: '' };
+    const chips = CHARACTER_QUALITIES.map(q =>
+      `<button class="voc-chip${payload.selected.includes(q) ? ' on' : ''}" data-char-chip="${escapeHtml(q)}">${escapeHtml(q)}</button>`
+    ).join('');
+    return `
+      <label class="voc-field-label">Which qualities do you most need to grow in right now?</label>
+      <div class="voc-chip-grid">${chips}</div>
+      <label class="voc-field-label">What kind of person must I become to carry the future I want?</label>
+      <textarea class="voc-textarea" id="charReflection" placeholder="Write freely — this isn't graded.">${escapeHtml(payload.reflection || '')}</textarea>`;
+  }
+  function wireCharacter(container) {
+    const payload = reflections['discover.character'] || { selected: [], reflection: '' };
+    container.querySelectorAll('[data-char-chip]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const q = chip.dataset.charChip;
+        const idx = payload.selected.indexOf(q);
+        if (idx === -1) payload.selected.push(q); else payload.selected.splice(idx, 1);
+        renderSection('discover.character');
+        saveReflectionDebounced('discover.character', payload);
+      });
+    });
+    container.querySelector('#charReflection')?.addEventListener('input', (e) => {
+      payload.reflection = e.target.value;
+      saveReflectionDebounced('discover.character', payload);
+    });
+  }
+
+  const RENDERERS = {
+    'discover.alive': { render: renderAlive, wire: wireAlive },
+    'discover.strengths': { render: renderStrengths, wire: wireStrengths },
+    'discover.nominees': { render: renderNominees, wire: wireNominees },
+    'discover.values': { render: renderValues, wire: wireValues },
+    'discover.environment': { render: renderEnvironment, wire: wireEnvironment },
+    'discover.hard_things': { render: renderHardThings, wire: wireHardThings },
+    'discover.character': { render: renderCharacter, wire: wireCharacter },
+  };
+
+  function isSectionComplete(key) {
+    if (key === 'discover.nominees') return nominees.length > 0;
+    const p = reflections[key];
+    if (!p) return false;
+    if (p.ratings) return Object.keys(p.ratings).length >= 3;
+    if (p.selected) return p.selected.length >= 1;
+    if (p.picks) return Object.keys(p.picks).length >= 3;
+    if (p.ranked) return true;
+    return false;
+  }
+
+  function renderSection(key) {
+    const body = document.querySelector(`[data-section-body="${key}"]`);
+    if (!body) return;
+    const r = RENDERERS[key];
+    body.innerHTML = r.render();
+    r.wire(body);
+    const sectionEl = body.closest('.voc-section');
+    sectionEl.classList.toggle('voc-complete', isSectionComplete(key));
+    const doneMark = sectionEl.querySelector('[data-done-mark]');
+    if (doneMark) doneMark.style.display = isSectionComplete(key) ? '' : 'none';
+  }
+
+  function renderAllSections() {
+    const list = $('sectionsList');
+    list.innerHTML = SECTIONS.map(s => `
+      <div class="list-card voc-section" data-section="${s.key}">
+        <div class="voc-section-head" data-toggle>
+          <div>
+            <div class="list-card-title"><span class="voc-section-num">${s.num}</span>${escapeHtml(s.title)}</div>
+            <div class="voc-section-sub">${escapeHtml(s.sub)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px">
+            <span class="badge badge-complete" data-done-mark style="display:none">✓</span>
+            <svg class="voc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <div class="voc-section-body" data-section-body="${s.key}"></div>
+      </div>`).join('');
+
+    list.querySelectorAll('[data-toggle]').forEach(head => {
+      head.addEventListener('click', () => head.closest('.voc-section').classList.toggle('open'));
+    });
+    SECTIONS.forEach(s => renderSection(s.key));
+  }
+
+  function updateGate() {
+    const allComplete = SECTIONS.every(s => isSectionComplete(s.key));
+    const hasEvidence = evidenceItems.length > 0;
+    const ready = allComplete && hasEvidence;
+    const btn = $('markReadyBtn');
+    btn.disabled = !ready;
+    $('gateHint').textContent = ready
+      ? 'All seven sections have real content and you’ve added evidence. You can mark this stage ready for your mentor.'
+      : `Complete all seven sections${!hasEvidence ? ' and add at least one piece of evidence in Strengths & Evidence' : ''} before this stage is ready for review.`;
+  }
+
+  $('markReadyBtn')?.addEventListener('click', async () => {
+    const btn = $('markReadyBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'discover');
+    if (error) { console.warn('Mark ready failed:', error); btn.textContent = 'Try Again'; btn.disabled = false; return; }
+    progressByStage.discover = { status: 'ready_for_review' };
+    renderStageStepper($('stepperWrap'), progressByStage, 'discover');
+    btn.textContent = 'Marked Ready for Review ✓';
+  });
+
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
+      else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      await upsertStageProgress(dbClient, user.id, 'discover');
+
+      const [progressRes, reflectionsRes, evidenceRes, nomineesRes] = await Promise.all([
+        dbClient.schema('mentorship').from('vocation_stage_progress').select('stage, status').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_reflections').select('section_key, payload').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_evidence_items').select('*').eq('student_id', user.id).eq('stage', 'discover'),
+        dbClient.schema('mentorship').from('vocation_external_nominees').select('*').eq('student_id', user.id),
+      ]);
+
+      progressByStage = Object.fromEntries((progressRes.data || []).map(r => [r.stage, r]));
+      reflections = Object.fromEntries((reflectionsRes.data || []).map(r => [r.section_key, r.payload]));
+      evidenceItems = evidenceRes.data || [];
+      nominees = nomineesRes.data || [];
+
+      renderStageStepper($('stepperWrap'), progressByStage, 'discover');
+      renderAllSections();
+      updateGate();
+
+      // Open the first incomplete section by default.
+      const firstIncomplete = SECTIONS.find(s => !isSectionComplete(s.key));
+      const target = firstIncomplete || SECTIONS[0];
+      document.querySelector(`[data-section="${target.key}"]`)?.classList.add('open');
+    } catch (e) {
+      console.warn('Discover page init failed:', e);
+    }
+  })();
+</script>
+</body>
+</html>

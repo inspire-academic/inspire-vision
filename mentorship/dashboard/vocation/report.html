@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report | Vocation & Life Pathways | Inspire Mentorship</title>
+  <meta name="description" content="Your Vocation & Life Pathways report — download, email, or share a parent link.">
+  <meta name="theme-color" content="#0A1628">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .voc-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .voc-mode-toggle { display: inline-flex; border: 1px solid var(--border-md, rgba(255,255,255,.15)); border-radius: 999px; overflow: hidden; }
+    .voc-mode-btn { padding: 8px 16px; font-size: 12px; font-weight: 700; background: transparent; border: none; color: var(--text-soft, rgba(244,246,249,.6)); cursor: pointer; }
+    .voc-mode-btn.active { background: var(--mentorship-gold); color: #fff; }
+    .voc-toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .voc-panel { display: none; margin-bottom: 20px; }
+    .voc-panel.open { display: block; }
+    .voc-status { font-size: 12px; margin-top: 8px; }
+    .voc-status.ok { color: #4ade80; }
+    .voc-status.err { color: #f87171; }
+    .voc-input { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; margin-bottom: 10px; }
+    .voc-link-box { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+    .voc-link-box code { flex: 1; min-width: 200px; background: var(--card-bg2, rgba(255,255,255,.06)); padding: 8px 12px; border-radius: 8px; font-size: 12px; word-break: break-all; }
+
+    /* ── Report content — always rendered on a white page, screen or print ── */
+    #report { background: #fff; color: #1a1a1a; border-radius: 12px; padding: 32px; max-width: 900px; margin: 0 auto; }
+    #report .r-cover { text-align: center; padding: 24px 0 32px; border-bottom: 3px solid #B85C1A; margin-bottom: 28px; }
+    #report .r-eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #B85C1A; font-weight: 700; margin-bottom: 8px; }
+    #report .r-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 800; color: #0A1628; margin-bottom: 6px; }
+    #report .r-meta { font-size: 13px; color: #667; }
+    #report .r-section { margin-bottom: 26px; page-break-inside: avoid; }
+    #report .r-section-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: #0A1628; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 12px; }
+    #report .r-statement { font-style: italic; font-size: 15px; color: #333; background: #f7f6f2; border-left: 4px solid #B85C1A; padding: 12px 16px; border-radius: 6px; }
+    #report .r-stage-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    #report .r-stage-row .status { color: #B85C1A; font-weight: 700; text-transform: capitalize; }
+    #report .r-item { font-size: 13px; color: #333; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    #report .r-item strong { color: #0A1628; }
+    #report .r-empty { font-size: 13px; color: #888; font-style: italic; }
+    #report .r-note { background: #eef2f7; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; font-size: 13px; color: #1a1a1a; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #report, #report * { visibility: visible; }
+      #report { position: absolute; left: 0; top: 0; width: 100%; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="https://www.inspirevision.org" title="Go to Inspire Vision">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-text-top">Inspire</div>
+        <div class="brand-text-sub">Mentorship</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">My Growth</div>
+      <a class="nav-item" href="/mentorship/dashboard/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="/mentorship/journey.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M9 18h9"/></svg>
+        My Journey
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/goals.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Goals & Plan
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/growth-compass.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Growth Compass
+      </a>
+      <a class="nav-item active" href="/mentorship/dashboard/vocation/index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
+        Vocation & Life Pathways <span class="badge badge-muted" style="margin-left:6px;font-size:9px">NEW</span>
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/pathways.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        Growth Pathways
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/check-in.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Check-Ins
+      </a>
+      <a class="nav-item" href="/mentorship/dashboard/journal.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Journal
+      </a>
+      <a class="nav-item" href="/mentorship/resources.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
+        Resources
+      </a>
+    </nav>
+
+    <div class="sidebar-cta">
+      <div class="sidebar-cta-bg"></div>
+      <div class="sidebar-cta-content">
+        <div class="sidebar-cta-eyebrow">You were made for more.</div>
+        <div class="sidebar-cta-title">We walk with you.<br>You become who<br>God created.</div>
+        <div class="sidebar-cta-sig">Inspire.</div>
+      </div>
+    </div>
+  </aside>
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="topbar-menu" id="topbarMenu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-welcome">
+        <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
+        <div class="topbar-sub">Your journey, gathered into one document.</div>
+      </div>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-bell" id="notifBell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="topbar-dropdown" id="notifDropdown">
+          <div class="topbar-dropdown-title">Notifications</div>
+          <div class="topbar-dropdown-empty">You're all caught up — no new notifications yet.</div>
+        </div>
+      </div>
+      <button class="topbar-theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <div class="topbar-dropdown-wrap">
+        <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
+        <div class="topbar-dropdown" id="profileDropdown">
+          <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
+          <button class="topbar-dropdown-item" id="signOutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Vocation & Life Pathways</div>
+          <h1 class="page-title">Your Report</h1>
+        </div>
+      </div>
+
+      <div class="card voc-toolbar">
+        <div class="voc-mode-toggle">
+          <button class="voc-mode-btn active" data-report-mode="mentee">Mentee View</button>
+          <button class="voc-mode-btn" data-report-mode="parent">Parent View</button>
+        </div>
+        <div class="voc-toolbar-actions">
+          <button class="list-card-btn" id="toggleParentLinkBtn">Parent Link</button>
+          <button class="list-card-btn" id="toggleEmailBtn">Email Once</button>
+          <button class="list-card-btn primary" id="downloadBtn">Download PDF</button>
+        </div>
+      </div>
+
+      <div class="card voc-panel" id="parentLinkPanel">
+        <div class="card-label">Persistent Parent Link</div>
+        <p style="font-size:12px; color:var(--text-soft, rgba(244,246,249,.55)); margin:0 0 10px">
+          This link always shows the current state of the journey — no account needed. Optionally email it directly.
+        </p>
+        <input class="voc-input" id="parentLinkEmail" type="email" placeholder="Parent's email (optional)">
+        <button class="list-card-btn primary" id="generateLinkBtn">Generate / Refresh Link</button>
+        <div class="voc-link-box" id="parentLinkBox" style="display:none">
+          <code id="parentLinkText"></code>
+          <button class="list-card-btn" id="copyLinkBtn">Copy</button>
+        </div>
+        <div class="voc-status" id="parentLinkStatus"></div>
+      </div>
+
+      <div class="card voc-panel" id="emailPanel">
+        <div class="card-label">Email This Snapshot</div>
+        <input class="voc-input" id="emailRecipient" type="email" placeholder="Recipient's email">
+        <button class="list-card-btn primary" id="sendEmailBtn">Send PDF</button>
+        <div class="voc-status" id="emailStatus"></div>
+      </div>
+
+      <div id="report">
+        <div class="r-cover">
+          <div class="r-eyebrow" id="reportEyebrow">Mentee Report</div>
+          <div class="r-title" id="reportTitle">Vocation & Life Pathways</div>
+          <div class="r-meta" id="reportMeta"></div>
+        </div>
+        <div id="reportBody"><div class="r-empty">Loading your report…</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const sidebarEl = document.getElementById('sidebar');
+  const backdropEl = document.getElementById('sidebarBackdrop');
+  function closeDrawer() { sidebarEl?.classList.remove('mobile-open'); backdropEl?.classList.remove('show'); }
+  function openDrawer()  { sidebarEl?.classList.add('mobile-open'); backdropEl?.classList.add('show'); }
+  document.getElementById('topbarMenu')?.addEventListener('click', () => {
+    sidebarEl?.classList.contains('mobile-open') ? closeDrawer() : openDrawer();
+  });
+  backdropEl?.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', closeDrawer); });
+
+  const notifDropdown = document.getElementById('notifDropdown');
+  const profileDropdown = document.getElementById('profileDropdown');
+  document.getElementById('notifBell')?.addEventListener('click', (e) => {
+    e.stopPropagation(); notifDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show');
+  });
+  document.getElementById('topbarAvatar')?.addEventListener('click', (e) => {
+    e.stopPropagation(); profileDropdown?.classList.toggle('show'); notifDropdown?.classList.remove('show');
+  });
+  document.addEventListener('click', () => { notifDropdown?.classList.remove('show'); profileDropdown?.classList.remove('show'); });
+  document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+    try { const db = await getDB(); await db.auth.signOut(); } catch (e) { console.warn('Sign out failed:', e); }
+    window.location.href = 'https://www.inspirevision.org';
+  });
+</script>
+
+<script>
+  (function () {
+    const html = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('iv-theme');
+    if (saved) html.setAttribute('data-theme', saved);
+    btn?.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('iv-theme', next);
+    });
+  })();
+</script>
+
+<script src="/assets/supabase.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+  let dbClient = null;
+  let currentUser = null;
+  let studentName = 'Your';
+  let reportMode = 'mentee';
+
+  const STAGE_LABELS = { discover: 'Discover', explore: 'Explore', test: 'Test', discern: 'Discern', design: 'Design', present: 'Present', review: 'Review' };
+  const STATUS_LABELS = { not_started: 'Not Started', in_progress: 'In Progress', ready_for_review: 'Ready for Review', mentor_reviewed: 'Mentor Reviewed', complete: 'Complete' };
+
+  function renderReportBody(data) {
+    const stageRows = Object.entries(STAGE_LABELS).map(([key, label]) => {
+      const status = (data.stageProgress.find(p => p.stage === key) || {}).status || 'not_started';
+      return `<div class="r-stage-row"><span>${label}</span><span class="status">${STATUS_LABELS[status]}</span></div>`;
+    }).join('');
+
+    const interests = data.careerInterests.length
+      ? data.careerInterests.map(c => `<div class="r-item"><strong>${escapeHtml(c.title)}</strong>${c.family ? ' — ' + escapeHtml(c.family) : ''} <span style="text-transform:capitalize">(${escapeHtml((c.reaction || '').replace(/_/g, ' '))})</span></div>`).join('')
+      : '<div class="r-empty">No career interests recorded yet.</div>';
+
+    const hypotheses = data.hypotheses.length
+      ? data.hypotheses.map(h => `<div class="r-item"><strong>${escapeHtml(h.label)}</strong>${h.category ? ' — ' + escapeHtml(h.category) : ''}${h.why_it_fits ? '<br>' + escapeHtml(h.why_it_fits) : ''}</div>`).join('')
+      : '<div class="r-empty">No active pathway hypotheses yet.</div>';
+
+    const pp = data.pathwayPlan || {};
+    const pathwaySection = (pp.preferred_pathway?.title || pp.alternative_pathway?.title)
+      ? `${pp.preferred_pathway?.title ? `<div class="r-item"><strong>Preferred:</strong> ${escapeHtml(pp.preferred_pathway.title)}${pp.preferred_pathway.description ? ' — ' + escapeHtml(pp.preferred_pathway.description) : ''}</div>` : ''}
+         ${pp.alternative_pathway?.title ? `<div class="r-item"><strong>Alternative:</strong> ${escapeHtml(pp.alternative_pathway.title)}${pp.alternative_pathway.description ? ' — ' + escapeHtml(pp.alternative_pathway.description) : ''}</div>` : ''}`
+      : '<div class="r-empty">No pathway plan yet.</div>';
+
+    const actionItems = data.actionPlanItems.length
+      ? data.actionPlanItems.map(i => `<div class="r-item"><strong>${escapeHtml(i.title)}</strong> — ${escapeHtml((i.plan_type || '').replace(/_/g, ' '))}${i.target_date ? ' · ' + fmtDate(i.target_date) : (i.target_period_text ? ' · ' + escapeHtml(i.target_period_text) : '')} <span style="text-transform:capitalize">(${escapeHtml(i.status)})</span></div>`).join('')
+      : '<div class="r-empty">No action plan items yet.</div>';
+
+    const evidence = data.evidence.length
+      ? data.evidence.slice(0, 20).map(e => `<div class="r-item"><strong>${escapeHtml(e.title)}</strong> — ${escapeHtml((e.evidence_type || '').replace(/_/g, ' '))}</div>`).join('')
+      : '<div class="r-empty">No evidence logged yet.</div>';
+
+    const mentorNotes = data.mentorNotes.length
+      ? data.mentorNotes.map(n => `<div class="r-note">${escapeHtml(n.note)}</div>`).join('')
+      : '<div class="r-empty">No mentor notes shared yet.</div>';
+
+    $('reportBody').innerHTML = `
+      <div class="r-section">
+        <div class="r-section-title">Current Working Statement of Vocation</div>
+        <div class="r-statement">${data.workingStatement ? escapeHtml(data.workingStatement) : 'No working statement written yet.'}</div>
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Journey Progress</div>
+        ${stageRows}
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Career Interests</div>
+        ${interests}
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Active Pathway Hypotheses</div>
+        ${hypotheses}
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Pathway Plan</div>
+        ${pathwaySection}
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Action Plan</div>
+        ${actionItems}
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Evidence Gathered</div>
+        ${evidence}
+      </div>
+      <div class="r-section">
+        <div class="r-section-title">Notes From Your Mentor</div>
+        ${mentorNotes}
+      </div>`;
+  }
+
+  function applyMode(mode) {
+    reportMode = mode;
+    document.querySelectorAll('[data-report-mode]').forEach(btn => btn.classList.toggle('active', btn.dataset.reportMode === mode));
+    $('reportEyebrow').textContent = mode === 'parent' ? 'A Report For You, From Your Young Person' : 'Mentee Report';
+    $('reportTitle').textContent = mode === 'parent' ? `${studentName}'s Vocation & Life Pathways Journey` : 'Vocation & Life Pathways';
+  }
+  document.querySelectorAll('[data-report-mode]').forEach(btn => {
+    btn.addEventListener('click', () => applyMode(btn.dataset.reportMode));
+  });
+
+  $('toggleParentLinkBtn')?.addEventListener('click', () => { $('parentLinkPanel').classList.toggle('open'); $('emailPanel').classList.remove('open'); });
+  $('toggleEmailBtn')?.addEventListener('click', () => { $('emailPanel').classList.toggle('open'); $('parentLinkPanel').classList.remove('open'); });
+
+  $('generateLinkBtn')?.addEventListener('click', async () => {
+    const btn = $('generateLinkBtn');
+    btn.disabled = true; btn.textContent = 'Generating…';
+    $('parentLinkStatus').textContent = '';
+    try {
+      const { data: { session } } = await dbClient.auth.getSession();
+      const res = await fetch('/.netlify/functions/vocation-parent-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ parentEmail: $('parentLinkEmail').value.trim() || undefined }),
+      });
+      const result = await res.json();
+      if (!res.ok || result.error) throw new Error(result.error || 'Failed to generate link');
+      $('parentLinkText').textContent = result.url;
+      $('parentLinkBox').style.display = 'flex';
+      $('parentLinkStatus').className = 'voc-status ok';
+      $('parentLinkStatus').textContent = result.emailSent ? 'Link generated and emailed.' : 'Link generated.';
+    } catch (e) {
+      $('parentLinkStatus').className = 'voc-status err';
+      $('parentLinkStatus').textContent = e.message || 'Something went wrong.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Generate / Refresh Link';
+    }
+  });
+  $('copyLinkBtn')?.addEventListener('click', () => {
+    navigator.clipboard?.writeText($('parentLinkText').textContent);
+    $('copyLinkBtn').textContent = 'Copied ✓';
+    setTimeout(() => { $('copyLinkBtn').textContent = 'Copy'; }, 1500);
+  });
+
+  // ── PDF generation (lazy-loaded, client-side) ──
+  let html2pdfLoaded = null;
+  function loadHtml2Pdf() {
+    if (window.html2pdf) return Promise.resolve();
+    if (html2pdfLoaded) return html2pdfLoaded;
+    html2pdfLoaded = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Could not load PDF engine — check your connection and try again.'));
+      document.head.appendChild(s);
+    });
+    return html2pdfLoaded;
+  }
+  function pdfOptions() {
+    return {
+      margin: 10,
+      filename: `${studentName.replace(/[^a-z0-9]+/gi, '_')}_Vocation_Report.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    };
+  }
+
+  $('downloadBtn')?.addEventListener('click', async () => {
+    const btn = $('downloadBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Generating…'; btn.disabled = true;
+    try {
+      await loadHtml2Pdf();
+      await html2pdf().set(pdfOptions()).from($('report')).save();
+      btn.textContent = 'Downloaded ✓';
+    } catch (e) {
+      console.error('PDF generation failed:', e);
+      btn.textContent = 'Failed — try again';
+    } finally {
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
+    }
+  });
+
+  $('sendEmailBtn')?.addEventListener('click', async () => {
+    const email = $('emailRecipient').value.trim();
+    const statusEl = $('emailStatus');
+    statusEl.className = 'voc-status';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      statusEl.className = 'voc-status err'; statusEl.textContent = 'Enter a valid email address.';
+      return;
+    }
+    const btn = $('sendEmailBtn');
+    btn.disabled = true; btn.textContent = 'Preparing PDF…';
+    try {
+      await loadHtml2Pdf();
+      const dataUri = await html2pdf().set(pdfOptions()).from($('report')).toPdf().output('datauristring');
+      const pdfBase64 = dataUri.split('base64,')[1];
+      btn.textContent = 'Sending…';
+      const res = await fetch('/.netlify/functions/vocation-report-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientEmail: email, studentName, pdfBase64, filename: pdfOptions().filename }),
+      });
+      const result = await res.json();
+      if (!res.ok || !result.success) throw new Error(result.error?.message || 'Send failed');
+      statusEl.className = 'voc-status ok'; statusEl.textContent = 'Sent!';
+    } catch (e) {
+      statusEl.className = 'voc-status err'; statusEl.textContent = e.message || 'Something went wrong.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Send PDF';
+    }
+  });
+
+  (async () => {
+    try {
+      dbClient = await getDB();
+      const { data: { user } } = await dbClient.auth.getUser();
+      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      currentUser = user;
+      const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
+      const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
+      studentName = user.user_metadata?.full_name || user.user_metadata?.name || firstName;
+      $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
+      $('profileDropdownName').textContent = firstName;
+      const avatarEl = $('topbarAvatar');
+      const avatarUrl = user.user_metadata?.avatar_url;
+      if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
+      else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
+
+      const [progressRes, statementRes, evidenceRes, reactionsRes, profilesRes, familiesRes, hypRes, planRes, itemsRes, recapsRes] = await Promise.all([
+        dbClient.schema('mentorship').from('vocation_stage_progress').select('stage, status').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_working_statement').select('statement').eq('student_id', user.id).maybeSingle(),
+        dbClient.schema('mentorship').from('vocation_evidence_items').select('title, evidence_type').eq('student_id', user.id).order('created_at', { ascending: false }),
+        dbClient.schema('mentorship').from('vocation_career_reactions').select('career_profile_id, reaction').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_career_profiles').select('id, title, family_id'),
+        dbClient.schema('mentorship').from('vocation_career_families').select('id, name'),
+        dbClient.schema('mentorship').from('vocation_pathway_hypotheses').select('label, category, why_it_fits').eq('student_id', user.id).eq('status', 'active'),
+        dbClient.schema('mentorship').from('vocation_pathway_plan').select('preferred_pathway, alternative_pathway').eq('student_id', user.id).maybeSingle(),
+        dbClient.schema('mentorship').from('vocation_action_plan_items').select('plan_type, title, target_date, target_period_text, status').eq('student_id', user.id),
+        dbClient.schema('mentorship').from('vocation_observation_recaps').select('note').eq('student_id', user.id).order('created_at', { ascending: false }),
+      ]);
+
+      const familyById = Object.fromEntries((familiesRes.data || []).map(f => [f.id, f.name]));
+      const profileById = Object.fromEntries((profilesRes.data || []).map(p => [p.id, p]));
+      const careerInterests = (reactionsRes.data || [])
+        .filter(r => r.reaction !== 'not_for_me')
+        .map(r => { const p = profileById[r.career_profile_id]; return p ? { title: p.title, family: familyById[p.family_id] || null, reaction: r.reaction } : null; })
+        .filter(Boolean);
+
+      renderReportBody({
+        stageProgress: progressRes.data || [],
+        workingStatement: statementRes.data?.statement || null,
+        evidence: evidenceRes.data || [],
+        careerInterests,
+        hypotheses: hypRes.data || [],
+        pathwayPlan: planRes.data || {},
+        actionPlanItems: itemsRes.data || [],
+        mentorNotes: recapsRes.data || [],
+      });
+      applyMode('mentee');
+      $('reportMeta').textContent = `Generated ${fmtDate(new Date().toISOString())}`;
+    } catch (e) {
+      console.warn('Report page init failed:', e);
+      $('reportBody').innerHTML = '<div class="r-empty">Something went wrong loading your report.</div>';
+    }
+  })();
+</script>
+</body>
+</html>
