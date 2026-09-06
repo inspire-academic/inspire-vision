@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Explore | Vocation & Life Pathways | Inspire Mentorship</title>
   <meta name="description" content="Stage 2 of Vocation & Life Pathways — expand possibility before narrowing direction.">
-  <meta name="theme-color" content="#0A1628">
+  <meta name="theme-color" content="#161310">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   <style>
     .voc-section { margin-bottom: 14px; }
     .voc-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; border-left: 3px solid var(--mentorship-gold); padding-left: 12px; margin-left: -12px; }
-    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.55)); margin-top: 4px; font-weight: 400; }
+    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(245,241,234,.55)); margin-top: 4px; font-weight: 400; }
     .voc-section-body { margin-top: 16px; display: none; }
     .voc-section.open .voc-section-body { display: block; }
     .voc-chevron { transition: transform .15s; opacity: .5; flex-shrink: 0; }
@@ -25,21 +25,21 @@
     .voc-profile-row { padding: 14px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); }
     .voc-profile-row:last-child { border-bottom: none; }
     .voc-profile-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-    .voc-profile-title { font-size: 14px; font-weight: 800; color: var(--text, #f4f6f9); margin-bottom: 3px; }
-    .voc-profile-summary { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.68)); line-height: 1.5; max-width: 46ch; }
+    .voc-profile-title { font-size: 14px; font-weight: 800; color: var(--text, #F5F1EA); margin-bottom: 3px; }
+    .voc-profile-summary { font-size: 13px; color: var(--text-muted, rgba(245,241,234,.68)); line-height: 1.5; max-width: 46ch; }
 
     .voc-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-    .voc-chip { padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #f4f6f9); font-size: 12px; cursor: pointer; transition: border-color .1s, background .1s; white-space: nowrap; }
+    .voc-chip { padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #F5F1EA); font-size: 12px; cursor: pointer; transition: border-color .1s, background .1s; white-space: nowrap; }
     .voc-chip.on-strong { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
     .voc-chip.on-maybe { background: rgba(217,119,6,.2); border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
     .voc-chip.on-save { background: rgba(59,130,246,.18); border-color: #60a5fa; color: #60a5fa; }
-    .voc-chip.on-not { background: rgba(255,255,255,.06); border-color: var(--border-md, rgba(255,255,255,.2)); color: var(--text-soft, rgba(244,246,249,.5)); text-decoration: line-through; }
+    .voc-chip.on-not { background: rgba(255,255,255,.06); border-color: var(--border-md, rgba(255,255,255,.2)); color: var(--text-soft, rgba(245,241,234,.5)); text-decoration: line-through; }
 
     .voc-shortlist-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 8px; }
-    .voc-shortlist-item a { color: var(--text, #f4f6f9); font-weight: 700; font-size: 13px; text-decoration: none; }
+    .voc-shortlist-item a { color: var(--text, #F5F1EA); font-weight: 700; font-size: 13px; text-decoration: none; }
     .voc-shortlist-item a:hover { color: var(--mentorship-gold); }
-    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
-    .voc-family-count { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.5)); }
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.5)); }
+    .voc-family-count { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.5)); }
     .voc-gate-card { margin-top: 24px; }
   </style>
 </head>
@@ -119,6 +119,13 @@
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
         <div class="topbar-sub">Explore entire worlds of work — not just the handful of jobs you already know.</div>
       </div>
+      <div class="topbar-progress-inline" id="topbarProgress">
+        <div>
+          <div class="topbar-progress-pct"><span id="topbarPct">0</span>% <span>complete</span></div>
+          <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbarProgressFill" style="width:0%"></div></div>
+        </div>
+        <div class="topbar-progress-next">Next up<strong id="topbarNext">—</strong></div>
+      </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -153,10 +160,31 @@
       <div id="stepperWrap" class="vocation-stage-stepper"></div>
 
       <div class="card" style="margin-bottom:20px">
-        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+        <p style="font-size:14px; color:var(--text-muted, rgba(245,241,234,.75)); line-height:1.6; margin:0">
           Browse whole worlds of work, not just the handful of jobs you already know exist. React to what catches
           your attention — nothing here commits you to anything. You're building a shortlist to test in Stage 3.
         </p>
+      </div>
+
+      <div class="voc-deliverable-grid">
+        <div class="card voc-deliverable-card">
+          <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg></div>
+          <div class="voc-deliverable-name">Career Map</div>
+          <div class="voc-deliverable-stat"><strong id="statFamilies">0</strong> of <span id="statFamiliesTotal">0</span> families explored</div>
+          <div class="voc-deliverable-next" id="statFamiliesNext">Open a family below to start browsing.</div>
+        </div>
+        <div class="card voc-deliverable-card">
+          <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="voc-deliverable-name">Reaction Log</div>
+          <div class="voc-deliverable-stat"><strong id="statReactions">0</strong> careers reacted to</div>
+          <div class="voc-deliverable-next" id="statReactionsNext">React to at least 3 to unlock Test.</div>
+        </div>
+        <div class="card voc-deliverable-card">
+          <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="voc-deliverable-name">Shortlist</div>
+          <div class="voc-deliverable-stat"><strong id="statShortlist">0</strong> careers shortlisted</div>
+          <div class="voc-deliverable-next" id="statShortlistNext">Carried into Test as what you'll try first.</div>
+        </div>
       </div>
 
       <div id="familiesList"></div>
@@ -260,6 +288,26 @@
     renderFamilies();
     renderShortlist();
     updateGate();
+    updateStats();
+  }
+
+  function updateStats() {
+    const reacted = Object.values(reactionsByProfile);
+    const distinctFamilies = new Set(reacted.map(r => profiles.find(p => p.id === r.career_profile_id)?.family_id).filter(Boolean));
+    const shortlisted = reacted.filter(r => r.reaction !== 'not_for_me');
+    $('statFamilies').textContent = distinctFamilies.size;
+    $('statFamiliesTotal').textContent = families.length;
+    $('statFamiliesNext').textContent = distinctFamilies.size > 0
+      ? `${distinctFamilies.size} of ${families.length} — keep browsing to widen the map.`
+      : 'Open a family below to start browsing.';
+    $('statReactions').textContent = reacted.length;
+    $('statReactionsNext').textContent = reacted.length >= 3
+      ? `${reacted.length} logged — nice range building up.`
+      : 'React to at least 3 to unlock Test.';
+    $('statShortlist').textContent = shortlisted.length;
+    $('statShortlistNext').textContent = shortlisted.length > 0
+      ? `${shortlisted.length} saved — carried into Test as what you'll try first.`
+      : "Carried into Test as what you'll try first.";
   }
 
   function renderFamilies() {
@@ -290,14 +338,16 @@
           </div>`;
       }).join('') || '<div class="voc-empty">No career profiles in this family yet.</div>';
 
+      const famPct = famProfiles.length ? Math.round((reactedCount / famProfiles.length) * 100) : 0;
       return `
         <div class="list-card voc-section" data-family="${f.id}">
           <div class="voc-section-head" data-toggle>
-            <div>
+            <div style="flex:1; min-width:0">
               <div class="list-card-title">${escapeHtml(f.name)}</div>
               <div class="voc-section-sub">${escapeHtml(f.description || '')}</div>
+              <div class="mini-progress-bar" style="max-width:220px"><div class="mini-progress-fill" style="width:${famPct}%"></div></div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px">
+            <div style="display:flex; align-items:center; gap:10px; flex-shrink:0">
               <span class="voc-family-count">${reactedCount} / ${famProfiles.length} reacted</span>
               <svg class="voc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
             </div>
@@ -383,6 +433,15 @@
       renderFamilies();
       renderShortlist();
       updateGate();
+      updateStats();
+
+      const stages = window.VOCATION_STAGES;
+      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
+      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      const pct = Math.round((doneCount / stages.length) * 100);
+      $('topbarPct').textContent = pct;
+      $('topbarProgressFill').style.width = `${pct}%`;
+      $('topbarNext').textContent = nextStage.label;
     } catch (e) {
       console.warn('Explore page init failed:', e);
     }

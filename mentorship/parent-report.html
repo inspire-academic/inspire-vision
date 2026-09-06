@@ -10,12 +10,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --navy: #0A1628; --gold: #B85C1A; }
+    /* --navy renamed in spirit to "ink" (2026-09-06): was #0A1628, the
+       same borrowed Academic navy repainted everywhere else in
+       Mentorship — swapped for a warm dark neutral in the same family
+       as the dashboard's own --text, so this print document reads as
+       Mentorship's own rather than inherited. Kept the variable name
+       --navy since it's only referenced within this one file. The
+       toolbar action button now uses --gold instead, matching the
+       primary-button convention used everywhere else in the module
+       (see dashboard/vocation/report.html's own Download/Send buttons)
+       rather than a dark ink color for a clickable action. */
+    :root { --navy: #211C17; --gold: #B85C1A; }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; background: #f4f2ec; color: #1a1a1a; min-height: 100vh; }
     .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
     .toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-    .toolbar button { background: var(--navy); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .toolbar button { background: var(--gold); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; }
     .report-card { background: #fff; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,.08); padding: 40px; }
     .r-cover { text-align: center; padding: 12px 0 32px; border-bottom: 3px solid var(--gold); margin-bottom: 28px; }
     .r-eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 8px; }

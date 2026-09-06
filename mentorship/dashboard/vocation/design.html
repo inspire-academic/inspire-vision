@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Design | Vocation & Life Pathways | Inspire Mentorship</title>
   <meta name="description" content="Stage 5 of Vocation & Life Pathways — turn direction into a pathway.">
-  <meta name="theme-color" content="#0A1628">
+  <meta name="theme-color" content="#161310">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,34 +19,27 @@
     .voc-pathway-card { border-left: 3px solid var(--mentorship-gold); }
     .voc-pathway-card.alt { border-left-color: var(--border-md, rgba(255,255,255,.2)); }
 
-    .voc-section { margin-bottom: 14px; }
-    .voc-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
-    .voc-section-num { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; color: var(--mentorship-gold); margin-right: 10px; }
-    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.55)); margin-top: 4px; font-weight: 400; }
-    .voc-section-body { margin-top: 16px; display: none; }
-    .voc-section.open .voc-section-body { display: block; }
-    .voc-chevron { transition: transform .15s; opacity: .5; flex-shrink: 0; }
-    .voc-section.open .voc-chevron { transform: rotate(90deg); }
+    .voc-section-sub { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.55)); font-weight: 400; line-height: 1.4; }
 
     .voc-plan-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 8px; }
     .voc-plan-item-main { flex: 1; }
-    .voc-plan-item-title { font-size: 13px; font-weight: 700; color: var(--text, #f4f6f9); }
+    .voc-plan-item-title { font-size: 13px; font-weight: 700; color: var(--text, #F5F1EA); }
     .voc-plan-item-title.done { text-decoration: line-through; opacity: .6; }
-    .voc-plan-item-meta { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.5)); margin-top: 2px; }
-    .voc-plan-item-desc { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.68)); margin-top: 4px; }
-    .voc-status-select { font-size: 11px; padding: 4px 8px; border-radius: 6px; background: var(--card-bg2, rgba(255,255,255,.06)); border: 1px solid var(--border-md, rgba(255,255,255,.14)); color: var(--text, #f4f6f9); flex-shrink: 0; }
+    .voc-plan-item-meta { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.5)); margin-top: 2px; }
+    .voc-plan-item-desc { font-size: 12px; color: var(--text-muted, rgba(245,241,234,.68)); margin-top: 4px; }
+    .voc-status-select { font-size: 11px; padding: 4px 8px; border-radius: 6px; background: var(--card-bg2, rgba(255,255,255,.06)); border: 1px solid var(--border-md, rgba(255,255,255,.14)); color: var(--text, #F5F1EA); flex-shrink: 0; }
 
     .voc-textarea, .voc-input, .voc-select {
       width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13));
-      border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9);
+      border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #F5F1EA);
       box-sizing: border-box; margin-bottom: 10px;
     }
     .voc-textarea { min-height: 64px; resize: vertical; }
-    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(245,241,234,.8)); }
     .voc-form-grid.two { display: grid; grid-template-columns: 1fr; gap: 0; }
     @media (min-width: 720px) { .voc-form-grid.two { grid-template-columns: 1fr 1fr; gap: 0 12px; } }
-    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
-    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 4px; }
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.5)); }
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.45)); margin-top: 4px; }
     .voc-gate-card { margin-top: 24px; }
   </style>
 </head>
@@ -126,6 +119,13 @@
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
         <div class="topbar-sub">A credible future is built from next steps, not vague ambition.</div>
       </div>
+      <div class="topbar-progress-inline" id="topbarProgress">
+        <div>
+          <div class="topbar-progress-pct"><span id="topbarPct">0</span>% <span>complete</span></div>
+          <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbarProgressFill" style="width:0%"></div></div>
+        </div>
+        <div class="topbar-progress-next">Next up<strong id="topbarNext">—</strong></div>
+      </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -160,7 +160,7 @@
       <div id="stepperWrap" class="vocation-stage-stepper"></div>
 
       <div class="card" style="margin-bottom:20px">
-        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+        <p style="font-size:14px; color:var(--text-muted, rgba(245,241,234,.75)); line-height:1.6; margin:0">
           Build a credible next step from what you've learned — a preferred pathway, a real alternative, and concrete
           actions across three time horizons. Broad scenarios, not false precision.
         </p>
@@ -185,12 +185,37 @@
         </div>
       </div>
 
-      <div id="sectionsList"></div>
+      <div class="card-label" style="margin-bottom:10px">Your Action Plan</div>
+      <div class="voc-flow-grid" style="margin-bottom:20px">
+        <div>
+          <div class="voc-flow-progress-track"><div class="voc-flow-progress-fill" id="flowProgressFill" style="width:0%"></div></div>
+          <div class="voc-flow-dots" id="flowDots"></div>
+
+          <div class="card voc-flow-card">
+            <div class="voc-flow-step-label" id="flowStepLabel">Step 1 of 3</div>
+            <div class="card-title" id="flowSectionTitle" style="font-size:19px; margin-bottom:4px"></div>
+            <div class="voc-section-sub" id="flowSectionSub" style="margin-bottom:16px"></div>
+            <div class="voc-flow-body" id="flowBody"></div>
+
+            <div class="voc-flow-nav">
+              <button class="list-card-btn" id="flowBackBtn">← Back</button>
+              <div class="voc-flow-nav-spacer"></div>
+              <button class="list-card-btn primary" id="flowNextBtn">Continue →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card voc-recap-card">
+          <div class="voc-recap-title">Your Pathway Plan</div>
+          <div class="voc-recap-sub">A running summary of the plan you're building across all three horizons.</div>
+          <div id="recapList"></div>
+        </div>
+      </div>
 
       <div class="card">
         <div class="card-label">The 10-Year Life Conversation</div>
         <div class="card-title" style="margin-bottom:8px">Beyond the first job</div>
-        <p style="font-size:12px; color:var(--text-soft, rgba(244,246,249,.55)); margin:0 0 10px">
+        <p style="font-size:12px; color:var(--text-soft, rgba(245,241,234,.55)); margin:0 0 10px">
           A pathway is the start of a life, not just a job title. What kind of life — not just career — are you hoping to build over the next ten years?
         </p>
         <textarea class="voc-textarea" id="tenYearReflection" style="min-height:100px"></textarea>
@@ -289,7 +314,13 @@
 
   function itemsFor(planType) { return actionItems.filter(i => i.plan_type === planType).sort((a, b) => a.sort_order - b.sort_order); }
 
-  function renderPlanSection(planType) {
+  // ── One-horizon-at-a-time flow — same shell as discover.html/test.html,
+  // scoped to just the three action-plan horizons (the preferred/alt
+  // pathway cards and the 10-year reflection above/below stay as their
+  // own free-standing cards, since they aren't part of this sequence). */
+  let currentIndex = 0;
+
+  function renderPlanBody(planType) {
     const cfg = PLAN_TYPES.find(p => p.key === planType);
     const items = itemsFor(planType);
     const rows = items.map(i => `
@@ -307,77 +338,113 @@
       </div>`).join('') || '<div class="voc-empty">Nothing added yet.</div>';
 
     return `
-      <div class="list-card voc-section" data-plan-section="${planType}">
-        <div class="voc-section-head" data-toggle>
-          <div>
-            <div class="list-card-title"><span class="voc-section-num">${cfg.num}</span>${escapeHtml(cfg.title)}</div>
-            <div class="voc-section-sub">${escapeHtml(cfg.sub)}</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px">
-            <span class="voc-section-sub">${items.length} item${items.length === 1 ? '' : 's'}</span>
-            <svg class="voc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
-          </div>
-        </div>
-        <div class="voc-section-body">
-          ${rows}
-          <div style="margin-top:12px">
-            <label class="voc-field-label">Add an item</label>
-            <input class="voc-input" data-item-title="${planType}" placeholder="e.g. Complete an engineering workplace visit">
-            <textarea class="voc-textarea" data-item-desc="${planType}" placeholder="Optional detail"></textarea>
-            ${cfg.usesDate
-              ? `<input class="voc-input" type="date" data-item-date="${planType}">`
-              : `<input class="voc-input" data-item-period="${planType}" placeholder="e.g. Year 2, Age 20-22">`}
-            <button class="list-card-btn" data-add-item="${planType}">+ Add Item</button>
-          </div>
-        </div>
+      ${rows}
+      <div style="margin-top:12px">
+        <label class="voc-field-label">Add an item</label>
+        <input class="voc-input" data-item-title="${planType}" placeholder="e.g. Complete an engineering workplace visit">
+        <textarea class="voc-textarea" data-item-desc="${planType}" placeholder="Optional detail"></textarea>
+        ${cfg.usesDate
+          ? `<input class="voc-input" type="date" data-item-date="${planType}">`
+          : `<input class="voc-input" data-item-period="${planType}" placeholder="e.g. Year 2, Age 20-22">`}
+        <button class="list-card-btn" data-add-item="${planType}">+ Add Item</button>
       </div>`;
   }
 
-  function renderPlanSections() {
-    $('sectionsList').innerHTML = PLAN_TYPES.map(p => renderPlanSection(p.key)).join('');
-
-    document.querySelectorAll('[data-toggle]').forEach(head => {
-      head.addEventListener('click', () => head.closest('.voc-section').classList.toggle('open'));
-    });
-    document.querySelectorAll('[data-item-status]').forEach(sel => {
+  function wirePlanBody(container, planType) {
+    container.querySelectorAll('[data-item-status]').forEach(sel => {
       sel.addEventListener('change', async () => {
         const item = actionItems.find(i => i.id === sel.dataset.itemStatus);
         const { error } = await dbClient.schema('mentorship').from('vocation_action_plan_items')
           .update({ status: sel.value, updated_at: new Date().toISOString() }).eq('id', item.id);
         if (error) { console.warn('Update item status failed:', error); return; }
         item.status = sel.value;
-        renderPlanSections();
+        renderSection(planType);
       });
     });
-    document.querySelectorAll('[data-add-item]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const planType = btn.dataset.addItem;
-        const titleEl = document.querySelector(`[data-item-title="${planType}"]`);
-        const title = titleEl.value.trim();
-        if (!title) return;
-        const descEl = document.querySelector(`[data-item-desc="${planType}"]`);
-        const dateEl = document.querySelector(`[data-item-date="${planType}"]`);
-        const periodEl = document.querySelector(`[data-item-period="${planType}"]`);
-        const payload = {
-          student_id: currentUser.id,
-          plan_type: planType,
-          title,
-          description: descEl.value.trim() || null,
-          target_date: dateEl ? (dateEl.value || null) : null,
-          target_period_text: periodEl ? (periodEl.value.trim() || null) : null,
-          sort_order: itemsFor(planType).length,
-        };
-        const { data, error } = await dbClient.schema('mentorship').from('vocation_action_plan_items').insert(payload).select().single();
-        if (error) { console.warn('Add plan item failed:', error); return; }
-        actionItems.push(data);
-        await markStageInProgress(dbClient, currentUser.id, 'design');
-        const openSections = new Set(Array.from(document.querySelectorAll('.voc-section.open')).map(el => el.dataset.planSection));
-        renderPlanSections();
-        openSections.forEach(key => document.querySelector(`[data-plan-section="${key}"]`)?.classList.add('open'));
-        updateGate();
-      });
+    container.querySelector('[data-add-item]')?.addEventListener('click', async () => {
+      const titleEl = container.querySelector(`[data-item-title="${planType}"]`);
+      const title = titleEl.value.trim();
+      if (!title) return;
+      const descEl = container.querySelector(`[data-item-desc="${planType}"]`);
+      const dateEl = container.querySelector(`[data-item-date="${planType}"]`);
+      const periodEl = container.querySelector(`[data-item-period="${planType}"]`);
+      const payload = {
+        student_id: currentUser.id,
+        plan_type: planType,
+        title,
+        description: descEl.value.trim() || null,
+        target_date: dateEl ? (dateEl.value || null) : null,
+        target_period_text: periodEl ? (periodEl.value.trim() || null) : null,
+        sort_order: itemsFor(planType).length,
+      };
+      const { data, error } = await dbClient.schema('mentorship').from('vocation_action_plan_items').insert(payload).select().single();
+      if (error) { console.warn('Add plan item failed:', error); return; }
+      actionItems.push(data);
+      await markStageInProgress(dbClient, currentUser.id, 'design');
+      renderSection(planType);
+      updateGate();
     });
   }
+
+  function renderSection(planType) {
+    const body = $('flowBody');
+    body.innerHTML = renderPlanBody(planType);
+    wirePlanBody(body, planType);
+    renderDots();
+    renderRecap();
+  }
+
+  function renderDots() {
+    const dots = $('flowDots');
+    dots.innerHTML = PLAN_TYPES.map((p, i) => `
+      <button type="button" class="voc-flow-dot${i === currentIndex ? ' current' : ''}${itemsFor(p.key).length > 0 ? ' done' : ''}"
+              data-goto="${i}" title="${escapeHtml(p.title)}" aria-label="Go to ${escapeHtml(p.title)}">${itemsFor(p.key).length > 0 ? '✓' : p.num}</button>
+    `).join('');
+    dots.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => goToSection(Number(btn.dataset.goto)));
+    });
+  }
+
+  function renderRecap() {
+    const rows = PLAN_TYPES.filter(p => itemsFor(p.key).length > 0).map(p => ({
+      icon: p.num,
+      text: `${escapeHtml(p.title)}: <strong>${itemsFor(p.key).length} item${itemsFor(p.key).length === 1 ? '' : 's'}</strong>`,
+    }));
+    if (pathwayPlan.preferred_pathway.title) {
+      rows.unshift({ icon: '★', text: `Preferred pathway: <strong>${escapeHtml(pathwayPlan.preferred_pathway.title)}</strong>` });
+    }
+    $('recapList').innerHTML = rows.length
+      ? rows.map(r => `<div class="voc-recap-row"><div class="voc-recap-row-icon">${r.icon}</div><div class="voc-recap-row-text">${r.text}</div></div>`).join('')
+      : '<div class="voc-recap-empty">Nothing yet — name a preferred pathway above, then start adding action items.</div>';
+  }
+
+  function renderFlow() {
+    const p = PLAN_TYPES[currentIndex];
+    const isLast = currentIndex === PLAN_TYPES.length - 1;
+    $('flowStepLabel').textContent = `Step ${currentIndex + 1} of ${PLAN_TYPES.length}`;
+    $('flowSectionTitle').textContent = p.title;
+    $('flowSectionSub').textContent = p.sub;
+    $('flowProgressFill').style.width = `${Math.round((currentIndex / (PLAN_TYPES.length - 1)) * 100)}%`;
+    $('flowBackBtn').disabled = currentIndex === 0;
+    const nextBtn = $('flowNextBtn');
+    if (isLast) {
+      nextBtn.textContent = 'All Horizons Covered ✓';
+      nextBtn.disabled = true;
+    } else {
+      nextBtn.textContent = 'Continue →';
+      nextBtn.disabled = false;
+    }
+    renderSection(p.key);
+  }
+
+  function goToSection(i) {
+    if (i < 0 || i >= PLAN_TYPES.length) return;
+    currentIndex = i;
+    renderFlow();
+  }
+
+  $('flowBackBtn').addEventListener('click', () => goToSection(currentIndex - 1));
+  $('flowNextBtn').addEventListener('click', () => goToSection(currentIndex + 1));
 
   // ── 10-Year Life Conversation ────────────────────────────────
   const saveTenYearDebounced = debounceAutosave(async (payload) => {
@@ -395,6 +462,7 @@
     $('gateHint').textContent = ready
       ? 'Your preferred pathway is named and all three horizons have concrete items. You can mark this stage ready for your mentor.'
       : `Give your preferred pathway a title${!horizonsFilled ? ' and add at least one item to each horizon' : ''} before this stage is ready for review.`;
+    renderRecap();
   }
 
   $('markReadyBtn')?.addEventListener('click', async () => {
@@ -448,7 +516,17 @@
       if (tenYearPayload?.text) $('tenYearReflection').value = tenYearPayload.text;
 
       renderStageStepper($('stepperWrap'), progressByStage, 'design');
-      renderPlanSections();
+
+      const stages = window.VOCATION_STAGES;
+      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
+      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
+      $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
+      $('topbarNext').textContent = nextStage.label;
+
+      const firstEmpty = PLAN_TYPES.findIndex(p => itemsFor(p.key).length === 0);
+      currentIndex = firstEmpty === -1 ? 0 : firstEmpty;
+      renderFlow();
       updateGate();
     } catch (e) {
       console.warn('Design page init failed:', e);

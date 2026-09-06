@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vocation Pathway Review | Inspire Mentorship</title>
   <meta name="description" content="See the whole journey, challenge weak assumptions, and prepare a credible family conversation.">
-  <meta name="theme-color" content="#0A1628">
+  <meta name="theme-color" content="#161310">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
     .mp-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
-    .mp-tab { padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: rgba(244,246,249,.75); cursor: pointer; }
+    .mp-tab { padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: rgba(245,241,234,.75); cursor: pointer; }
     .mp-tab.active { background: var(--mentorship-gold); color: #fff; border-color: var(--mentorship-gold); }
     .mp-section { display: none; }
     .mp-section.active { display: block; }
@@ -25,16 +25,16 @@
 
     .voc-stage-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); flex-wrap: wrap; }
     .voc-stage-row:last-child { border-bottom: none; }
-    .voc-stage-name { font-size: 14px; font-weight: 700; color: var(--text, #f4f6f9); min-width: 100px; }
+    .voc-stage-name { font-size: 14px; font-weight: 700; color: var(--text, #F5F1EA); min-width: 100px; }
     .voc-stage-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    .voc-item { padding: 10px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); font-size: 13px; color: var(--text-muted, rgba(244,246,249,.75)); }
+    .voc-item { padding: 10px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); font-size: 13px; color: var(--text-muted, rgba(245,241,234,.75)); }
     .voc-item:last-child { border-bottom: none; }
-    .voc-item strong { color: var(--text, #f4f6f9); }
-    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
-    .voc-statement { font-style: italic; font-size: 14px; color: var(--text, #f4f6f9); background: var(--card-bg2, rgba(255,255,255,.04)); border-left: 3px solid var(--mentorship-gold); padding: 12px 16px; border-radius: 6px; }
+    .voc-item strong { color: var(--text, #F5F1EA); }
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.5)); }
+    .voc-statement { font-style: italic; font-size: 14px; color: var(--text, #F5F1EA); background: var(--card-bg2, rgba(255,255,255,.04)); border-left: 3px solid var(--mentorship-gold); padding: 12px 16px; border-radius: 6px; }
 
-    .voc-textarea, .voc-input { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; margin-bottom: 10px; }
+    .voc-textarea, .voc-input { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #F5F1EA); box-sizing: border-box; margin-bottom: 10px; }
     .voc-textarea { min-height: 90px; resize: vertical; }
     .voc-note-item { padding: 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 10px; }
     .voc-note-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -342,7 +342,7 @@
             <span class="voc-empty">${fmtDate(n.created_at)}</span>
             <span class="badge ${n.shared_with_student ? 'badge-reviewed' : 'badge-muted'}">${n.shared_with_student ? 'Shared with mentee' : 'Private'}</span>
           </div>
-          <div style="font-size:13px; color:var(--text, #f4f6f9)">${escapeHtml(n.note)}</div>
+          <div style="font-size:13px; color:var(--text, #F5F1EA)">${escapeHtml(n.note)}</div>
         </div>`).join('')
       : '<div class="empty-state"><div class="empty-state-icon">📝</div>No observations yet — add your first one above.</div>';
   }

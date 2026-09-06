@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Review | Vocation & Life Pathways | Inspire Mentorship</title>
   <meta name="description" content="Stage 7 of Vocation & Life Pathways — direction can mature without becoming drift.">
-  <meta name="theme-color" content="#0A1628">
+  <meta name="theme-color" content="#161310">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,23 +17,23 @@
     .voc-two-col { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
     @media (min-width: 860px) { .voc-two-col { grid-template-columns: 1fr 1fr; } }
 
-    .voc-select { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; margin-bottom: 10px; }
-    .voc-textarea, .voc-input { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; margin-bottom: 10px; }
+    .voc-select { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #F5F1EA); box-sizing: border-box; margin-bottom: 10px; }
+    .voc-textarea, .voc-input { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #F5F1EA); box-sizing: border-box; margin-bottom: 10px; }
     .voc-textarea { min-height: 90px; resize: vertical; }
-    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(245,241,234,.8)); }
 
     .voc-timeline { border-left: 2px solid var(--mentorship-gold); padding-left: 18px; }
     .voc-timeline-item { position: relative; margin-bottom: 22px; }
     .voc-timeline-item:last-child { margin-bottom: 0; }
     .voc-timeline-item::before { content: ''; position: absolute; left: -23px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--mentorship-gold); }
     .voc-timeline-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--mentorship-gold); margin-bottom: 4px; }
-    .voc-timeline-statement { font-size: 13px; color: var(--text, #f4f6f9); font-style: italic; margin-bottom: 6px; line-height: 1.5; }
-    .voc-timeline-reflection { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.7)); line-height: 1.5; }
-    .voc-timeline-mentor { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.7)); line-height: 1.5; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
+    .voc-timeline-statement { font-size: 13px; color: var(--text, #F5F1EA); font-style: italic; margin-bottom: 6px; line-height: 1.5; }
+    .voc-timeline-reflection { font-size: 12px; color: var(--text-muted, rgba(245,241,234,.7)); line-height: 1.5; }
+    .voc-timeline-mentor { font-size: 12px; color: var(--text-muted, rgba(245,241,234,.7)); line-height: 1.5; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
     .voc-timeline-mentor strong { color: var(--mentorship-gold); }
 
-    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
-    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 4px; }
+    .voc-empty { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.5)); }
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.45)); margin-top: 4px; }
     .voc-gate-card { margin-top: 24px; }
   </style>
 </head>
@@ -113,6 +113,13 @@
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
         <div class="topbar-sub">Review the evidence, notice what changed, and adjust the plan deliberately.</div>
       </div>
+      <div class="topbar-progress-inline" id="topbarProgress">
+        <div>
+          <div class="topbar-progress-pct"><span id="topbarPct">0</span>% <span>complete</span></div>
+          <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbarProgressFill" style="width:0%"></div></div>
+        </div>
+        <div class="topbar-progress-next">Next up<strong id="topbarNext">—</strong></div>
+      </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -147,7 +154,7 @@
       <div id="stepperWrap" class="vocation-stage-stepper"></div>
 
       <div class="card" style="margin-bottom:20px">
-        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+        <p style="font-size:14px; color:var(--text-muted, rgba(245,241,234,.75)); line-height:1.6; margin:0">
           Every few months, pause and look back honestly. What's changed? What new evidence do you have? Each review
           is saved permanently, so you can always see how your thinking has developed over time.
         </p>
@@ -326,6 +333,14 @@
       reviews = reviewsRes.data || [];
 
       renderStageStepper($('stepperWrap'), progressByStage, 'review');
+
+      const stages = window.VOCATION_STAGES;
+      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
+      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
+      $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
+      $('topbarNext').textContent = nextStage.label;
+
       renderTimeline();
       updateGate();
     } catch (e) {
