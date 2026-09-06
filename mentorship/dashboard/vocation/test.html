@@ -14,14 +14,7 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
-    .voc-section { margin-bottom: 14px; }
-    .voc-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
-    .voc-section-num { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; color: var(--mentorship-gold); margin-right: 10px; }
-    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(245,241,234,.55)); margin-top: 4px; font-weight: 400; }
-    .voc-section-body { margin-top: 16px; display: none; }
-    .voc-section.open .voc-section-body { display: block; }
-    .voc-chevron { transition: transform .15s; opacity: .5; flex-shrink: 0; }
-    .voc-section.open .voc-chevron { transform: rotate(90deg); }
+    .voc-section-sub { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.55)); font-weight: 400; line-height: 1.4; }
 
     .voc-entry-item { padding: 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 10px; }
     .voc-entry-title { font-size: 13px; font-weight: 700; color: var(--text, #F5F1EA); margin-bottom: 4px; }
@@ -39,9 +32,7 @@
     .voc-form-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
     @media (min-width: 720px) { .voc-form-grid.two { grid-template-columns: 1fr 1fr; gap: 0 12px; } }
 
-    .voc-quote-card { background: var(--card-bg2, rgba(255,255,255,.04)); border-left: 3px solid var(--mentorship-gold); padding: 18px 20px; border-radius: 10px; font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5; color: var(--text, #F5F1EA); font-style: italic; }
     .voc-empty { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.5)); }
-    .voc-gate-card { margin-top: 24px; }
   </style>
 </head>
 <body>
@@ -120,6 +111,13 @@
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
         <div class="topbar-sub">A career can sound attractive from a distance. Now gather evidence from reality.</div>
       </div>
+      <div class="topbar-progress-inline" id="topbarProgress">
+        <div>
+          <div class="topbar-progress-pct"><span id="topbarPct">0</span>% <span>complete</span></div>
+          <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbarProgressFill" style="width:0%"></div></div>
+        </div>
+        <div class="topbar-progress-next">Next up<strong id="topbarNext">—</strong></div>
+      </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -160,17 +158,31 @@
         </p>
       </div>
 
-      <div id="sectionsList"></div>
+      <div class="voc-flow-grid">
+        <div>
+          <div class="voc-flow-progress-track"><div class="voc-flow-progress-fill" id="flowProgressFill" style="width:0%"></div></div>
+          <div class="voc-flow-dots" id="flowDots"></div>
 
-      <div class="voc-quote-card" style="margin-bottom:20px">
-        "Don't ask only, 'Do I like the idea of this?' Ask, 'What happened when I met the reality of it?'"
-      </div>
+          <div class="card voc-flow-card">
+            <div class="voc-flow-step-label" id="flowStepLabel">Step 1 of 3</div>
+            <div class="card-title" id="flowSectionTitle" style="font-size:19px; margin-bottom:4px"></div>
+            <div class="voc-section-sub" id="flowSectionSub" style="margin-bottom:16px"></div>
+            <div class="voc-flow-body" id="flowBody"></div>
 
-      <div class="card voc-gate-card">
-        <div class="card-label">Ready to move forward?</div>
-        <div class="card-title" style="margin-bottom:8px">Mark Test ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Log at least one conversation, one workplace exposure and one mini experiment before this stage is ready for your mentor to review.</div>
+            <div class="voc-flow-nav">
+              <button class="list-card-btn" id="flowBackBtn">← Back</button>
+              <div class="voc-flow-nav-spacer"></div>
+              <button class="list-card-btn primary" id="flowNextBtn">Continue →</button>
+            </div>
+            <div class="vocation-gate-hint" id="gateHint" style="display:none"></div>
+          </div>
+        </div>
+
+        <div class="card voc-recap-card">
+          <div class="voc-recap-title">Your Real-World Evidence</div>
+          <div class="voc-recap-sub">"Don't ask only, 'Do I like the idea of this?' Ask, 'What happened when I met the reality of it?'"</div>
+          <div id="recapList"></div>
+        </div>
       </div>
     </div>
   </main>
@@ -402,56 +414,102 @@
     { key: 'experiments', num: '03', title: 'Mini Experiment', sub: 'Try a small version of the work. Build, fix, explain, design or investigate.', render: renderExperiments, wire: wireExperiments, count: () => experiments.length },
   ];
 
+  // ── One-section-at-a-time flow — same shell as discover.html.
+  // These three sections are "log entries over time" rather than
+  // "answer once," so the dots double as free navigation for someone
+  // coming back to add another conversation/exposure/experiment later,
+  // not just a first-pass linear walk. ──────────────────────────────
+  let currentIndex = 0;
+
   function renderSection(key) {
     const s = SECTIONS.find(x => x.key === key);
-    const body = document.querySelector(`[data-section-body="${key}"]`);
-    if (!body || !s) return;
+    const body = $('flowBody');
     body.innerHTML = s.render();
     s.wire(body);
-    const sectionEl = body.closest('.voc-section');
-    const complete = s.count() > 0;
-    sectionEl.classList.toggle('voc-complete', complete);
-    const doneMark = sectionEl.querySelector('[data-done-mark]');
-    if (doneMark) doneMark.style.display = complete ? '' : 'none';
-    const countEl = sectionEl.querySelector('[data-count]');
-    if (countEl) countEl.textContent = `${s.count()} logged`;
+    renderDots();
+    renderRecap();
   }
 
-  function renderAllSections() {
-    const list = $('sectionsList');
-    list.innerHTML = SECTIONS.map(s => `
-      <div class="list-card voc-section" data-section="${s.key}">
-        <div class="voc-section-head" data-toggle>
-          <div>
-            <div class="list-card-title"><span class="voc-section-num">${s.num}</span>${escapeHtml(s.title)}</div>
-            <div class="voc-section-sub">${escapeHtml(s.sub)}</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px">
-            <span class="voc-section-sub" data-count>0 logged</span>
-            <span class="badge badge-complete" data-done-mark style="display:none">✓</span>
-            <svg class="voc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
-          </div>
-        </div>
-        <div class="voc-section-body" data-section-body="${s.key}"></div>
-      </div>`).join('');
-
-    list.querySelectorAll('[data-toggle]').forEach(head => {
-      head.addEventListener('click', () => head.closest('.voc-section').classList.toggle('open'));
+  function renderDots() {
+    const dots = $('flowDots');
+    dots.innerHTML = SECTIONS.map((s, i) => `
+      <button type="button" class="voc-flow-dot${i === currentIndex ? ' current' : ''}${s.count() > 0 ? ' done' : ''}"
+              data-goto="${i}" title="${escapeHtml(s.title)}" aria-label="Go to ${escapeHtml(s.title)}">${s.count() > 0 ? '✓' : s.num}</button>
+    `).join('');
+    dots.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => goToSection(Number(btn.dataset.goto)));
     });
-    SECTIONS.forEach(s => renderSection(s.key));
+  }
+
+  function renderRecap() {
+    const rows = SECTIONS.filter(s => s.count() > 0).map(s => ({
+      icon: s.num,
+      text: `${escapeHtml(s.title)}: <strong>${s.count()} logged</strong>`,
+    }));
+    $('recapList').innerHTML = rows.length
+      ? rows.map(r => `<div class="voc-recap-row"><div class="voc-recap-row-icon">${r.icon}</div><div class="voc-recap-row-text">${r.text}</div></div>`).join('')
+      : '<div class="voc-recap-empty">Nothing logged yet — start with a conversation, a visit, or a small experiment.</div>';
+  }
+
+  function renderFlow() {
+    const s = SECTIONS[currentIndex];
+    const isLast = currentIndex === SECTIONS.length - 1;
+    $('flowStepLabel').textContent = `Step ${currentIndex + 1} of ${SECTIONS.length}`;
+    $('flowSectionTitle').textContent = s.title;
+    $('flowSectionSub').textContent = s.sub;
+    $('flowProgressFill').style.width = `${Math.round((currentIndex / (SECTIONS.length - 1)) * 100)}%`;
+    $('flowBackBtn').disabled = currentIndex === 0;
+    $('gateHint').style.display = 'none';
+
+    const stageStatus = (progressByStage.test || {}).status;
+    const alreadySubmitted = ['ready_for_review', 'mentor_reviewed', 'complete'].includes(stageStatus);
+    const nextBtn = $('flowNextBtn');
+    if (isLast) {
+      nextBtn.disabled = alreadySubmitted;
+      nextBtn.textContent = stageStatus === 'ready_for_review' ? 'Marked Ready for Review ✓'
+        : (stageStatus === 'mentor_reviewed' || stageStatus === 'complete') ? 'Reviewed by Mentor ✓'
+        : 'Mark Test Ready for Review';
+    } else {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Continue →';
+    }
+
+    const body = $('flowBody');
+    body.innerHTML = s.render();
+    s.wire(body);
+    renderDots();
+    renderRecap();
+  }
+
+  function goToSection(i) {
+    if (i < 0 || i >= SECTIONS.length) return;
+    currentIndex = i;
+    renderFlow();
   }
 
   function updateGate() {
-    const ready = SECTIONS.every(s => s.count() > 0);
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
-    $('gateHint').textContent = ready
-      ? 'You have real evidence in all three categories. You can mark this stage ready for your mentor.'
-      : `Log at least one entry in each category before this stage is ready for review (${SECTIONS.filter(s => s.count() === 0).map(s => s.title).join(', ')} still empty).`;
+    // No-op placeholder: gating now happens inline in the flowNextBtn
+    // handler below (only relevant on the last step), but wire*()
+    // callbacks in each section's render function still call this
+    // after logging an entry — re-render the dots/recap instead.
+    renderDots();
+    renderRecap();
   }
 
-  $('markReadyBtn')?.addEventListener('click', async () => {
-    const btn = $('markReadyBtn');
+  $('flowBackBtn').addEventListener('click', () => goToSection(currentIndex - 1));
+  $('flowNextBtn').addEventListener('click', async () => {
+    const isLast = currentIndex === SECTIONS.length - 1;
+    if (!isLast) { goToSection(currentIndex + 1); return; }
+
+    const ready = SECTIONS.every(s => s.count() > 0);
+    if (!ready) {
+      const hint = $('gateHint');
+      hint.textContent = `Log at least one entry in each category before this stage is ready for review (${SECTIONS.filter(s => s.count() === 0).map(s => s.title).join(', ')} still empty).`;
+      hint.style.display = 'block';
+      return;
+    }
+
+    const btn = $('flowNextBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'test');
     if (error) { console.warn('Mark ready failed:', error); btn.textContent = 'Try Again'; btn.disabled = false; return; }
@@ -490,12 +548,17 @@
       experiments = expmtRes.data || [];
 
       renderStageStepper($('stepperWrap'), progressByStage, 'test');
-      renderAllSections();
-      updateGate();
 
-      const firstEmpty = SECTIONS.find(s => s.count() === 0);
-      const target = firstEmpty || SECTIONS[0];
-      document.querySelector(`[data-section="${target.key}"]`)?.classList.add('open');
+      const stages = window.VOCATION_STAGES;
+      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
+      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
+      $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
+      $('topbarNext').textContent = nextStage.label;
+
+      const firstEmpty = SECTIONS.findIndex(s => s.count() === 0);
+      currentIndex = firstEmpty === -1 ? 0 : firstEmpty;
+      renderFlow();
     } catch (e) {
       console.warn('Test page init failed:', e);
     }
