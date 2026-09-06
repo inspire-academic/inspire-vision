@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inspire Mentorship | My Journey</title>
   <meta name="description" content="Your mentorship journey — achievements, active challenges, and a timeline of your growth.">
-  <meta name="theme-color" content="#0A1628">
+  <meta name="theme-color" content="#161310">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50e9f3f9548a4ce3bb5af6208dd5899d"}'></script>
 </head>
 <body>
 <div class="app">
@@ -276,7 +277,7 @@
       <div class="card" style="text-align:center; padding:18px 12px; opacity:${b.unlocked ? '1' : '.4'}">
         <div style="font-size:28px; margin-bottom:6px">${b.icon}</div>
         <div style="font-size:12px; font-weight:800; margin-bottom:2px">${b.label}</div>
-        <div style="font-size:10px; color:rgba(244,246,249,.5)">${b.unlocked ? 'Unlocked' : b.desc}</div>
+        <div style="font-size:10px; color:rgba(245,241,234,.5)">${b.unlocked ? 'Unlocked' : b.desc}</div>
       </div>`).join('');
   }
 
@@ -319,8 +320,8 @@
       <div class="list-card" style="display:flex; align-items:flex-start; gap:12px">
         <div style="font-size:18px">${e.icon}</div>
         <div style="flex:1">
-          <div style="font-size:13px; color:#f4f6f9">${e.text}</div>
-          <div style="font-size:11px; color:rgba(244,246,249,.5); margin-top:2px">${new Date(e.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
+          <div style="font-size:13px; color:#F5F1EA">${e.text}</div>
+          <div style="font-size:11px; color:rgba(245,241,234,.5); margin-top:2px">${new Date(e.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
         </div>
       </div>`).join('');
   }

@@ -14,25 +14,25 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
-    .voc-section-sub { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.55)); font-weight: 400; line-height: 1.4; }
+    .voc-section-sub { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.55)); font-weight: 400; line-height: 1.4; }
 
     .voc-rating-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); }
     .voc-rating-row:last-child { border-bottom: none; }
-    .voc-rating-text { font-size: 14px; color: var(--text, #f4f6f9); flex: 1; }
+    .voc-rating-text { font-size: 14px; color: var(--text, #F5F1EA); flex: 1; }
     .voc-dots { display: flex; gap: 6px; flex-shrink: 0; }
     .voc-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-md, rgba(255,255,255,.18)); background: transparent; cursor: pointer; padding: 0; transition: background .1s, border-color .1s; }
     .voc-dot.on { background: var(--mentorship-gold); border-color: var(--mentorship-gold); }
 
     .voc-textarea, .voc-input {
       width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13));
-      border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9);
+      border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #F5F1EA);
       box-sizing: border-box; margin-bottom: 10px;
     }
     .voc-textarea { min-height: 70px; resize: vertical; }
-    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(245,241,234,.8)); }
 
     .voc-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .voc-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #f4f6f9); font-size: 13px; cursor: pointer; transition: border-color .1s, background .1s; }
+    .voc-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #F5F1EA); font-size: 13px; cursor: pointer; transition: border-color .1s, background .1s; }
     .voc-chip.on { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
 
     .voc-values-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -42,12 +42,12 @@
 
     .voc-evidence-list { margin-bottom: 12px; }
     .voc-evidence-item { padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
-    .voc-evidence-item strong { color: var(--text, #f4f6f9); }
-    .voc-evidence-item span { color: var(--text-soft, rgba(244,246,249,.55)); }
+    .voc-evidence-item strong { color: var(--text, #F5F1EA); }
+    .voc-evidence-item span { color: var(--text-soft, rgba(245,241,234,.55)); }
 
     .voc-nominee-item { padding: 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 10px; }
 
-    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 4px; }
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.45)); margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -167,7 +167,7 @@
       <div id="stepperWrap" class="vocation-stage-stepper"></div>
 
       <div class="card" style="margin-bottom:20px">
-        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0">
+        <p style="font-size:14px; color:var(--text-muted, rgba(245,241,234,.75)); line-height:1.6; margin:0">
           Your first task is not choosing a job. It is learning to notice yourself honestly — what makes you come alive,
           what you may be good at, what you value, and what kinds of difficulty you're willing to carry. Nothing here
           produces a verdict. Everything here becomes evidence for later.
@@ -411,10 +411,10 @@
     const listHtml = nominees.map(n => `
       <div class="voc-nominee-item">
         <div style="font-weight:700; font-size:14px; margin-bottom:4px">${escapeHtml(n.name)} <span class="voc-save-note" style="display:inline">(${escapeHtml(n.relationship)})</span></div>
-        <div style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.75))">${escapeHtml(n.mentee_summary || 'No summary yet.')}</div>
+        <div style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.75))">${escapeHtml(n.mentee_summary || 'No summary yet.')}</div>
       </div>`).join('') || '<div class="voc-save-note">No one added yet — ask 2-3 trusted people, then add what you heard back.</div>';
     return `
-      <p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); margin-bottom:12px">
+      <p style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.7)); margin-bottom:12px">
         Ask people like a parent, teacher, mentor, coach or relative: what do people repeatedly ask you for help with?
         What strength do adults often notice in you? When have you surprised yourself?
       </p>
@@ -454,7 +454,7 @@
         <span class="voc-value-rank">${i + 1}</span>${escapeHtml(v)}
       </div>`).join('');
     return `
-      <p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); margin-bottom:12px">Drag to reorder — top is most important to you right now.</p>
+      <p style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.7)); margin-bottom:12px">Drag to reorder — top is most important to you right now.</p>
       <div class="voc-values-list" id="valuesList">${items}</div>`;
   }
   function wireValues(container) {
@@ -515,7 +515,7 @@
       ).join('');
       return `<div class="voc-rating-row"><div class="voc-rating-text">${escapeHtml(thing)}</div><div class="voc-dots">${dots}</div></div>`;
     }).join('');
-    return `<p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); margin-bottom:8px">Rate how willing you are to endure each, 1 (not at all) to 5 (very willing).</p>${rows}`;
+    return `<p style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.7)); margin-bottom:8px">Rate how willing you are to endure each, 1 (not at all) to 5 (very willing).</p>${rows}`;
   }
   function wireHardThings(container) {
     const payload = getPayload('discover.hard_things', () => ({ ratings: {} }));

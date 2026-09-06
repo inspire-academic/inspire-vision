@@ -16,7 +16,14 @@
    ──────────────────────────────────────────────────────────────── */
 :root {
   --mentorship-gold:    var(--clr-mentorship, #B85C1A);
-  --mentorship-navy:    var(--clr-navy, #0A1628);
+  /* Warm-charcoal repaint (2026-09-06) applied here too — auth pages
+     (login/join/mentors) and the public marketing pages both used this
+     same borrowed --clr-navy for their full-page dark background, so
+     they had the identical "tired blue" problem as the dashboard shell.
+     Hardcoded directly rather than deferring to --clr-navy, same as
+     --navy above: that token is shared site-wide with Academic and
+     was never in scope to repaint globally. */
+  --mentorship-navy:    #161310;
   --mentorship-accent:  var(--clr-mentorship-mid, #D97706);
 }
 
@@ -26,7 +33,7 @@
    stub pages, no way for anyone to register). ──────────────────── */
 body.auth-body {
   background: var(--mentorship-navy);
-  color: #f4f6f9;
+  color: #F5F1EA;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   min-height: 100vh;
   display: grid;
@@ -55,9 +62,9 @@ body.auth-body {
   font-weight: 700;
   margin-bottom: 6px;
 }
-.auth-sub { color: rgba(244,246,249,.62); font-size: 13px; margin-bottom: 28px; line-height: 1.5 }
+.auth-sub { color: rgba(245,241,234,.62); font-size: 13px; margin-bottom: 28px; line-height: 1.5 }
 .auth-field { margin-bottom: 16px }
-.auth-field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: rgba(244,246,249,.85) }
+.auth-field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: rgba(245,241,234,.85) }
 .auth-field input, .auth-field textarea {
   width: 100%;
   background: rgba(255,255,255,.05);
@@ -72,14 +79,14 @@ body.auth-body {
      one change here covers all of them. */
   font-size: 16px;
   font-family: inherit;
-  color: #f4f6f9;
+  color: #F5F1EA;
 }
 .auth-field input:focus, .auth-field textarea:focus {
   outline: none;
   border-color: var(--mentorship-gold);
 }
 .auth-field textarea { resize: vertical; min-height: 80px }
-.auth-check { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: rgba(244,246,249,.7); margin-bottom: 20px; line-height: 1.5 }
+.auth-check { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: rgba(245,241,234,.7); margin-bottom: 20px; line-height: 1.5 }
 .auth-check input { margin-top: 3px }
 .auth-btn {
   width: 100%;
@@ -97,7 +104,7 @@ body.auth-body {
 .auth-msg.show { display: block }
 .auth-msg.error { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3); color: #fca5a5 }
 .auth-msg.success { background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.3); color: #86efac }
-.auth-footer { text-align: center; font-size: 13px; color: rgba(244,246,249,.6); margin-top: 20px }
+.auth-footer { text-align: center; font-size: 13px; color: rgba(245,241,234,.6); margin-top: 20px }
 .auth-footer a { color: var(--mentorship-gold); font-weight: 700 }
 .auth-field select {
   width: 100%;
@@ -107,7 +114,7 @@ body.auth-body {
   padding: 11px 14px;
   font-size: 16px; /* same iOS auto-zoom reasoning as .auth-field input above */
   font-family: inherit;
-  color: #f4f6f9;
+  color: #F5F1EA;
 }
 .auth-field select:focus { outline: none; border-color: var(--mentorship-gold) }
 .auth-btn-secondary {
@@ -116,7 +123,7 @@ body.auth-body {
   border-radius: 10px;
   background: transparent;
   border: 1px solid rgba(255,255,255,.15);
-  color: rgba(244,246,249,.8);
+  color: rgba(245,241,234,.8);
   font-size: 14px;
   font-weight: 700;
   margin-top: 10px;
@@ -131,15 +138,15 @@ body.auth-body {
 .onboard-steps { display: flex; gap: 6px; margin-bottom: 24px }
 .onboard-steps span { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,.12) }
 .onboard-steps span.done, .onboard-steps span.active { background: var(--mentorship-gold) }
-.onboard-skip { display: block; text-align: center; font-size: 13px; color: rgba(244,246,249,.55); margin-top: 14px }
-.onboard-skip:hover { color: rgba(244,246,249,.8) }
+.onboard-skip { display: block; text-align: center; font-size: 13px; color: rgba(245,241,234,.55); margin-top: 14px }
+.onboard-skip:hover { color: rgba(245,241,234,.8) }
 .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px }
 .chip {
   padding: 9px 15px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.15);
   background: rgba(255,255,255,.04);
-  color: rgba(244,246,249,.8);
+  color: rgba(245,241,234,.8);
   font-size: 13px;
   font-weight: 600;
   transition: border-color .15s, background .15s, color .15s;
@@ -147,7 +154,7 @@ body.auth-body {
 .chip.selected { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff }
 .wheel-row { margin-bottom: 18px }
 .wheel-row-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px }
-.wheel-row-top span:first-child { font-weight: 700; color: rgba(244,246,249,.9) }
+.wheel-row-top span:first-child { font-weight: 700; color: rgba(245,241,234,.9) }
 .wheel-row-top span:last-child { color: var(--mentorship-gold); font-weight: 700 }
 .wheel-row input[type="range"] {
   width: 100%;
@@ -166,7 +173,7 @@ body.auth-body {
   flex-wrap: wrap;
 }
 .page-eyebrow { color: var(--mentorship-gold); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px }
-.page-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--text, #f4f6f9) }
+.page-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: var(--text, #F5F1EA) }
 .page-cta {
   padding: 11px 20px;
   border-radius: 10px;
@@ -185,7 +192,7 @@ body.auth-body {
   font-weight: 700;
   background: transparent;
   border: 1px solid rgba(255,255,255,.15);
-  color: rgba(244,246,249,.7);
+  color: rgba(245,241,234,.7);
   white-space: nowrap;
   cursor: pointer;
   transition: border-color .15s, color .15s;
@@ -199,9 +206,9 @@ body.auth-body {
   margin-bottom: 12px;
 }
 .list-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px }
-.list-card-title { font-size: 15px; font-weight: 800; color: var(--text, #f4f6f9) }
-.list-card-desc { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.62)); line-height: 1.5; margin-bottom: 12px }
-.list-card-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); flex-wrap: wrap }
+.list-card-title { font-size: 15px; font-weight: 800; color: var(--text, #F5F1EA) }
+.list-card-desc { font-size: 13px; color: var(--text-muted, rgba(245,241,234,.62)); line-height: 1.5; margin-bottom: 12px }
+.list-card-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-soft, rgba(245,241,234,.5)); flex-wrap: wrap }
 .badge {
   display: inline-block;
   padding: 3px 10px;
@@ -214,7 +221,7 @@ body.auth-body {
   color: var(--mentorship-gold);
   border: 1px solid rgba(184,92,26,.3);
 }
-.badge.badge-muted { background: var(--card-bg2, rgba(255,255,255,.06)); color: var(--text-muted, rgba(244,246,249,.6)); border-color: var(--border, rgba(255,255,255,.1)) }
+.badge.badge-muted { background: var(--card-bg2, rgba(255,255,255,.06)); color: var(--text-muted, rgba(245,241,234,.6)); border-color: var(--border, rgba(255,255,255,.1)) }
 .list-card-actions { display: flex; gap: 8px; margin-top: 12px }
 .list-card-btn {
   padding: 7px 14px;
@@ -222,13 +229,13 @@ body.auth-body {
   font-size: 12px;
   font-weight: 700;
   border: 1px solid var(--border-md, rgba(255,255,255,.15));
-  color: var(--text-muted, rgba(244,246,249,.85));
+  color: var(--text-muted, rgba(245,241,234,.85));
   transition: all .18s;
 }
 .list-card-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold) }
 .list-card-btn.primary { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff }
 .list-card-btn.primary:hover { opacity: .9; color: #fff }
-.empty-state { text-align: center; padding: 48px 20px; color: var(--text-soft, rgba(244,246,249,.5)) }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-soft, rgba(245,241,234,.5)) }
 .empty-state-icon { font-size: 32px; margin-bottom: 12px }
 .mini-progress-bar { height: 6px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.08)); overflow: hidden; margin: 10px 0 }
 .mini-progress-fill { height: 100%; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); border-radius: 999px; transition: width .5s ease }
@@ -257,7 +264,7 @@ body.auth-body {
        Replaced with a warm near-black ("Warm Charcoal") that pairs with
        amber/terracotta the way navy never did — text/border/card tokens
        below are warm-tinted off-white to match, instead of the previous
-       cool bluish-white (#f4f6f9 etc). Deliberately scoped to THIS file's
+       cool bluish-white (#F5F1EA etc). Deliberately scoped to THIS file's
        --navy/--text/--border/--card-bg tokens only, not tokens.css's
        --clr-navy — that token is shared site-wide (Academic's own hero/
        sidebar surfaces included) and repainting it was never in scope
@@ -977,7 +984,7 @@ body.auth-body {
       font-size: 14px; font-weight: 800;
       /* Fixed gradient regardless of theme (photo placeholder tile) —
          its fallback initial needs fixed light text to stay legible. */
-      color: #f4f6f9;
+      color: #F5F1EA;
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -1309,21 +1316,21 @@ body.auth-body {
    from parents.html when index.html was built to reuse the same pattern. */
 body.public-page-body {
   background: var(--mentorship-navy);
-  color: #f4f6f9;
+  color: #F5F1EA;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 .pg-header {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
   max-width: 1000px; margin: 0 auto; padding: 28px 24px 0; gap: 12px;
 }
-.pg-brand { color: #f4f6f9; text-decoration: none; font-weight: 800; letter-spacing: .02em; }
+.pg-brand { color: #F5F1EA; text-decoration: none; font-weight: 800; letter-spacing: .02em; }
 .pg-brand span { color: var(--mentorship-gold); }
 .pg-header-right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
-.pg-back { color: rgba(244,246,249,.6); font-size: 13px; text-decoration: none; }
+.pg-back { color: rgba(245,241,234,.6); font-size: 13px; text-decoration: none; }
 .pg-back:hover { color: var(--mentorship-gold); }
 .pg-signin-btn {
   display: inline-block; padding: 8px 18px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,.24); color: #f4f6f9;
+  border: 1px solid rgba(255,255,255,.24); color: #F5F1EA;
   font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;
 }
 .pg-signin-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
@@ -1331,19 +1338,19 @@ body.public-page-body {
 .pg-hero { max-width: 760px; margin: 0 auto; padding: 56px 24px 40px; text-align: center; }
 .pg-eyebrow { color: var(--mentorship-gold); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; margin-bottom: 14px; }
 .pg-hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.15; margin-bottom: 16px; }
-.pg-hero p { color: rgba(244,246,249,.72); font-size: 16px; line-height: 1.65; max-width: 600px; margin: 0 auto 28px; }
+.pg-hero p { color: rgba(245,241,234,.72); font-size: 16px; line-height: 1.65; max-width: 600px; margin: 0 auto 28px; }
 .pg-hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .pg-btn {
   display: inline-block; padding: 13px 26px; border-radius: 9px; font-weight: 700; font-size: 14px; text-decoration: none;
 }
 .pg-btn-primary { background: var(--mentorship-gold); color: #fff; }
 .pg-btn-primary:hover { opacity: .92; }
-.pg-btn-outline { border: 1px solid rgba(255,255,255,.2); color: #f4f6f9; }
+.pg-btn-outline { border: 1px solid rgba(255,255,255,.2); color: #F5F1EA; }
 .pg-btn-outline:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
 
 .pg-section { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
 .pg-section-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; margin-bottom: 8px; text-align: center; }
-.pg-section-sub { color: rgba(244,246,249,.6); font-size: 14px; text-align: center; max-width: 560px; margin: 0 auto 32px; line-height: 1.6; }
+.pg-section-sub { color: rgba(245,241,234,.6); font-size: 14px; text-align: center; max-width: 560px; margin: 0 auto 32px; line-height: 1.6; }
 
 .pg-values { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
 .pg-value-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 24px 22px; }
@@ -1354,14 +1361,14 @@ body.public-page-body {
 }
 .pg-value-icon svg { width: 20px; height: 20px; stroke-width: 1.7; }
 .pg-value-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-.pg-value-card p { font-size: 13px; color: rgba(244,246,249,.62); line-height: 1.6; }
+.pg-value-card p { font-size: 13px; color: rgba(245,241,234,.62); line-height: 1.6; }
 
 .pg-safety-section { background: rgba(184,92,26,.06); border-top: 1px solid rgba(184,92,26,.2); border-bottom: 1px solid rgba(184,92,26,.2); }
 .pg-safety-list { display: flex; flex-direction: column; gap: 14px; max-width: 640px; margin: 0 auto; }
 .pg-safety-item { display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px 20px; }
 .pg-safety-check { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: rgba(184,92,26,.18); color: var(--mentorship-gold); display: flex; align-items: center; justify-content: center; margin-top: 1px; }
 .pg-safety-check svg { width: 14px; height: 14px; stroke-width: 3; }
-.pg-safety-item p { font-size: 14px; line-height: 1.55; color: rgba(244,246,249,.85); }
+.pg-safety-item p { font-size: 14px; line-height: 1.55; color: rgba(245,241,234,.85); }
 .pg-safety-item strong { color: #fff; }
 
 .pg-steps { counter-reset: pg-step; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
@@ -1374,7 +1381,7 @@ body.public-page-body {
   margin-bottom: 12px;
 }
 .pg-step h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-.pg-step p { font-size: 13px; color: rgba(244,246,249,.6); line-height: 1.55; }
+.pg-step p { font-size: 13px; color: rgba(245,241,234,.6); line-height: 1.55; }
 
 .pg-faq-item { border-bottom: 1px solid rgba(255,255,255,.08); padding: 18px 0; }
 .pg-faq-item:last-child { border-bottom: none; }
@@ -1384,19 +1391,19 @@ body.public-page-body {
 .pg-faq-item.open .pg-faq-icon { transform: rotate(45deg); }
 .pg-faq-a { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
 .pg-faq-item.open .pg-faq-a { max-height: 240px; }
-.pg-faq-a p { font-size: 13px; color: rgba(244,246,249,.65); line-height: 1.6; padding-top: 12px; }
+.pg-faq-a p { font-size: 13px; color: rgba(245,241,234,.65); line-height: 1.6; padding-top: 12px; }
 
 .pg-cta { text-align: center; padding: 56px 24px 72px; }
 .pg-cta h2 { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-.pg-cta p { color: rgba(244,246,249,.62); font-size: 14px; margin-bottom: 24px; }
+.pg-cta p { color: rgba(245,241,234,.62); font-size: 14px; margin-bottom: 24px; }
 
-.pg-footer { text-align: center; padding: 24px; border-top: 1px solid rgba(255,255,255,.06); font-size: 12px; color: rgba(244,246,249,.4); }
+.pg-footer { text-align: center; padding: 24px; border-top: 1px solid rgba(255,255,255,.06); font-size: 12px; color: rgba(245,241,234,.4); }
 
 /* index.html-specific additions */
 .pg-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; max-width: 700px; margin: 0 auto; }
 .pg-stat-card { text-align: center; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 22px 16px; }
 .pg-stat-value { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; color: var(--mentorship-gold); line-height: 1; margin-bottom: 6px; }
-.pg-stat-label { font-size: 12px; color: rgba(244,246,249,.6); }
+.pg-stat-label { font-size: 12px; color: rgba(245,241,234,.6); }
 .pg-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
 .pg-path-card { display: block; text-decoration: none; color: inherit; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; padding: 28px 26px; transition: border-color .15s; }
 .pg-path-card:hover { border-color: var(--mentorship-gold); }
@@ -1407,14 +1414,14 @@ body.public-page-body {
 }
 .pg-path-icon svg { width: 22px; height: 22px; stroke-width: 1.7; }
 .pg-path-card h3 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 700; margin-bottom: 8px; }
-.pg-path-card p { font-size: 13px; color: rgba(244,246,249,.62); line-height: 1.6; margin-bottom: 14px; }
+.pg-path-card p { font-size: 13px; color: rgba(245,241,234,.62); line-height: 1.6; margin-bottom: 14px; }
 .pg-path-link { font-size: 13px; font-weight: 700; color: var(--mentorship-gold); }
 .pg-parent-banner {
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   max-width: 900px; margin: 0 auto 48px; padding: 20px 24px;
   background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
 }
-.pg-parent-banner p { font-size: 14px; color: rgba(244,246,249,.8); }
+.pg-parent-banner p { font-size: 14px; color: rgba(245,241,234,.8); }
 .pg-parent-banner p strong { color: #fff; }
 
 /* ── VOCATION & LIFE PATHWAYS — shared stage stepper ─────────
@@ -1430,11 +1437,11 @@ body.public-page-body {
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 800; font-family: 'Fraunces', serif;
   border: 2px solid var(--border-md, rgba(255,255,255,.14));
-  color: var(--text-soft, rgba(244,246,249,.5));
+  color: var(--text-soft, rgba(245,241,234,.5));
   background: var(--card-bg, rgba(255,255,255,.03));
   transition: border-color .15s, background .15s, color .15s;
 }
-.vocation-stage-step-label { font-size: 10px; letter-spacing: .04em; color: var(--text-soft, rgba(244,246,249,.5)); text-align: center; white-space: nowrap; }
+.vocation-stage-step-label { font-size: 10px; letter-spacing: .04em; color: var(--text-soft, rgba(245,241,234,.5)); text-align: center; white-space: nowrap; }
 .vocation-stage-step.in_progress .vocation-stage-step-circle,
 .vocation-stage-step.ready_for_review .vocation-stage-step-circle { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
 .vocation-stage-step.mentor_reviewed .vocation-stage-step-circle,
@@ -1442,7 +1449,7 @@ body.public-page-body {
 .vocation-stage-step.in_progress .vocation-stage-step-label,
 .vocation-stage-step.ready_for_review .vocation-stage-step-label,
 .vocation-stage-step.mentor_reviewed .vocation-stage-step-label,
-.vocation-stage-step.complete .vocation-stage-step-label { color: var(--text, #f4f6f9); font-weight: 600; }
+.vocation-stage-step.complete .vocation-stage-step-label { color: var(--text, #F5F1EA); font-weight: 600; }
 .vocation-stage-connector { flex: 0 0 16px; height: 2px; background: var(--border-md, rgba(255,255,255,.14)); margin-bottom: 20px; }
 .vocation-stage-connector.done { background: var(--mentorship-gold); }
 
@@ -1453,7 +1460,7 @@ body.public-page-body {
 .badge.badge-complete { background: var(--mentorship-gold); color: #fff; border-color: var(--mentorship-gold); }
 
 /* Evidence-gate hint text under a disabled "Mark Ready for Review" button. */
-.vocation-gate-hint { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); margin-top: 8px; line-height: 1.5; }
+.vocation-gate-hint { font-size: 12px; color: var(--text-soft, rgba(245,241,234,.5)); margin-top: 8px; line-height: 1.5; }
 
 /* ── VOCATION & LIFE PATHWAYS — redesign pilot (2026-09-06) ──────────
    Shared across dashboard/vocation/index.html (home) and discover.html
@@ -1469,12 +1476,12 @@ body.public-page-body {
    progress simply don't include it. */
 .topbar-progress-inline { display: none; align-items: center; gap: 10px; margin-left: 24px; padding-left: 24px; border-left: 1px solid var(--border-md, rgba(255,255,255,.13)); }
 @media (min-width: 720px) { .topbar-progress-inline { display: flex; } }
-.topbar-progress-pct { font-family: var(--font-display, 'Fraunces', serif); font-size: 15px; font-weight: 700; color: var(--text, #f4f6f9); white-space: nowrap; }
-.topbar-progress-pct span { font-size: 11px; font-weight: 600; color: var(--text-soft, rgba(244,246,249,.5)); text-transform: none; }
+.topbar-progress-pct { font-family: var(--font-display, 'Fraunces', serif); font-size: 15px; font-weight: 700; color: var(--text, #F5F1EA); white-space: nowrap; }
+.topbar-progress-pct span { font-size: 11px; font-weight: 600; color: var(--text-soft, rgba(245,241,234,.5)); text-transform: none; }
 .topbar-progress-bar { width: 88px; height: 5px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.13)); overflow: hidden; }
 .topbar-progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); transition: width .6s cubic-bezier(.4,0,.2,1); }
-.topbar-progress-next { font-size: 10px; color: var(--text-soft, rgba(244,246,249,.5)); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
-.topbar-progress-next strong { display: block; font-size: 12px; color: var(--text, #f4f6f9); text-transform: none; letter-spacing: 0; font-weight: 700; margin-top: 1px; }
+.topbar-progress-next { font-size: 10px; color: var(--text-soft, rgba(245,241,234,.5)); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.topbar-progress-next strong { display: block; font-size: 12px; color: var(--text, #F5F1EA); text-transform: none; letter-spacing: 0; font-weight: 700; margin-top: 1px; }
 
 /* Small "framework" aside card that rides in the vocation hero, in the
    scripture-card's slot on wide screens — same glass-panel treatment,
@@ -1487,15 +1494,15 @@ body.public-page-body {
   position: absolute; top: 24px; right: 28px; z-index: 3;
   width: 232px; background: rgba(22,19,16,.88); backdrop-filter: blur(16px);
   border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: var(--radius, 16px);
-  padding: 18px; color: #f4f6f9;
+  padding: 18px; color: #F5F1EA;
 }
 @media (min-width: 901px) { .voc-framework-card { display: block; } }
-.voc-framework-label { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: rgba(244,246,249,.5); font-weight: 800; margin-bottom: 12px; }
+.voc-framework-label { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: rgba(245,241,234,.5); font-weight: 800; margin-bottom: 12px; }
 .voc-framework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .voc-framework-item { text-align: center; padding: 10px 4px; border-radius: 10px; background: rgba(255,255,255,.05); }
-.voc-framework-item-label { font-size: 10px; font-weight: 700; color: #f4f6f9; }
+.voc-framework-item-label { font-size: 10px; font-weight: 700; color: #F5F1EA; }
 .voc-framework-divider { height: 1px; background: rgba(255,255,255,.1); margin-bottom: 10px; }
-.voc-framework-quote { font-family: var(--font-display, 'Fraunces', serif); font-size: 13px; font-weight: 600; line-height: 1.4; color: #f4f6f9; }
+.voc-framework-quote { font-family: var(--font-display, 'Fraunces', serif); font-size: 13px; font-weight: 600; line-height: 1.4; color: #F5F1EA; }
 
 /* Deliverable cards — replace bare stat counters on the vocation home
    with a named, keepable artifact ("Discovery Notebook") plus a short
@@ -1505,10 +1512,10 @@ body.public-page-body {
 .voc-deliverable-card { display: flex; flex-direction: column; gap: 10px; }
 .voc-deliverable-icon { width: 34px; height: 34px; border-radius: 10px; background: var(--gold-dim, rgba(184,92,26,.15)); color: var(--mentorship-gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .voc-deliverable-icon svg { width: 18px; height: 18px; }
-.voc-deliverable-name { font-family: var(--font-display, 'Fraunces', serif); font-size: 16px; font-weight: 700; color: var(--text, #f4f6f9); }
-.voc-deliverable-stat { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.62)); }
+.voc-deliverable-name { font-family: var(--font-display, 'Fraunces', serif); font-size: 16px; font-weight: 700; color: var(--text, #F5F1EA); }
+.voc-deliverable-stat { font-size: 12px; color: var(--text-muted, rgba(245,241,234,.62)); }
 .voc-deliverable-stat strong { color: var(--mentorship-gold); font-weight: 800; }
-.voc-deliverable-next { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); line-height: 1.4; padding-top: 8px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
+.voc-deliverable-next { font-size: 12px; color: var(--text-soft, rgba(245,241,234,.5)); line-height: 1.4; padding-top: 8px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
 
 /* One-section-at-a-time flow shell (discover.html and, on rollout, the
    other stage pages). Two columns on desktop: the active exercise, and
@@ -1520,7 +1527,7 @@ body.public-page-body {
 .voc-flow-progress-track { height: 6px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.13)); overflow: hidden; margin-bottom: 14px; }
 .voc-flow-progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); transition: width .5s cubic-bezier(.4,0,.2,1); }
 .voc-flow-dots { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
-.voc-flow-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-md, rgba(255,255,255,.14)); background: var(--card-bg, rgba(255,255,255,.03)); color: var(--text-soft, rgba(244,246,249,.5)); font-size: 11px; font-weight: 800; font-family: var(--font-display, 'Fraunces', serif); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; flex-shrink: 0; }
+.voc-flow-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-md, rgba(255,255,255,.14)); background: var(--card-bg, rgba(255,255,255,.03)); color: var(--text-soft, rgba(245,241,234,.5)); font-size: 11px; font-weight: 800; font-family: var(--font-display, 'Fraunces', serif); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; flex-shrink: 0; }
 .voc-flow-dot:hover { border-color: var(--mentorship-gold); }
 .voc-flow-dot.current { border-color: var(--mentorship-gold); color: var(--mentorship-gold); box-shadow: 0 0 0 3px var(--gold-dim, rgba(184,92,26,.15)); }
 .voc-flow-dot.done { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
@@ -1532,13 +1539,13 @@ body.public-page-body {
 
 .voc-recap-card { position: sticky; top: 16px; }
 .voc-recap-title { font-family: var(--font-display, 'Fraunces', serif); font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-.voc-recap-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); margin-bottom: 14px; line-height: 1.4; }
+.voc-recap-sub { font-size: 12px; color: var(--text-soft, rgba(245,241,234,.5)); margin-bottom: 14px; line-height: 1.4; }
 .voc-recap-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); }
 .voc-recap-row:last-child { border-bottom: none; }
 .voc-recap-row-icon { width: 22px; height: 22px; border-radius: 7px; background: var(--card-bg2, rgba(255,255,255,.08)); color: var(--mentorship-gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 800; }
-.voc-recap-row-text { font-size: 12.5px; color: var(--text-muted, rgba(244,246,249,.75)); line-height: 1.45; }
-.voc-recap-row-text strong { color: var(--text, #f4f6f9); }
-.voc-recap-empty { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.45)); font-style: italic; }
+.voc-recap-row-text { font-size: 12.5px; color: var(--text-muted, rgba(245,241,234,.75)); line-height: 1.45; }
+.voc-recap-row-text strong { color: var(--text, #F5F1EA); }
+.voc-recap-empty { font-size: 12px; color: var(--text-soft, rgba(245,241,234,.45)); font-style: italic; }
 
 /* Tactile feedback on rating dots / chips — a state-change confirmation,
    not decoration (kept to a single quick pulse; nothing loops or plays

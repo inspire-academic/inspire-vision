@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Career Profile | Vocation & Life Pathways | Inspire Mentorship</title>
   <meta name="description" content="A single career profile within Stage 2 of Vocation & Life Pathways.">
-  <meta name="theme-color" content="#0A1628">
+  <meta name="theme-color" content="#161310">
   <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,33 +14,33 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
-    .voc-back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted, rgba(244,246,249,.7)); text-decoration: none; margin-bottom: 14px; }
+    .voc-back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted, rgba(245,241,234,.7)); text-decoration: none; margin-bottom: 14px; }
     .voc-back-link:hover { color: var(--mentorship-gold); }
     .voc-placeholder-badge { display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgba(217,119,6,.15); color: var(--mentorship-gold); border: 1px solid rgba(217,119,6,.3); margin-bottom: 12px; }
     .voc-lens-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 8px; }
     @media (min-width: 720px) { .voc-lens-grid { grid-template-columns: 1fr 1fr; } }
     .voc-lens-card { padding: 14px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; }
     .voc-lens-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--mentorship-gold); margin-bottom: 6px; }
-    .voc-lens-text { font-size: 13px; color: var(--text-muted, rgba(244,246,249,.78)); line-height: 1.55; }
+    .voc-lens-text { font-size: 13px; color: var(--text-muted, rgba(245,241,234,.78)); line-height: 1.55; }
     .voc-route-item { padding: 10px 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 8px; }
-    .voc-route-item strong { color: var(--text, #f4f6f9); text-transform: capitalize; }
-    .voc-route-item span { color: var(--text-soft, rgba(244,246,249,.55)); font-size: 12px; }
+    .voc-route-item strong { color: var(--text, #F5F1EA); text-transform: capitalize; }
+    .voc-route-item span { color: var(--text-soft, rgba(245,241,234,.55)); font-size: 12px; }
     .voc-subject-chip { display: inline-block; padding: 5px 12px; border-radius: 999px; background: var(--card-bg2, rgba(255,255,255,.06)); border: 1px solid var(--border-md, rgba(255,255,255,.14)); font-size: 12px; margin: 0 6px 6px 0; }
     .voc-lm-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.06)); font-size: 13px; }
     .voc-lm-row:last-child { border-bottom: none; }
-    .voc-lm-key { color: var(--text-soft, rgba(244,246,249,.55)); text-transform: capitalize; }
-    .voc-lm-source { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 8px; }
+    .voc-lm-key { color: var(--text-soft, rgba(245,241,234,.55)); text-transform: capitalize; }
+    .voc-lm-source { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.45)); margin-top: 8px; }
 
-    .voc-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #f4f6f9); font-size: 13px; cursor: pointer; transition: border-color .1s, background .1s; }
+    .voc-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-md, rgba(255,255,255,.15)); background: transparent; color: var(--text, #F5F1EA); font-size: 13px; cursor: pointer; transition: border-color .1s, background .1s; }
     .voc-chip.on-strong { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
     .voc-chip.on-maybe { background: rgba(217,119,6,.2); border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
     .voc-chip.on-save { background: rgba(59,130,246,.18); border-color: #60a5fa; color: #60a5fa; }
-    .voc-chip.on-not { background: rgba(255,255,255,.06); border-color: var(--border-md, rgba(255,255,255,.2)); color: var(--text-soft, rgba(244,246,249,.5)); text-decoration: line-through; }
+    .voc-chip.on-not { background: rgba(255,255,255,.06); border-color: var(--border-md, rgba(255,255,255,.2)); color: var(--text-soft, rgba(245,241,234,.5)); text-decoration: line-through; }
     .voc-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .voc-textarea { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #f4f6f9); box-sizing: border-box; min-height: 90px; resize: vertical; }
+    .voc-textarea { width: 100%; background: var(--card-bg2, rgba(255,255,255,.05)); border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; color: var(--text, #F5F1EA); box-sizing: border-box; min-height: 90px; resize: vertical; }
     .voc-textarea:disabled { opacity: .5; cursor: not-allowed; }
-    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(244,246,249,.8)); }
-    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 6px; }
+    .voc-field-label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-muted, rgba(245,241,234,.8)); }
+    .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(245,241,234,.45)); margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -273,8 +273,8 @@
       </div>
       ${isPlaceholder ? '<div class="voc-placeholder-badge">Illustrative example — not yet a live data source</div><br>' : ''}
       <div class="card" style="margin-bottom:20px">
-        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.78)); line-height:1.6; margin:0 0 12px">${escapeHtml(profile.summary || '')}</p>
-        ${profile.day_in_life ? `<p style="font-size:13px; color:var(--text-muted, rgba(244,246,249,.7)); line-height:1.6; margin:0"><strong style="color:var(--text,#f4f6f9)">A day in the life:</strong> ${escapeHtml(profile.day_in_life)}</p>` : ''}
+        <p style="font-size:14px; color:var(--text-muted, rgba(245,241,234,.78)); line-height:1.6; margin:0 0 12px">${escapeHtml(profile.summary || '')}</p>
+        ${profile.day_in_life ? `<p style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.7)); line-height:1.6; margin:0"><strong style="color:var(--text,#F5F1EA)">A day in the life:</strong> ${escapeHtml(profile.day_in_life)}</p>` : ''}
       </div>
 
       <div class="card" style="margin-bottom:20px">

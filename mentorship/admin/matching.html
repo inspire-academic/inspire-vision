@@ -14,7 +14,7 @@
   <style>
     body.admin-body {
       background: var(--mentorship-navy);
-      color: #f4f6f9;
+      color: #F5F1EA;
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       min-height: 100vh;
       padding: 40px 20px;
@@ -34,14 +34,14 @@
     .admin-btn { padding: 9px 16px; border-radius: 9px; font-size: 13px; font-weight: 700 }
     .admin-btn-approve { background: var(--mentorship-gold); color: #fff }
     .admin-btn-approve:hover { opacity: .9 }
-    .admin-btn-reject { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(244,246,249,.8) }
+    .admin-btn-reject { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(245,241,234,.8) }
     .admin-btn-reject:hover { border-color: rgba(239,68,68,.5); color: #fca5a5 }
     .admin-btn:disabled { opacity: .5 }
     .assign-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
     .assign-row select {
       flex: 1; min-width: 180px;
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.13);
-      border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #f4f6f9; font-family: inherit;
+      border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #F5F1EA; font-family: inherit;
     }
     .assign-arrow { opacity: .4; font-size: 16px }
     .health-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
@@ -51,11 +51,11 @@
     .closure-form { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; gap: 10px; }
     .closure-form select, .closure-form input[type="text"] {
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.13);
-      border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #f4f6f9; font-family: inherit;
+      border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #F5F1EA; font-family: inherit;
     }
-    .closure-form label { font-size: 12px; display: flex; align-items: center; gap: 6px; color: rgba(244,246,249,.8); }
+    .closure-form label { font-size: 12px; display: flex; align-items: center; gap: 6px; color: rgba(245,241,234,.8); }
     .closure-form-actions { display: flex; gap: 8px }
-    .closure-form-actions .admin-btn-cancel { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(244,246,249,.7) }
+    .closure-form-actions .admin-btn-cancel { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(245,241,234,.7) }
   </style>
 </head>
 <body class="admin-body">
@@ -142,7 +142,7 @@
                     <div class="admin-app-email">
                       Paired ${new Date(a.assigned_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       · <span class="health-badge health-${a.health}">${HEALTH_LABEL[a.health] || a.health}</span>
-                      ${a.commitment_acknowledged_at ? '' : ' · <span class="health-badge" style="background:rgba(255,255,255,.08);color:rgba(244,246,249,.6)">Commitment not yet acknowledged</span>'}
+                      ${a.commitment_acknowledged_at ? '' : ' · <span class="health-badge" style="background:rgba(255,255,255,.08);color:rgba(245,241,234,.6)">Commitment not yet acknowledged</span>'}
                     </div>
                   </div>
                   <button class="admin-btn admin-btn-reject" data-action="toggleEnd">End Pairing</button>
