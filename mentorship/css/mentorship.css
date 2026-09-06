@@ -247,22 +247,37 @@ body.auth-body {
        (--clr-mentorship, terracotta/ochre) rather than the gold this
        dashboard originally shipped with — resolved 2026-07-09, see
        mentorship/css/mentorship.css for the full history. ───────────── */
+    /* Dark-mode neutral repainted 2026-09-06 — the previous --navy/-mid/
+       -light stack (#0A1628/#0F2040/#162B52) was tokens.css's --clr-navy,
+       i.e. Academic's brand ink borrowed wholesale rather than a neutral
+       derived from Mentorship's own terracotta cardinal colour. Eric's
+       call after reviewing options: it read as flat/cold ("tired faded
+       blue cloth"), which also matches the general 2026 dark-mode
+       consensus against cool low-saturation navy for "serious" software.
+       Replaced with a warm near-black ("Warm Charcoal") that pairs with
+       amber/terracotta the way navy never did — text/border/card tokens
+       below are warm-tinted off-white to match, instead of the previous
+       cool bluish-white (#f4f6f9 etc). Deliberately scoped to THIS file's
+       --navy/--text/--border/--card-bg tokens only, not tokens.css's
+       --clr-navy — that token is shared site-wide (Academic's own hero/
+       sidebar surfaces included) and repainting it was never in scope
+       here. Gold/terracotta accent itself is untouched. */
     :root {
-      --navy:       var(--clr-navy, #0A1628);
-      --navy-mid:   var(--clr-navy-mid, #0F2040);
-      --navy-light: var(--clr-navy-light, #162B52);
+      --navy:       #161310;
+      --navy-mid:   #1F1A15;
+      --navy-light: #2B241D;
       --gold:       var(--clr-mentorship, #B85C1A);
       --gold-light: var(--clr-mentorship-mid, #D97706);
       --gold-dim:   rgba(184,92,26,.15);
       --gold-border:rgba(184,92,26,.3);
       --white:      #ffffff;
-      --text:       #f4f6f9;
-      --text-muted: rgba(244,246,249,.62);
-      --text-soft:  rgba(244,246,249,.38);
-      --border:     rgba(255,255,255,.08);
-      --border-md:  rgba(255,255,255,.13);
-      --card-bg:    rgba(255,255,255,.05);
-      --card-bg2:   rgba(255,255,255,.08);
+      --text:       #F5F1EA;
+      --text-muted: rgba(245,241,234,.62);
+      --text-soft:  rgba(245,241,234,.38);
+      --border:     rgba(245,241,234,.08);
+      --border-md:  rgba(245,241,234,.13);
+      --card-bg:    rgba(245,241,234,.05);
+      --card-bg2:   rgba(245,241,234,.08);
       --success:    #4ade80;
       --sidebar-w:  248px;
       --radius:     16px;
@@ -307,16 +322,16 @@ body.auth-body {
     html[data-theme="light"] .sidebar,
     html[data-theme="light"] .topbar,
     html[data-theme="light"] .hero {
-      --navy:       #0A1628;
-      --navy-mid:   #0F2040;
-      --navy-light: #162B52;
-      --text:       #f4f6f9;
-      --text-muted: rgba(244,246,249,.62);
-      --text-soft:  rgba(244,246,249,.38);
-      --border:     rgba(255,255,255,.08);
-      --border-md:  rgba(255,255,255,.13);
-      --card-bg:    rgba(255,255,255,.05);
-      --card-bg2:   rgba(255,255,255,.08);
+      --navy:       #161310;
+      --navy-mid:   #1F1A15;
+      --navy-light: #2B241D;
+      --text:       #F5F1EA;
+      --text-muted: rgba(245,241,234,.62);
+      --text-soft:  rgba(245,241,234,.38);
+      --border:     rgba(245,241,234,.08);
+      --border-md:  rgba(245,241,234,.13);
+      --card-bg:    rgba(245,241,234,.05);
+      --card-bg2:   rgba(245,241,234,.08);
     }
 
     /* ── RESET ──────────────────────────────────────────────── */
@@ -512,7 +527,7 @@ body.auth-body {
       gap: 16px;
       padding: 0 16px;
       border-bottom: 1px solid var(--border);
-      background: rgba(10,21,32,.8);
+      background: rgba(22,19,16,.8);
       backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
@@ -655,16 +670,20 @@ body.auth-body {
     }
     .hero-img-placeholder {
       position: absolute; inset: 0;
-      background: linear-gradient(135deg, #0d2040 0%, #1a3a5c 40%, #0a2030 100%);
+      /* Warm-charcoal gradient (2026-09-06), matching the --navy repaint
+         above — this literal gradient can't reference the CSS variable
+         (a gradient stop needs a color, not a token that changes value),
+         so it's kept in step with --navy/--navy-mid/--navy-light by hand. */
+      background: linear-gradient(135deg, #201a14 0%, #2b2119 40%, #14100c 100%);
     }
     /* Overlay gradient */
     .hero-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(
         to right,
-        rgba(10,21,32,.92) 0%,
-        rgba(10,21,32,.7) 40%,
-        rgba(10,21,32,.2) 70%,
+        rgba(22,19,16,.92) 0%,
+        rgba(22,19,16,.7) 40%,
+        rgba(22,19,16,.2) 70%,
         transparent 100%
       );
     }
@@ -724,7 +743,7 @@ body.auth-body {
       top: 24px; right: 28px;
       z-index: 3;
       width: 220px;
-      background: rgba(10,21,32,.88);
+      background: rgba(22,19,16,.88);
       backdrop-filter: blur(16px);
       border: 1px solid var(--border-md);
       border-radius: var(--radius);
@@ -1278,13 +1297,20 @@ body.public-page-body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 .pg-header {
-  display: flex; align-items: center; justify-content: space-between;
-  max-width: 1000px; margin: 0 auto; padding: 28px 24px 0;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  max-width: 1000px; margin: 0 auto; padding: 28px 24px 0; gap: 12px;
 }
 .pg-brand { color: #f4f6f9; text-decoration: none; font-weight: 800; letter-spacing: .02em; }
 .pg-brand span { color: var(--mentorship-gold); }
+.pg-header-right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 .pg-back { color: rgba(244,246,249,.6); font-size: 13px; text-decoration: none; }
 .pg-back:hover { color: var(--mentorship-gold); }
+.pg-signin-btn {
+  display: inline-block; padding: 8px 18px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.24); color: #f4f6f9;
+  font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.pg-signin-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
 
 .pg-hero { max-width: 760px; margin: 0 auto; padding: 56px 24px 40px; text-align: center; }
 .pg-eyebrow { color: var(--mentorship-gold); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; margin-bottom: 14px; }
@@ -1443,7 +1469,7 @@ body.public-page-body {
 .voc-framework-card {
   display: none;
   position: absolute; top: 24px; right: 28px; z-index: 3;
-  width: 232px; background: rgba(10,21,32,.88); backdrop-filter: blur(16px);
+  width: 232px; background: rgba(22,19,16,.88); backdrop-filter: blur(16px);
   border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: var(--radius, 16px);
   padding: 18px; color: #f4f6f9;
 }
