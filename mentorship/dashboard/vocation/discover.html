@@ -14,15 +14,7 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
-    .voc-section { margin-bottom: 14px; }
-    .voc-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
-    .voc-section-num { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 700; color: var(--mentorship-gold); margin-right: 10px; }
-    .voc-section-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.55)); margin-top: 4px; font-weight: 400; }
-    .voc-section-body { margin-top: 16px; display: none; }
-    .voc-section.open .voc-section-body { display: block; }
-    .voc-chevron { transition: transform .15s; opacity: .5; flex-shrink: 0; }
-    .voc-section.open .voc-chevron { transform: rotate(90deg); }
-    .voc-section.voc-complete { opacity: .85; }
+    .voc-section-sub { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.55)); font-weight: 400; line-height: 1.4; }
 
     .voc-rating-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); }
     .voc-rating-row:last-child { border-bottom: none; }
@@ -56,7 +48,6 @@
     .voc-nominee-item { padding: 12px; background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.08)); border-radius: 10px; margin-bottom: 10px; }
 
     .voc-save-note { font-size: 11px; color: var(--text-soft, rgba(244,246,249,.45)); margin-top: 4px; }
-    .voc-gate-card { margin-top: 24px; }
   </style>
 </head>
 <body>
@@ -135,6 +126,13 @@
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
         <div class="topbar-sub">You do not need your whole life figured out. Start by learning to read yourself well.</div>
       </div>
+      <div class="topbar-progress-inline" id="topbarProgress">
+        <div>
+          <div class="topbar-progress-pct"><span id="topbarPct">0</span>% <span>complete</span></div>
+          <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbarProgressFill" style="width:0%"></div></div>
+        </div>
+        <div class="topbar-progress-next">Next up<strong id="topbarNext">—</strong></div>
+      </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -176,13 +174,31 @@
         </p>
       </div>
 
-      <div id="sectionsList"></div>
+      <div class="voc-flow-grid">
+        <div>
+          <div class="voc-flow-progress-track"><div class="voc-flow-progress-fill" id="flowProgressFill" style="width:0%"></div></div>
+          <div class="voc-flow-dots" id="flowDots"></div>
 
-      <div class="card voc-gate-card">
-        <div class="card-label">Ready to move forward?</div>
-        <div class="card-title" style="margin-bottom:8px">Mark Discover ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Complete all seven sections and add at least one piece of evidence before this stage is ready for your mentor to review.</div>
+          <div class="card voc-flow-card">
+            <div class="voc-flow-step-label" id="flowStepLabel">Step 1 of 7</div>
+            <div class="card-title" id="flowSectionTitle" style="font-size:19px; margin-bottom:4px"></div>
+            <div class="voc-section-sub" id="flowSectionSub" style="margin-bottom:16px"></div>
+            <div class="voc-flow-body" id="flowBody"></div>
+
+            <div class="voc-flow-nav">
+              <button class="list-card-btn" id="flowBackBtn">← Back</button>
+              <div class="voc-flow-nav-spacer"></div>
+              <button class="list-card-btn primary" id="flowNextBtn">Continue →</button>
+            </div>
+            <div class="vocation-gate-hint" id="gateHint" style="display:none"></div>
+          </div>
+        </div>
+
+        <div class="card voc-recap-card">
+          <div class="voc-recap-title">Your Emerging Profile</div>
+          <div class="voc-recap-sub">A live snapshot of what you're discovering — this carries forward into your Discovery Report.</div>
+          <div id="recapList"></div>
+        </div>
       </div>
     </div>
   </main>
@@ -562,54 +578,131 @@
     return false;
   }
 
+  // ── One-section-at-a-time flow ─────────────────────────────
+  // Only the current section is ever mounted/interactive — re-uses the
+  // same RENDERERS/wire* functions the accordion version used, so each
+  // exercise's own logic above is untouched. Replaces the old always-
+  // -open accordion (see git history) with the reference concept's
+  // step-through pattern: less overwhelming, and gives the "Your
+  // Emerging Profile" recap somewhere to live as a visible payoff for
+  // answering, instead of a bare checkmark.
+  let currentIndex = 0;
+
   function renderSection(key) {
-    const body = document.querySelector(`[data-section-body="${key}"]`);
-    if (!body) return;
+    const body = $('flowBody');
     const r = RENDERERS[key];
     body.innerHTML = r.render();
     r.wire(body);
-    const sectionEl = body.closest('.voc-section');
-    sectionEl.classList.toggle('voc-complete', isSectionComplete(key));
-    const doneMark = sectionEl.querySelector('[data-done-mark]');
-    if (doneMark) doneMark.style.display = isSectionComplete(key) ? '' : 'none';
+    renderDots();
+    renderRecap();
   }
 
-  function renderAllSections() {
-    const list = $('sectionsList');
-    list.innerHTML = SECTIONS.map(s => `
-      <div class="list-card voc-section" data-section="${s.key}">
-        <div class="voc-section-head" data-toggle>
-          <div>
-            <div class="list-card-title"><span class="voc-section-num">${s.num}</span>${escapeHtml(s.title)}</div>
-            <div class="voc-section-sub">${escapeHtml(s.sub)}</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px">
-            <span class="badge badge-complete" data-done-mark style="display:none">✓</span>
-            <svg class="voc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>
-          </div>
-        </div>
-        <div class="voc-section-body" data-section-body="${s.key}"></div>
-      </div>`).join('');
-
-    list.querySelectorAll('[data-toggle]').forEach(head => {
-      head.addEventListener('click', () => head.closest('.voc-section').classList.toggle('open'));
+  function renderDots() {
+    const dots = $('flowDots');
+    dots.innerHTML = SECTIONS.map((s, i) => `
+      <button type="button" class="voc-flow-dot${i === currentIndex ? ' current' : ''}${isSectionComplete(s.key) ? ' done' : ''}"
+              data-goto="${i}" title="${escapeHtml(s.title)}" aria-label="Go to ${escapeHtml(s.title)}">${isSectionComplete(s.key) ? '✓' : s.num}</button>
+    `).join('');
+    dots.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => goToSection(Number(btn.dataset.goto)));
     });
-    SECTIONS.forEach(s => renderSection(s.key));
   }
 
-  function updateGate() {
+  // Recap rows are intentionally best-effort/heuristic (top-rated items,
+  // counts) rather than a full re-derivation of each renderer's payload
+  // shape — good enough for a live "it's adding up" signal without
+  // duplicating every exercise's own logic.
+  function buildRecapRows() {
+    const rows = [];
+    const alive = reflections['discover.alive'];
+    if (alive?.ratings && Object.keys(alive.ratings).length) {
+      const top = Object.entries(alive.ratings).filter(([, s]) => s >= 4).map(([i]) => ALIVE_STATEMENTS[i]).filter(Boolean);
+      if (top.length) rows.push({ icon: '01', text: `Comes alive when: <strong>${escapeHtml(top.slice(0, 2).join('; '))}</strong>` });
+    }
+    const strengths = reflections['discover.strengths'];
+    if (strengths?.selected?.length) rows.push({ icon: '02', text: `Sees strength in: <strong>${escapeHtml(strengths.selected.slice(0, 3).join(', '))}</strong>` });
+    if (evidenceItems.length) rows.push({ icon: '02', text: `<strong>${evidenceItems.length}</strong> piece${evidenceItems.length === 1 ? '' : 's'} of evidence collected so far.` });
+    if (nominees.length) rows.push({ icon: '03', text: `<strong>${nominees.length}</strong> trusted ${nominees.length === 1 ? 'person has' : 'people have'} weighed in.` });
+    const values = reflections['discover.values'];
+    if (values?.ranked?.length) rows.push({ icon: '04', text: `Top value right now: <strong>${escapeHtml(values.ranked[0])}</strong>` });
+    const env = reflections['discover.environment'];
+    if (env?.picks && Object.keys(env.picks).length) {
+      const n = Object.keys(env.picks).length;
+      rows.push({ icon: '05', text: `<strong>${n}</strong> working-style preference${n === 1 ? '' : 's'} recorded.` });
+    }
+    const hard = reflections['discover.hard_things'];
+    if (hard?.ratings && Object.keys(hard.ratings).length) {
+      const top = Object.entries(hard.ratings).filter(([, s]) => s >= 4).map(([i]) => HARD_THINGS[i]).filter(Boolean);
+      if (top.length) rows.push({ icon: '06', text: `Willing to carry: <strong>${escapeHtml(top.slice(0, 2).join('; '))}</strong>` });
+    }
+    const character = reflections['discover.character'];
+    if (character?.selected?.length) rows.push({ icon: '07', text: `Growing in: <strong>${escapeHtml(character.selected.slice(0, 3).join(', '))}</strong>` });
+    return rows;
+  }
+
+  function renderRecap() {
+    const rows = buildRecapRows();
+    $('recapList').innerHTML = rows.length
+      ? rows.map(r => `
+          <div class="voc-recap-row">
+            <div class="voc-recap-row-icon">${r.icon}</div>
+            <div class="voc-recap-row-text">${r.text}</div>
+          </div>`).join('')
+      : '<div class="voc-recap-empty">Nothing yet — answer a few questions and your profile will start forming here.</div>';
+  }
+
+  function renderFlow() {
+    const section = SECTIONS[currentIndex];
+    const isLast = currentIndex === SECTIONS.length - 1;
+    $('flowStepLabel').textContent = `Step ${currentIndex + 1} of ${SECTIONS.length}`;
+    $('flowSectionTitle').textContent = section.title;
+    $('flowSectionSub').textContent = section.sub;
+    $('flowProgressFill').style.width = `${Math.round((currentIndex / (SECTIONS.length - 1)) * 100)}%`;
+    $('flowBackBtn').disabled = currentIndex === 0;
+    $('gateHint').style.display = 'none';
+
+    const stageStatus = (progressByStage.discover || {}).status;
+    const alreadySubmitted = stageStatus === 'ready_for_review' || stageStatus === 'mentor_reviewed' || stageStatus === 'complete';
+    const nextBtn = $('flowNextBtn');
+    if (isLast) {
+      nextBtn.disabled = alreadySubmitted;
+      nextBtn.textContent = stageStatus === 'ready_for_review' ? 'Marked Ready for Review ✓'
+        : (stageStatus === 'mentor_reviewed' || stageStatus === 'complete') ? 'Reviewed by Mentor ✓'
+        : 'Mark Discover Ready for Review';
+    } else {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Continue →';
+    }
+
+    const body = $('flowBody');
+    const r = RENDERERS[section.key];
+    body.innerHTML = r.render();
+    r.wire(body);
+    renderDots();
+    renderRecap();
+  }
+
+  function goToSection(i) {
+    if (i < 0 || i >= SECTIONS.length) return;
+    currentIndex = i;
+    renderFlow();
+  }
+
+  $('flowBackBtn').addEventListener('click', () => goToSection(currentIndex - 1));
+  $('flowNextBtn').addEventListener('click', async () => {
+    const isLast = currentIndex === SECTIONS.length - 1;
+    if (!isLast) { goToSection(currentIndex + 1); return; }
+
     const allComplete = SECTIONS.every(s => isSectionComplete(s.key));
     const hasEvidence = evidenceItems.length > 0;
-    const ready = allComplete && hasEvidence;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
-    $('gateHint').textContent = ready
-      ? 'All seven sections have real content and you’ve added evidence. You can mark this stage ready for your mentor.'
-      : `Complete all seven sections${!hasEvidence ? ' and add at least one piece of evidence in Strengths & Evidence' : ''} before this stage is ready for review.`;
-  }
+    if (!allComplete || !hasEvidence) {
+      const hint = $('gateHint');
+      hint.textContent = `Complete all seven sections${!hasEvidence ? ' and add at least one piece of evidence in Strengths & Evidence' : ''} before this stage is ready for your mentor to review.`;
+      hint.style.display = 'block';
+      return;
+    }
 
-  $('markReadyBtn')?.addEventListener('click', async () => {
-    const btn = $('markReadyBtn');
+    const btn = $('flowNextBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'discover');
     if (error) { console.warn('Mark ready failed:', error); btn.textContent = 'Try Again'; btn.disabled = false; return; }
@@ -648,13 +741,20 @@
       nominees = nomineesRes.data || [];
 
       renderStageStepper($('stepperWrap'), progressByStage, 'discover');
-      renderAllSections();
-      updateGate();
 
-      // Open the first incomplete section by default.
-      const firstIncomplete = SECTIONS.find(s => !isSectionComplete(s.key));
-      const target = firstIncomplete || SECTIONS[0];
-      document.querySelector(`[data-section="${target.key}"]`)?.classList.add('open');
+      // Topbar progress readout — same "X% complete / Next up" pattern as
+      // the vocation home page, computed from all seven stages' status.
+      const stages = window.VOCATION_STAGES;
+      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
+      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
+      $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
+      $('topbarNext').textContent = nextStage.label;
+
+      // Start on the first not-yet-complete section.
+      const firstIncomplete = SECTIONS.findIndex(s => !isSectionComplete(s.key));
+      currentIndex = firstIncomplete === -1 ? 0 : firstIncomplete;
+      renderFlow();
     } catch (e) {
       console.warn('Discover page init failed:', e);
     }

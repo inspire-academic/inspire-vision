@@ -14,9 +14,7 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
   <style>
-    .voc-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
-    .voc-stat-card .card-title { font-size: 26px; }
-    .voc-two-col { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .voc-two-col { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px; }
     @media (min-width: 860px) { .voc-two-col { grid-template-columns: 1.4fr 1fr; } }
     .voc-mentor-note { border-left: 3px solid var(--mentorship-gold); }
     .voc-empty { font-size: 13px; color: var(--text-soft, rgba(244,246,249,.5)); }
@@ -89,6 +87,13 @@
         <div class="topbar-greeting" id="topbarGreeting">Welcome back 👋</div>
         <div class="topbar-sub">Keep going — your future is taking shape.</div>
       </div>
+      <div class="topbar-progress-inline" id="topbarProgress">
+        <div>
+          <div class="topbar-progress-pct"><span id="topbarPct">0</span>% <span>complete</span></div>
+          <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbarProgressFill" style="width:0%"></div></div>
+        </div>
+        <div class="topbar-progress-next">Next up<strong id="topbarNext">Discover</strong></div>
+      </div>
       <div class="topbar-dropdown-wrap">
         <button class="topbar-bell" id="notifBell" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -113,43 +118,82 @@
     </header>
 
     <div class="content">
-      <div class="page-header">
-        <div>
+
+      <section class="hero" style="height:296px">
+        <div class="hero-img-placeholder"></div>
+        <img src="/assets/images/mentorship/hero/vocation-hero.webp" alt="" class="hero-img"
+             loading="eager" fetchpriority="high"
+             onload="this.style.opacity=1" onerror="this.style.display='none'"
+             style="opacity:0;transition:opacity .4s ease">
+        <div class="hero-overlay"></div>
+        <div class="hero-overlay-bottom"></div>
+
+        <div class="hero-content">
           <div class="page-eyebrow">Mentorship & Formation</div>
-          <h1 class="page-title">Vocation & Life Pathways</h1>
+          <div class="hero-headline" style="font-size:clamp(28px,3.6vw,44px)">Vocation &amp;<br><span class="gold">Life Pathways</span></div>
+          <p class="hero-tagline">Discover your gifts. Discern your direction. Design a life worth building.</p>
+          <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center">
+            <a class="hero-btn" id="continueBtn" href="/mentorship/dashboard/vocation/discover.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+              Start Your Journey
+            </a>
+            <a href="/mentorship/dashboard/vocation/report.html" style="font-size:13px; font-weight:700; color:var(--text-muted, rgba(244,246,249,.75))">View Report →</a>
+          </div>
         </div>
-      </div>
 
-      <div class="card" style="margin-bottom:20px">
-        <p style="font-size:14px; color:var(--text-muted, rgba(244,246,249,.75)); line-height:1.6; margin:0 0 14px">
-          Discover your strengths, explore possible futures, test your assumptions and build a credible pathway
-          into adulthood. Nothing here is a verdict — everything is evidence you're gathering about yourself and
-          the world, one step at a time.
-        </p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap">
-          <a class="list-card-btn primary" id="continueBtn" href="/mentorship/dashboard/vocation/discover.html">Continue Your Journey →</a>
-          <a class="list-card-btn" href="/mentorship/dashboard/vocation/report.html">View Report</a>
+        <div class="voc-framework-card">
+          <div class="voc-framework-label">Our Framework</div>
+          <div class="voc-framework-grid">
+            <div class="voc-framework-item"><div class="voc-framework-item-label">Love</div></div>
+            <div class="voc-framework-item"><div class="voc-framework-item-label">Ability</div></div>
+            <div class="voc-framework-item"><div class="voc-framework-item-label">Service</div></div>
+            <div class="voc-framework-item"><div class="voc-framework-item-label">Viability</div></div>
+          </div>
+          <div class="voc-framework-divider"></div>
+          <div class="voc-framework-quote">"Your future deserves more than guesswork."</div>
         </div>
-      </div>
+      </section>
 
-      <div id="stepperWrap" class="vocation-stage-stepper"></div>
+      <div style="padding:20px 28px 0">
+        <div id="stepperWrap" class="vocation-stage-stepper"></div>
 
-      <div class="voc-stat-grid">
-        <div class="card voc-stat-card"><div class="card-label">Evidence Collected</div><div class="card-title" id="statEvidence">0</div></div>
-        <div class="card voc-stat-card"><div class="card-label">Career Families Explored</div><div class="card-title" id="statFamilies">0</div></div>
-        <div class="card voc-stat-card"><div class="card-label">Pathways Being Compared</div><div class="card-title" id="statHypotheses">0</div></div>
-        <div class="card voc-stat-card"><div class="card-label">Mentor Notes Shared</div><div class="card-title" id="statNotes">0</div></div>
-      </div>
-
-      <div class="voc-two-col">
-        <div class="card">
-          <div class="card-label">Your Current Working Statement</div>
-          <div class="card-title" style="margin-bottom:8px">Vocation Statement</div>
-          <div id="statementText" class="voc-empty">You haven't written a working statement of vocation yet — you'll get to this in Discern.</div>
+        <div class="voc-deliverable-grid">
+          <div class="card voc-deliverable-card">
+            <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg></div>
+            <div class="voc-deliverable-name">Discovery Notebook</div>
+            <div class="voc-deliverable-stat"><strong id="statEvidence">0</strong> pieces of evidence collected</div>
+            <div class="voc-deliverable-next" id="statEvidenceNext">Start in Discover — rate what makes you come alive.</div>
+          </div>
+          <div class="card voc-deliverable-card">
+            <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg></div>
+            <div class="voc-deliverable-name">Career Map</div>
+            <div class="voc-deliverable-stat"><strong id="statFamilies">0</strong> career families explored</div>
+            <div class="voc-deliverable-next" id="statFamiliesNext">Unlocks once you reach Explore.</div>
+          </div>
+          <div class="card voc-deliverable-card">
+            <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18"/><path d="M5 7l-3 6a4 4 0 0 0 8 0z"/><path d="M19 7l-3 6a4 4 0 0 0 8 0z"/><path d="M5 7h14"/></svg></div>
+            <div class="voc-deliverable-name">Pathway Comparison</div>
+            <div class="voc-deliverable-stat"><strong id="statHypotheses">0</strong> pathways being compared</div>
+            <div class="voc-deliverable-next" id="statHypothesesNext">Unlocks once you reach Discern.</div>
+          </div>
+          <div class="card voc-deliverable-card">
+            <div class="voc-deliverable-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="voc-deliverable-name">Mentor Check-Ins</div>
+            <div class="voc-deliverable-stat"><strong id="statNotes">0</strong> notes shared by your mentor</div>
+            <div class="voc-deliverable-next" id="statNotesNext">Your mentor can add notes any time.</div>
+          </div>
         </div>
-        <div class="card voc-mentor-note">
-          <div class="card-label">From Your Mentor</div>
-          <div id="mentorNoteText" class="voc-empty">No shared notes from your mentor yet.</div>
+
+        <div class="voc-two-col">
+          <div class="card">
+            <div class="card-label">Your Current Working Statement</div>
+            <div class="card-title" style="margin-bottom:8px">Vocation Statement</div>
+            <div id="statementText" class="voc-empty">You haven't written a working statement of vocation yet — you'll get to this in Discern.</div>
+          </div>
+          <div class="card voc-mentor-note">
+            <div class="card-label">From Your Mentor</div>
+            <div id="mentorNoteText" class="voc-empty">No shared notes from your mentor yet.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -223,12 +267,26 @@
       const progressByStage = Object.fromEntries((progressRes.data || []).map(r => [r.stage, r]));
       renderStageStepper($('stepperWrap'), progressByStage, null);
 
-      $('statEvidence').textContent = evidenceRes.count ?? 0;
-      $('statFamilies').textContent = reactionsRes.count ?? 0;
-      $('statHypotheses').textContent = hypothesesRes.count ?? 0;
+      const evidenceCount = evidenceRes.count ?? 0;
+      const familiesCount = reactionsRes.count ?? 0;
+      const hypothesesCount = hypothesesRes.count ?? 0;
+      $('statEvidence').textContent = evidenceCount;
+      $('statFamilies').textContent = familiesCount;
+      $('statHypotheses').textContent = hypothesesCount;
+      $('statEvidenceNext').textContent = evidenceCount > 0
+        ? `${evidenceCount} saved — keep building it as you go.`
+        : 'Start in Discover — rate what makes you come alive.';
+      $('statFamiliesNext').textContent = familiesCount > 0
+        ? `${familiesCount} saved — compare them in Discern.`
+        : 'Unlocks once you reach Explore.';
+      $('statHypothesesNext').textContent = hypothesesCount > 0
+        ? `${hypothesesCount} active — narrow these down in Design.`
+        : 'Unlocks once you reach Discern.';
 
       const allNotes = await dbClient.schema('mentorship').from('vocation_observation_recaps').select('id', { count: 'exact', head: true }).eq('student_id', user.id);
-      $('statNotes').textContent = allNotes.count ?? 0;
+      const notesCount = allNotes.count ?? 0;
+      $('statNotes').textContent = notesCount;
+      $('statNotesNext').textContent = notesCount > 0 ? 'See the most recent note below.' : 'Your mentor can add notes any time.';
 
       if (notesRes.data && notesRes.data.length) {
         $('mentorNoteText').textContent = notesRes.data[0].note;
@@ -248,7 +306,17 @@
       }) || stages[0];
       $('continueBtn').href = nextStage.href;
       const hasAnyProgress = Object.keys(progressByStage).length > 0;
-      $('continueBtn').textContent = hasAnyProgress ? 'Continue Where You Left Off →' : 'Start Your Journey →';
+      $('continueBtn').lastChild.textContent = hasAnyProgress ? ' Continue Where You Left Off' : ' Start Your Journey';
+
+      // Topbar progress readout: percent of stages fully complete + what's next.
+      const doneCount = stages.filter(s => {
+        const st = (progressByStage[s.key] || {}).status;
+        return st === 'complete' || st === 'mentor_reviewed';
+      }).length;
+      const pct = Math.round((doneCount / stages.length) * 100);
+      $('topbarPct').textContent = pct;
+      $('topbarProgressFill').style.width = `${pct}%`;
+      $('topbarNext').textContent = nextStage.label;
     } catch (e) {
       console.warn('Vocation dashboard init failed:', e);
     }

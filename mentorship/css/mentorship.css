@@ -1265,7 +1265,7 @@ body.auth-body {
       .right-col { grid-column: auto; grid-row: auto }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition-duration: 0ms !important }
+      *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important }
     }
 
 /* ── PUBLIC MARKETING PAGES (parents.html, index.html, philosophy.html) ──
@@ -1412,3 +1412,95 @@ body.public-page-body {
 
 /* Evidence-gate hint text under a disabled "Mark Ready for Review" button. */
 .vocation-gate-hint { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); margin-top: 8px; line-height: 1.5; }
+
+/* ── VOCATION & LIFE PATHWAYS — redesign pilot (2026-09-06) ──────────
+   Shared across dashboard/vocation/index.html (home) and discover.html
+   (first stage, converted from an always-open accordion to a one-
+   -section-at-a-time flow). New pages under vocation/ should reuse
+   these rather than re-inventing per-page styles — see the Founder
+   E2E report / CLAUDE.md for the reasoning behind this pass. ───────── */
+
+/* Compact "you are here" readout dropped into a page's .topbar-welcome,
+   next to the greeting — mirrors the reference concept's top-of-screen
+   "28% complete / Next up" readout so progress is visible before a
+   mentee even scrolls to the stepper. Optional: pages without journey
+   progress simply don't include it. */
+.topbar-progress-inline { display: none; align-items: center; gap: 10px; margin-left: 24px; padding-left: 24px; border-left: 1px solid var(--border-md, rgba(255,255,255,.13)); }
+@media (min-width: 720px) { .topbar-progress-inline { display: flex; } }
+.topbar-progress-pct { font-family: var(--font-display, 'Fraunces', serif); font-size: 15px; font-weight: 700; color: var(--text, #f4f6f9); white-space: nowrap; }
+.topbar-progress-pct span { font-size: 11px; font-weight: 600; color: var(--text-soft, rgba(244,246,249,.5)); text-transform: none; }
+.topbar-progress-bar { width: 88px; height: 5px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.13)); overflow: hidden; }
+.topbar-progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); transition: width .6s cubic-bezier(.4,0,.2,1); }
+.topbar-progress-next { font-size: 10px; color: var(--text-soft, rgba(244,246,249,.5)); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.topbar-progress-next strong { display: block; font-size: 12px; color: var(--text, #f4f6f9); text-transform: none; letter-spacing: 0; font-weight: 700; margin-top: 1px; }
+
+/* Small "framework" aside card that rides in the vocation hero, in the
+   scripture-card's slot on wide screens — same glass-panel treatment,
+   different content (the four-value compass, not scripture). Kept as
+   its own class rather than reusing .scripture-card directly so this
+   page's content stays decoupled from the sitewide "Today's Focus"
+   scripture pattern. */
+.voc-framework-card {
+  display: none;
+  position: absolute; top: 24px; right: 28px; z-index: 3;
+  width: 232px; background: rgba(10,21,32,.88); backdrop-filter: blur(16px);
+  border: 1px solid var(--border-md, rgba(255,255,255,.13)); border-radius: var(--radius, 16px);
+  padding: 18px; color: #f4f6f9;
+}
+@media (min-width: 901px) { .voc-framework-card { display: block; } }
+.voc-framework-label { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: rgba(244,246,249,.5); font-weight: 800; margin-bottom: 12px; }
+.voc-framework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.voc-framework-item { text-align: center; padding: 10px 4px; border-radius: 10px; background: rgba(255,255,255,.05); }
+.voc-framework-item-label { font-size: 10px; font-weight: 700; color: #f4f6f9; }
+.voc-framework-divider { height: 1px; background: rgba(255,255,255,.1); margin-bottom: 10px; }
+.voc-framework-quote { font-family: var(--font-display, 'Fraunces', serif); font-size: 13px; font-weight: 600; line-height: 1.4; color: #f4f6f9; }
+
+/* Deliverable cards — replace bare stat counters on the vocation home
+   with a named, keepable artifact ("Discovery Notebook") plus a short
+   next-action line, per the research: naming the thing you're building
+   reads as accomplishment, a bare number reads as a KPI dashboard. */
+.voc-deliverable-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.voc-deliverable-card { display: flex; flex-direction: column; gap: 10px; }
+.voc-deliverable-icon { width: 34px; height: 34px; border-radius: 10px; background: var(--gold-dim, rgba(184,92,26,.15)); color: var(--mentorship-gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.voc-deliverable-icon svg { width: 18px; height: 18px; }
+.voc-deliverable-name { font-family: var(--font-display, 'Fraunces', serif); font-size: 16px; font-weight: 700; color: var(--text, #f4f6f9); }
+.voc-deliverable-stat { font-size: 12px; color: var(--text-muted, rgba(244,246,249,.62)); }
+.voc-deliverable-stat strong { color: var(--mentorship-gold); font-weight: 800; }
+.voc-deliverable-next { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); line-height: 1.4; padding-top: 8px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
+
+/* One-section-at-a-time flow shell (discover.html and, on rollout, the
+   other stage pages). Two columns on desktop: the active exercise, and
+   a live "emerging profile" recap that plays the role of the reference
+   concept's "evidence notebook" — visible payoff for answering, not
+   just a saved checkmark. */
+.voc-flow-grid { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: start; }
+@media (min-width: 980px) { .voc-flow-grid { grid-template-columns: 1.6fr 1fr; } }
+.voc-flow-progress-track { height: 6px; border-radius: 999px; background: var(--border-md, rgba(255,255,255,.13)); overflow: hidden; margin-bottom: 14px; }
+.voc-flow-progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--mentorship-gold), var(--mentorship-accent)); transition: width .5s cubic-bezier(.4,0,.2,1); }
+.voc-flow-dots { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.voc-flow-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-md, rgba(255,255,255,.14)); background: var(--card-bg, rgba(255,255,255,.03)); color: var(--text-soft, rgba(244,246,249,.5)); font-size: 11px; font-weight: 800; font-family: var(--font-display, 'Fraunces', serif); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; flex-shrink: 0; }
+.voc-flow-dot:hover { border-color: var(--mentorship-gold); }
+.voc-flow-dot.current { border-color: var(--mentorship-gold); color: var(--mentorship-gold); box-shadow: 0 0 0 3px var(--gold-dim, rgba(184,92,26,.15)); }
+.voc-flow-dot.done { background: var(--mentorship-gold); border-color: var(--mentorship-gold); color: #fff; }
+.voc-flow-step-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--mentorship-gold); font-weight: 800; margin-bottom: 6px; }
+.voc-flow-card { min-height: 340px; display: flex; flex-direction: column; }
+.voc-flow-body { flex: 1; }
+.voc-flow-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border, rgba(255,255,255,.08)); }
+.voc-flow-nav-spacer { flex: 1; }
+
+.voc-recap-card { position: sticky; top: 16px; }
+.voc-recap-title { font-family: var(--font-display, 'Fraunces', serif); font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.voc-recap-sub { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.5)); margin-bottom: 14px; line-height: 1.4; }
+.voc-recap-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,.08)); }
+.voc-recap-row:last-child { border-bottom: none; }
+.voc-recap-row-icon { width: 22px; height: 22px; border-radius: 7px; background: var(--card-bg2, rgba(255,255,255,.08)); color: var(--mentorship-gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 800; }
+.voc-recap-row-text { font-size: 12.5px; color: var(--text-muted, rgba(244,246,249,.75)); line-height: 1.45; }
+.voc-recap-row-text strong { color: var(--text, #f4f6f9); }
+.voc-recap-empty { font-size: 12px; color: var(--text-soft, rgba(244,246,249,.45)); font-style: italic; }
+
+/* Tactile feedback on rating dots / chips — a state-change confirmation,
+   not decoration (kept to a single quick pulse; nothing loops or plays
+   on page load). Respects reduced-motion via the sitewide rule already
+   defined above. */
+@keyframes vocPulse { 0% { transform: scale(1); } 40% { transform: scale(1.22); } 100% { transform: scale(1); } }
+.voc-dot.on, .voc-chip.on { animation: vocPulse .22s ease; }
