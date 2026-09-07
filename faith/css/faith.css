@@ -1,0 +1,253 @@
+/* Inspire Faith — design tokens + shared styles.
+   Deliberately its own visual identity (DM Serif Display + Inter, deep
+   teal/gold/sage/rose palette), distinct from the main site's Fraunces/
+   Jakarta navy-gold system — same pattern Mentorship's warm-charcoal
+   system uses relative to the rest of inspirevision.org. Extracted from
+   the approved Inspire_Faith_Landing_Responsive.html build (2026-09)
+   into its own stylesheet now, since more Faith pages (Bible Study,
+   Prayer, Community, etc.) are coming and will share this file rather
+   than each re-embedding the same rules.
+*/
+:root{
+  --ink:#102d38;
+  --ink-2:#153944;
+  --teal:#0b4a51;
+  --teal-deep:#083941;
+  --gold:#c79122;
+  --gold-2:#d8a432;
+  --sage:#66856f;
+  --rose:#be6d63;
+  --slate:#445775;
+  --paper:#fbfaf7;
+  --cream:#f8f4ec;
+  --line:#e5e2dc;
+  --muted:#65757b;
+  --white:#fff;
+  --shadow:0 10px 30px rgba(16,45,56,.10);
+  --serif:"DM Serif Display", Georgia, "Times New Roman", serif;
+  --sans:"Inter", Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit}
+button,input{font:inherit}
+.wrap{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+
+/* Header */
+.site-header{
+  height:72px;background:#fff;display:flex;align-items:center;gap:28px;
+  padding:0 24px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(16,45,56,.05)
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap}
+.brand-mark{width:34px;height:42px;position:relative;display:grid;place-items:center}
+.brand-mark svg{width:34px;height:42px}
+.brand-copy strong{display:block;font:400 23px/1 var(--serif);letter-spacing:-.01em}
+.brand-copy small{display:block;margin-top:4px;font:italic 10px/1.1 Georgia,serif;color:#46616a}
+.nav{display:flex;justify-content:center;gap:22px;flex:1}
+.nav a{text-decoration:none;font-size:12px;font-weight:500;padding:27px 0 11px}
+.nav a.active{border-bottom:2px solid var(--gold)}
+.header-actions{display:flex;align-items:center;gap:10px}
+.search-btn,.menu-btn{border:0;background:transparent;color:var(--ink);width:38px;height:38px;display:grid;place-items:center;cursor:pointer}
+.search-btn svg,.menu-btn svg{width:21px;height:21px}
+.menu-btn{display:none}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  min-height:40px;padding:10px 19px;border-radius:999px;border:1px solid transparent;
+  text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap;transition:.2s ease
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#fff;box-shadow:0 5px 14px rgba(199,145,34,.18)}
+.btn-outline{border-color:#b88c37;background:#fff}
+.btn-ghost{border-color:rgba(255,255,255,.88);color:#fff;background:rgba(12,39,47,.08);backdrop-filter:blur(2px)}
+.btn-light{background:#fff;color:var(--ink)}
+.btn-outline-gold{border-color:var(--gold);background:#fff;color:var(--ink)}
+.mobile-nav{display:none;background:#fff;border-top:1px solid var(--line);padding:8px 20px 16px}
+.mobile-nav a{display:block;padding:11px 0;text-decoration:none;font-size:14px;border-bottom:1px solid #f0eee9}
+
+/* Hero */
+.hero{
+  min-height:385px;position:relative;display:flex;align-items:center;
+  background:url('/assets/images/faith/01-hero-mountain-sunrise.png') center 49%/cover no-repeat;overflow:hidden
+}
+.hero:before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(250,246,237,.86) 0%,rgba(250,246,237,.59) 35%,rgba(246,236,215,.13) 61%,rgba(6,38,48,.25) 100%)
+}
+.hero-content{position:relative;display:flex;align-items:center;justify-content:space-between;gap:50px;padding:42px 0 74px}
+.hero-copy{max-width:660px}
+.hero h1{margin:0;color:#0c2b37;font:400 clamp(54px,6vw,86px)/.93 var(--serif);letter-spacing:-.025em}
+.hero-kicker{margin:13px 0 11px;font:italic 400 clamp(25px,2.4vw,33px)/1.1 var(--serif)}
+.hero-copy .intro{font-size:16px;line-height:1.45;color:#1c343d;margin:0}
+.cta-row{display:flex;gap:15px;flex-wrap:wrap;margin-top:24px}
+.cta-row .btn{min-height:42px;padding-inline:22px}
+.hero-quote{max-width:345px;text-align:center;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.28);margin-right:26px}
+.hero-quote blockquote{margin:0;font:italic 400 28px/1.33 var(--serif)}
+.hero-quote .rule{width:34px;height:2px;background:rgba(255,255,255,.84);margin:22px auto}
+.hero-quote .motto{font-size:12px;letter-spacing:.08em;font-weight:600;white-space:nowrap}
+
+/* Gateway cards */
+.gateway{
+  display:grid;grid-template-columns:repeat(8,1fr);gap:8px;
+  position:relative;z-index:4;margin-top:-55px
+}
+.gateway-card{
+  background:#fff;border:1px solid #eeeae2;border-radius:8px;box-shadow:var(--shadow);
+  min-height:157px;padding:16px 9px 13px;text-align:center;text-decoration:none;
+  display:flex;flex-direction:column;align-items:center;transition:.18s ease
+}
+.gateway-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(16,45,56,.13)}
+.icon-round{
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;margin-bottom:10px;
+  background:#dbe7e4;color:#1a5b64
+}
+.icon-round svg{width:25px;height:25px;stroke:currentColor}
+.gateway-card:nth-child(2) .icon-round,.gateway-card:nth-child(5) .icon-round{background:#dfe9df;color:#56755e}
+.gateway-card:nth-child(3) .icon-round{background:#f4e5b8;color:#b57b10}
+.gateway-card:nth-child(4) .icon-round,.gateway-card:nth-child(6) .icon-round{background:#efd4cf;color:#b55f57}
+.gateway-card:nth-child(7) .icon-round{background:#d9dfeb;color:#405476}
+.gateway-card h3{font:400 15px/1.1 var(--serif);margin:0 0 5px}
+.gateway-card p{font-size:10.4px;line-height:1.28;margin:0;color:#40545b}
+
+/* Feature cards */
+.feature-grid{display:grid;grid-template-columns:2fr .95fr 1.06fr;gap:16px;margin-top:16px}
+.feature-card{
+  min-height:168px;border:1px solid #eeeae4;border-radius:8px;background:#fff;
+  box-shadow:0 3px 12px rgba(16,45,56,.06);overflow:hidden
+}
+.feature-card h2,.section-heading h2,.initiatives h2{font:400 21px/1.05 var(--serif);margin:0;color:var(--ink)}
+.inspiration{display:grid;grid-template-columns:46% 54%}
+.inspiration .image{background:url('/assets/images/faith/02-todays-inspiration-bible.png') center/cover no-repeat;min-height:168px}
+.inspiration .copy{padding:18px 18px 15px}
+.inspiration blockquote{font:italic 400 19px/1.35 var(--serif);margin:12px 0 0}
+.inspiration .verse-ref{font:400 14px/1.3 var(--serif);margin:3px 0 14px}
+.next-step{padding:20px 20px 16px;display:flex;gap:14px;align-items:flex-start}
+.next-step .badge{
+  flex:0 0 54px;width:54px;height:54px;border-radius:50%;
+  background:#f5ead4;display:grid;place-items:center;color:var(--gold)
+}
+.next-step .badge svg{width:30px;height:30px;fill:currentColor}
+.next-step p{font-size:13px;line-height:1.35;margin:9px 0 14px;color:#43565c}
+.community-card{background:linear-gradient(135deg,#0b535a,#0a4148);color:#fff;border:0;padding:20px;display:flex;gap:14px}
+.community-card h2{color:#fff}
+.community-card .community-icon{flex:0 0 52px}
+.community-card svg{width:50px;height:50px;stroke:#f7e3b0}
+.community-card p{font-size:12.5px;line-height:1.4;margin:10px 0 14px}
+
+/* Pathways */
+.pathways{padding:18px 0 30px}
+.section-heading{display:flex;justify-content:space-between;align-items:end}
+.section-heading p{font-size:12px;color:#687b82;margin:5px 0 0}
+.section-heading>a{font-size:12px;text-decoration:none}
+.pathway-layout{display:grid;grid-template-columns:1fr 285px;gap:14px;margin-top:11px}
+.pathway-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pathway-card{border-radius:7px;border:1px solid #ece8e1;background:#fff;overflow:hidden;box-shadow:0 2px 9px rgba(16,45,56,.05);text-decoration:none}
+.pathway-card img{width:100%;height:106px;object-fit:cover}
+.pathway-card .text{padding:8px 9px 10px}
+.pathway-card h3{font:400 14px/1.12 var(--serif);margin:0 0 5px}
+.pathway-card p{font-size:10px;line-height:1.25;color:#68777d;margin:0}
+.initiatives{border:1px solid #ece8e1;border-radius:8px;background:#fff;padding:13px 14px;box-shadow:0 2px 9px rgba(16,45,56,.05)}
+.initiatives h2{font-size:17px;margin-bottom:8px}
+.initiatives ul{list-style:none;margin:0;padding:0}
+.initiatives li{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:5px 0}
+.initiative-icon{
+  width:24px;height:24px;border-radius:50%;background:#f7eed6;color:var(--gold);
+  display:grid;place-items:center;font-size:12px;font-weight:700
+}
+.initiatives strong{display:block;font-size:11.5px;line-height:1.15}
+.initiatives span{display:block;font-size:9.5px;line-height:1.25;color:#6c7b81;margin-top:2px}
+
+/* Faith banner */
+.faith-banner{
+  position:relative;color:#fff;background:url('/assets/images/faith/01-hero-mountain-sunrise.png') center 72%/cover no-repeat
+}
+.faith-banner:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,51,58,.90),rgba(6,57,64,.82))}
+.faith-banner-content{position:relative;min-height:142px;display:flex;align-items:center;justify-content:space-between;gap:35px;padding:24px 0}
+.faith-banner h2{font:400 30px/1 var(--serif);margin:0 0 6px}
+.faith-banner p{font:400 14px/1.4 var(--serif);margin:0 0 15px}
+.banner-values{display:grid;grid-template-columns:repeat(4,1fr);min-width:430px}
+.value-item{text-align:center;padding:0 17px;border-left:1px solid rgba(255,255,255,.48)}
+.value-item:first-child{border-left:0}
+.value-item svg{width:29px;height:29px;stroke:#fff;fill:none;margin:0 auto 5px}
+.value-item b{display:block;font:400 13px/1.15 var(--serif)}
+
+/* Footer */
+.footer{background:#fff}
+.footer-main{
+  min-height:110px;display:grid;grid-template-columns:1.05fr 1.1fr 1.4fr .75fr;gap:24px;align-items:center;padding:18px 0
+}
+.footer .brand-copy strong{font-size:20px}
+.footer .brand-mark svg{width:30px}
+.footer-links{display:flex;gap:16px;flex-wrap:wrap}
+.footer-links a{text-decoration:none;font-size:10px;color:#50636a}
+.social{display:flex;gap:10px;margin-top:12px}
+.social span{width:18px;height:18px;border-radius:50%;background:#315b68;color:#fff;display:grid;place-items:center;font-size:9px}
+.subscribe label{display:block;font-size:10px;font-weight:700;margin-bottom:2px}
+.subscribe small{display:block;font-size:9px;color:#64757c;margin-bottom:5px}
+.subscribe-row{display:flex}
+.subscribe input{flex:1;min-width:0;height:35px;border:1px solid #cfd7d9;border-radius:5px 0 0 5px;padding:0 10px;font-size:10px}
+.subscribe button{height:35px;border:0;border-radius:0 5px 5px 0;padding:0 18px;background:var(--gold);color:#fff;font-size:10px;font-weight:700}
+.footer-note{text-align:right;font:italic 13px/1.2 Georgia,serif;color:#607883}
+.footer-note strong{font-weight:400}
+.copyright{font-size:9px;color:#6d7b80;padding:0 0 9px}
+
+/* Accessibility */
+:focus-visible{outline:3px solid rgba(199,145,34,.55);outline-offset:3px}
+
+/* Tablet */
+@media(max-width:1120px){
+  .nav{display:none}
+  .menu-btn{display:grid}
+  .gateway{grid-template-columns:repeat(4,1fr)}
+  .gateway-card{min-height:145px}
+  .pathway-layout{grid-template-columns:1fr}
+  .initiatives{display:none}
+  .hero-quote{margin-right:0}
+  .footer-main{grid-template-columns:1fr 1fr}
+}
+@media(max-width:850px){
+  .site-header{height:66px;padding-inline:14px}
+  .header-actions .signin{display:none}
+  .hero{min-height:525px;background-position:58% center}
+  .hero:before{background:linear-gradient(180deg,rgba(250,246,237,.92) 0%,rgba(250,246,237,.76) 46%,rgba(7,45,54,.26) 100%)}
+  .hero-content{padding:48px 0 90px;flex-direction:column;align-items:flex-start}
+  .hero-copy{max-width:620px}
+  .hero-quote{max-width:530px;text-align:left}
+  .hero-quote .rule{margin-left:0}
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .inspiration{grid-column:1/-1}
+  .pathway-cards{overflow-x:auto;display:flex;padding-bottom:8px;scroll-snap-type:x proximity}
+  .pathway-card{min-width:220px;scroll-snap-align:start}
+  .faith-banner-content{flex-direction:column;align-items:flex-start}
+  .banner-values{width:100%;min-width:0}
+}
+@media(max-width:620px){
+  .wrap{width:min(100% - 24px,1180px)}
+  .site-header .join{display:none}
+  .brand-copy strong{font-size:20px}
+  .hero{min-height:570px;background-position:65% center}
+  .hero-content{padding-top:40px}
+  .hero h1{font-size:56px}
+  .hero-kicker{font-size:25px}
+  .hero-copy .intro{font-size:14px}
+  .hero-quote blockquote{font-size:23px}
+  .hero-quote .motto{font-size:10px;white-space:normal}
+  .gateway{grid-template-columns:repeat(2,1fr);margin-top:-58px}
+  .gateway-card{min-height:140px}
+  .feature-grid{grid-template-columns:1fr}
+  .inspiration{grid-template-columns:1fr}
+  .inspiration .image{min-height:210px}
+  .next-step,.community-card{min-height:150px}
+  .banner-values{grid-template-columns:repeat(2,1fr);gap:22px 0}
+  .value-item:nth-child(3){border-left:0}
+  .footer-main{grid-template-columns:1fr}
+  .footer-note{text-align:left}
+}
+@media(max-width:390px){
+  .hero h1{font-size:49px}
+  .hero-kicker{font-size:22px}
+  .gateway-card h3{font-size:14px}
+  .cta-row{width:100%}
+  .cta-row .btn{flex:1}
+}
