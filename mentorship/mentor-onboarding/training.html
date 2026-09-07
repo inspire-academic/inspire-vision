@@ -28,6 +28,15 @@
     .module-text { font-size: 14px; color: rgba(245,241,234,.75); line-height: 1.65; white-space: pre-line; margin-bottom: 16px; }
     .module-chevron { transition: transform .15s; opacity: .5; }
     .module-card.open .module-chevron { transform: rotate(90deg); }
+    .module-check { background: var(--card-bg2, rgba(255,255,255,.04)); border: 1px solid var(--border, rgba(255,255,255,.1)); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+    .module-check-q { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .module-check-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; line-height: 1.5; padding: 6px 0; cursor: pointer; color: rgba(245,241,234,.85); }
+    .module-check-opt input { margin-top: 3px; }
+    .module-check-feedback { font-size: 12.5px; font-weight: 600; margin-top: 8px; display: none; }
+    .module-check-feedback.show { display: block; }
+    .module-check-feedback.wrong { color: #fca5a5; }
+    .module-check-feedback.right { color: #86efac; }
+    .list-card-btn.primary:disabled { background: var(--card-bg2, rgba(255,255,255,.08)); border-color: var(--border, rgba(255,255,255,.12)); color: rgba(245,241,234,.4); cursor: not-allowed; }
   </style>
 </head>
 <body class="admin-body">
@@ -78,6 +87,15 @@
 If a mentee ever tells you something that worries you — anything touching on self-harm, abuse, or feeling unsafe at home — you are not the person meant to resolve it, and you shouldn't try to carry it alone. Take it seriously, stay calm and non-judgmental with them in the moment, and contact the Inspire team directly and promptly afterwards. Session Notes are a private, useful record for your own memory, but they are not automatically reviewed by anyone — don't rely on writing something down as the same thing as raising it.
 
 When in doubt, raise it. A false alarm costs us five minutes. A missed one costs far more.`,
+        check: {
+          question: 'A mentee tells you something that genuinely worries you — self-harm, abuse, feeling unsafe at home. What do you do?',
+          options: [
+            'Handle it myself and keep it between us so they trust me',
+            'Stay calm and non-judgmental with them, then contact the Inspire team promptly afterwards',
+            'Write it in Session Notes so there is a record, and leave it there',
+          ],
+          correct: 1,
+        },
       },
       {
         slug: 'active-listening',
@@ -87,6 +105,15 @@ When in doubt, raise it. A false alarm costs us five minutes. A missed one costs
 Try reflecting back what you heard before responding to it: "It sounds like that really frustrated you" lands very differently from jumping straight to "here's what you should do." Ask open questions that can't be answered in one word — "what was that like for you?" instead of "are you okay?" And get comfortable with a pause. Silence after a hard sentence isn't a gap you need to fill — it's often the mentee deciding whether to say more.
 
 You'll give plenty of advice over time. Just let listening come first.`,
+        check: {
+          question: 'A mentee shares something difficult. What should generally come first?',
+          options: [
+            'Offering a solution right away, before the moment passes',
+            'Reflecting back what you heard, before responding to it',
+            'Asking "are you okay?" to check the severity',
+          ],
+          correct: 1,
+        },
       },
       {
         slug: 'boundaries-consistency',
@@ -96,6 +123,15 @@ You'll give plenty of advice over time. Just let listening come first.`,
 Keep the relationship inside the platform's channels, keep topics age-appropriate, and know the edge of your role. You are a mentor, not a therapist, a lawyer, or a crisis line — if a topic is clearly above what a mentor should be handling alone (a mental health crisis, a legal or family court matter, anything safeguarding-related), that's exactly when to refer up rather than try to carry it yourself. See the Safeguarding Basics module for how.
 
 Consistency and knowing your own edges aren't in tension with each other. They're the same skill.`,
+        check: {
+          question: "A mentee asks to move your conversations to their personal messaging app since it's 'easier.' What's the right move?",
+          options: [
+            "Agree — it's more convenient for both of you",
+            'Keep the relationship inside the platform\'s channels',
+            'Only use the personal app for urgent messages',
+          ],
+          correct: 1,
+        },
       },
       {
         slug: 'using-the-platform',
@@ -105,6 +141,15 @@ Consistency and knowing your own edges aren't in tension with each other. They'r
 Sessions is where you log every meeting — date, and a status once it's done. Session Notes is your own private working record of what was discussed; it's never shown to your mentee, so keep it factual and useful to future-you, not performative. My Mentees shows your active pairing. Nudge Messages let you send a light, encouraging check-in between sessions — a genuine "thinking of you" or a nudge toward a goal, not a replacement for the real conversation in your next session.
 
 One thing worth knowing clearly: when a mentee submits "Ask for Help" or "Prayer & Support" on their side, it routes to our admin team's safeguarding queue — not to you directly. Don't assume you'll be automatically notified if a mentee reaches out that way. If something comes up in a session that concerns you, you're the one who needs to raise it (see Safeguarding Basics).`,
+        check: {
+          question: 'A mentee submits "Ask for Help" on their dashboard. Who sees that?',
+          options: [
+            'You, the mentor, immediately',
+            "Our admin team's safeguarding queue — not the mentor directly",
+            'No one, until you check in with the mentee next session',
+          ],
+          correct: 1,
+        },
       },
       {
         slug: 'ask-dont-tell',
@@ -116,17 +161,31 @@ A mentee brings you a problem. Your brain solves it in three seconds. Good — n
 This is exactly what the Goal, Reality, Options, Will structure in your Session Notes is built around — ask about the goal, ask what's really going on, ask what options they see, and only then help them land on one commitment. Resist the urge to skip straight to "Will."
 
 Give it five minutes of silence-tolerance before you offer a single suggestion. You'll be surprised how often they don't need one.`,
+        check: {
+          question: 'A mentee brings you a problem you already know how to solve. What does this module recommend?',
+          options: [
+            'Tell them your solution right away — it saves time',
+            "Ask what they've already tried and what's really going on, before you speak",
+            'Wait silently until they ask you directly for advice',
+          ],
+          correct: 1,
+        },
       },
     ];
 
     let dbClient = null;
     let currentUser = null;
     let completedSlugs = new Set();
+    // Passing the check unlocks the button for that module in this render
+    // pass — reset on every re-render so re-opening a module after
+    // completion doesn't leave stale unlocked state lying around.
+    let passedSlugs = new Set();
 
     function renderModules() {
       const list = $('modulesList');
       list.innerHTML = MODULES.map((m, i) => {
         const done = completedSlugs.has(m.slug);
+        const passed = done || passedSlugs.has(m.slug);
         return `
         <div class="list-card module-card${done ? ' done' : ''}" data-slug="${m.slug}">
           <div class="module-head" data-toggle>
@@ -138,8 +197,18 @@ Give it five minutes of silence-tolerance before you offer a single suggestion. 
           </div>
           <div class="module-body">
             <div class="module-text">${escapeHtml(m.body)}</div>
+            ${done ? '' : `
+            <div class="module-check" data-check>
+              <div class="module-check-q">Quick check: ${escapeHtml(m.check.question)}</div>
+              ${m.check.options.map((opt, oi) => `
+                <label class="module-check-opt">
+                  <input type="radio" name="check-${m.slug}" value="${oi}">
+                  <span>${escapeHtml(opt)}</span>
+                </label>`).join('')}
+              <div class="module-check-feedback" data-feedback></div>
+            </div>`}
             <div class="list-card-actions">
-              <button class="list-card-btn primary" data-complete ${done ? 'disabled' : ''}>${done ? 'Completed' : 'Mark as Read & Complete'}</button>
+              <button class="list-card-btn primary" data-complete ${done || !passed ? 'disabled' : ''}>${done ? 'Completed' : 'Mark as Read & Complete'}</button>
             </div>
           </div>
         </div>`;
@@ -147,6 +216,30 @@ Give it five minutes of silence-tolerance before you offer a single suggestion. 
 
       list.querySelectorAll('[data-toggle]').forEach(head => {
         head.addEventListener('click', () => head.closest('.module-card').classList.toggle('open'));
+      });
+      list.querySelectorAll('[data-check]').forEach(checkEl => {
+        const card = checkEl.closest('.module-card');
+        const slug = card.dataset.slug;
+        const module = MODULES.find(m => m.slug === slug);
+        const feedback = checkEl.querySelector('[data-feedback]');
+        const completeBtn = card.querySelector('[data-complete]');
+        checkEl.querySelectorAll('input[type="radio"]').forEach(radio => {
+          radio.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const chosen = Number(radio.value);
+            feedback.classList.add('show');
+            if (chosen === module.check.correct) {
+              feedback.textContent = '✓ That\'s right.';
+              feedback.className = 'module-check-feedback show right';
+              passedSlugs.add(slug);
+              completeBtn.disabled = false;
+            } else {
+              feedback.textContent = 'Not quite — take another look at the module above and try again.';
+              feedback.className = 'module-check-feedback show wrong';
+              completeBtn.disabled = true;
+            }
+          });
+        });
       });
       list.querySelectorAll('[data-complete]').forEach(btn => {
         btn.addEventListener('click', async (e) => {

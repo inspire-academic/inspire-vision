@@ -56,6 +56,13 @@
     .closure-form label { font-size: 12px; display: flex; align-items: center; gap: 6px; color: rgba(245,241,234,.8); }
     .closure-form-actions { display: flex; gap: 8px }
     .closure-form-actions .admin-btn-cancel { background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(245,241,234,.7) }
+    .match-context { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+    .match-context-col { font-size: 12px; color: rgba(245,241,234,.75); line-height: 1.55 }
+    .match-context-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: rgba(245,241,234,.45); margin-bottom: 6px }
+    .match-context-empty { opacity: .5; font-style: italic }
+    .match-chip { display: inline-block; background: rgba(255,255,255,.07); border-radius: 999px; padding: 2px 9px; font-size: 11px; margin: 0 4px 4px 0 }
+    .match-caseload { font-weight: 700 }
+    .match-caseload.busy { color: #fbbf24 }
   </style>
 </head>
 <body class="admin-body">
@@ -87,6 +94,38 @@
       ['safeguarding_concern', 'Safeguarding concern'],
       ['other', 'Other'],
     ];
+    // Labels for the onboarding profile fields surfaced as matching
+    // context below — mirrors the option/chip values set in
+    // onboarding/know-me.html and onboarding/life-wheel.html exactly.
+    const REASON_LABELS = {
+      confidence: 'Building confidence', direction: 'Finding direction / purpose',
+      someone_to_talk_to: 'Someone to talk to', faith: 'Growing in faith',
+      academic: 'Academic and life balance', all: 'A bit of everything',
+    };
+    const LIFE_WHEEL_LABELS = { spiritual: 'Spiritual', intellectual: 'Intellectual', physical: 'Physical', social: 'Social', emotional: 'Emotional', character: 'Character' };
+    const titleCase = s => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    function menteeContext(m) {
+      if (!m) return '<div class="match-context-empty">No mentee selected.</div>';
+      const parts = [];
+      if (m.mentorship_reason && REASON_LABELS[m.mentorship_reason]) parts.push(`<div>Looking for: ${REASON_LABELS[m.mentorship_reason]}</div>`);
+      if (m.strengths?.length) parts.push(`<div>${m.strengths.map(s => `<span class="match-chip">${escapeHtml(titleCase(s))}</span>`).join('')}</div>`);
+      if (m.life_wheel) {
+        const lowest = Object.entries(m.life_wheel).filter(([k]) => LIFE_WHEEL_LABELS[k]).sort((a, b) => a[1] - b[1]).slice(0, 2);
+        if (lowest.length) parts.push(`<div>Lowest self-rated areas: ${lowest.map(([k, v]) => `${LIFE_WHEEL_LABELS[k]} (${v}/10)`).join(', ')}</div>`);
+      }
+      if (m.about_me) parts.push(`<div style="margin-top:6px">"${escapeHtml(m.about_me.length > 160 ? m.about_me.slice(0, 160) + '…' : m.about_me)}" — in their own words</div>`);
+      return parts.length ? parts.join('') : '<div class="match-context-empty">No onboarding profile shared yet.</div>';
+    }
+
+    function mentorContext(m) {
+      if (!m) return '<div class="match-context-empty">No mentor selected.</div>';
+      const parts = [];
+      const busy = m.active_caseload >= 3;
+      parts.push(`<div>Current mentees: <span class="match-caseload${busy ? ' busy' : ''}">${m.active_caseload}</span>${busy ? ' — already carrying a full caseload' : ''}</div>`);
+      if (m.motivation) parts.push(`<div style="margin-top:6px">"${escapeHtml(m.motivation.length > 160 ? m.motivation.slice(0, 160) + '…' : m.motivation)}"</div>`);
+      return parts.join('');
+    }
 
     // See admin/index.html for why this button was added to every admin page.
     $('adminSignOutBtn')?.addEventListener('click', async () => {
@@ -119,13 +158,17 @@
              </div>`
           : `<div class="admin-app-card">
                <div class="assign-row">
-                 <select id="mentorSelect">${mentors.map(m => `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}</option>`).join('')}</select>
+                 <select id="mentorSelect">${mentors.map(m => `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}${m.active_caseload ? ` (${m.active_caseload} active)` : ''}</option>`).join('')}</select>
                  <span class="assign-arrow">→</span>
                  <select id="menteeSelect">${unassignedMentees.map(m => {
                    const flag = m.is_minor && m.guardian_consent_status !== 'confirmed' ? ' — ⚠️ guardian consent pending' : '';
                    return `<option value="${m.id}">${escapeHtml(m.full_name || m.email)}${flag}</option>`;
                  }).join('')}</select>
                  <button class="admin-btn admin-btn-approve" id="assignBtn">Assign</button>
+               </div>
+               <div class="match-context" id="matchContext">
+                 <div class="match-context-col"><div class="match-context-label">Mentor</div><div id="mentorContextBody"></div></div>
+                 <div class="match-context-col"><div class="match-context-label">Mentee</div><div id="menteeContextBody"></div></div>
                </div>
              </div>`
         }`;
@@ -163,6 +206,15 @@
         }`;
 
       content.innerHTML = assignSection + activeSection;
+      refreshMatchContext();
+    }
+
+    function refreshMatchContext() {
+      if (!latestData || !$('matchContext')) return;
+      const mentor = latestData.mentors.find(m => m.id === $('mentorSelect')?.value);
+      const mentee = latestData.unassignedMentees.find(m => m.id === $('menteeSelect')?.value);
+      $('mentorContextBody').innerHTML = mentorContext(mentor);
+      $('menteeContextBody').innerHTML = menteeContext(mentee);
     }
 
     async function reload() {
@@ -189,6 +241,9 @@
 
         await reload();
 
+        content.addEventListener('change', (e) => {
+          if (e.target.id === 'mentorSelect' || e.target.id === 'menteeSelect') refreshMatchContext();
+        });
         content.addEventListener('click', async (e) => {
           const assignBtn = e.target.closest('#assignBtn');
           if (assignBtn) {

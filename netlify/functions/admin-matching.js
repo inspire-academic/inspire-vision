@@ -91,20 +91,42 @@ exports.handler = async (event) => {
       // so a self-elevated account could otherwise appear here as if
       // genuinely vetted by admin-mentors.js.
       const approvedMentorIds = new Set((applications || []).map(a => a.mentor_id));
+      // Caseload — the original decision-support gap wasn't just "no
+      // compatibility signal", it was that an admin assigning a new
+      // mentee had no visibility into who was already stretched thin.
+      // Every active assignment already fetched above is enough to
+      // count this without a new query.
+      const caseloadByMentor = new Map();
+      (assignments || []).forEach(a => caseloadByMentor.set(a.mentor_id, (caseloadByMentor.get(a.mentor_id) || 0) + 1));
       const mentors = users
         .filter(u => approvedMentorIds.has(u.id))
-        .map(u => ({ id: u.id, email: u.email, full_name: u.user_metadata?.full_name || '' }));
+        .map(u => ({
+          id: u.id,
+          email: u.email,
+          full_name: u.user_metadata?.full_name || '',
+          motivation: u.user_metadata?.mentor_motivation || '',
+          active_caseload: caseloadByMentor.get(u.id) || 0,
+        }));
       // Surfaced so admin/matching.html can flag an unconfirmed minor in
       // the picker before hitting the hard server-side gate below — see
       // "assign" action. is_minor is self-reported at signup (same trust
       // level as mentorship_role elsewhere in this schema).
       const consentByStudent = new Map((consents || []).map(c => [c.student_id, c.status]));
+      // Onboarding profile (know-me / strengths / life-wheel) has never
+      // fed the matching decision — it's collected, then never seen again
+      // by anyone doing the pairing. It already lives in user_metadata
+      // (same place mentorship_role etc. live), so surfacing it here is
+      // read-only context, not a new trust boundary.
       const toMenteeRow = u => ({
         id: u.id,
         email: u.email,
         full_name: u.user_metadata?.full_name || '',
         is_minor: !!u.user_metadata?.is_minor,
         guardian_consent_status: consentByStudent.get(u.id) || null,
+        mentorship_reason: u.user_metadata?.mentorship_reason || '',
+        strengths: Array.isArray(u.user_metadata?.strengths) ? u.user_metadata.strengths : [],
+        life_wheel: u.user_metadata?.life_wheel || null,
+        about_me: u.user_metadata?.about_me || '',
       });
       const unassignedMentees = users
         .filter(u => u.user_metadata?.mentorship_role === 'mentee' && !assignedStudentIds.has(u.id))

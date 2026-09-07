@@ -47,11 +47,22 @@
     .sg-badge-status-seen { background: rgba(255,255,255,.08); color: rgba(245,241,234,.6); }
     .sg-badge-status-resolved { background: rgba(34,197,94,.15); color: #86efac; }
     .sg-message { font-size: 13px; opacity: .85; line-height: 1.55; margin-bottom: 14px; white-space: pre-wrap }
-    .sg-meta { font-size: 12px; opacity: .5; margin-bottom: 14px; }
-    .sg-actions { display: flex; gap: 10px }
-    .sg-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(245,241,234,.8); cursor: pointer; }
+    .sg-meta { font-size: 12px; opacity: .5; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .sg-stale { color: #fca5a5; opacity: 1; font-weight: 700; }
+    .sg-claim { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.06); }
+    .sg-claim.mine { background: rgba(184,92,26,.18); color: var(--mentorship-gold); }
+    .sg-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .sg-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; background: transparent; border: 1px solid rgba(255,255,255,.15); color: rgba(245,241,234,.8); cursor: pointer; min-width: 100px; }
     .sg-btn:hover { border-color: var(--mentorship-gold); color: var(--mentorship-gold); }
     .sg-btn:disabled { opacity: .5; cursor: default; }
+    .sg-reply-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+    .sg-reply-existing { background: rgba(184,92,26,.08); border: 1px solid rgba(184,92,26,.22); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 12.5px; line-height: 1.5; }
+    .sg-reply-existing b { color: var(--mentorship-gold); }
+    .sg-reply-form { display: flex; gap: 8px; flex-wrap: wrap; }
+    .sg-reply-input {
+      flex: 1; min-width: 200px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.13);
+      border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: inherit; color: #F5F1EA; resize: vertical; min-height: 42px;
+    }
   </style>
 </head>
 <body class="admin-body">
@@ -105,6 +116,23 @@
         const email = r.student?.email || 'unknown';
         const nextActions = { new: ['seen', 'resolved'], seen: ['resolved'], resolved: [] }[r.status] || [];
         const actionLabel = { seen: 'Mark Seen', resolved: 'Mark Resolved' };
+
+        // Staleness: how long an unresolved request has been open — the
+        // audit flagged that a 4-day-old request looked identical to one
+        // from 4 minutes ago. Threshold of 1 day is deliberately tight
+        // given this queue's subject matter.
+        const daysOpen = Math.floor((Date.now() - new Date(r.created_at).getTime()) / 86400000);
+        const staleNote = r.status !== 'resolved' && daysOpen >= 1
+          ? `<span class="sg-stale">Open ${daysOpen} day${daysOpen === 1 ? '' : 's'}</span>` : '';
+
+        const claim = r.response?.claimed_by
+          ? `<span class="sg-claim${r.response.claimed_by === session.user.id ? ' mine' : ''}">Claimed by ${escapeHtml(r.response.claimed_by === session.user.id ? 'you' : r.response.claimed_by_name)}</span>`
+          : `<button class="sg-btn" data-claim-btn style="flex:0 1 auto; min-width:0; padding:3px 12px; font-size:12px">Claim</button>`;
+
+        const existingReply = r.response?.reply_message
+          ? `<div class="sg-reply-existing"><b>Sent to student</b> — ${escapeHtml(r.response.reply_message)}<br>&mdash; ${escapeHtml(r.response.replied_by_name)}, ${new Date(r.response.replied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div>`
+          : '';
+
         return `
           <div class="sg-card ${r.category === 'urgent' ? 'urgent' : ''}" data-id="${r.id}">
             <div class="sg-top">
@@ -118,8 +146,15 @@
               </div>
             </div>
             <div class="sg-message">${escapeHtml(r.message)}</div>
-            <div class="sg-meta">${date}</div>
+            <div class="sg-meta">${date} ${staleNote} ${claim}</div>
             ${nextActions.length ? `<div class="sg-actions">${nextActions.map(a => `<button class="sg-btn" data-action="${a}">${actionLabel[a]}</button>`).join('')}</div>` : ''}
+            <div class="sg-reply-block">
+              ${existingReply}
+              <div class="sg-reply-form">
+                <textarea class="sg-reply-input" data-reply-input placeholder="${r.response?.reply_message ? 'Send an updated reply…' : 'Reply to the student — they will see this in Prayer & Support…'}"></textarea>
+                <button class="sg-btn" data-reply-btn style="flex:0 1 auto">Send Reply</button>
+              </div>
+            </div>
           </div>`;
       }).join('');
     }
@@ -165,21 +200,67 @@
         renderRequests();
 
         content.addEventListener('click', async (e) => {
-          const btn = e.target.closest('button[data-action]');
-          if (!btn) return;
-          const card = btn.closest('.sg-card');
+          const statusBtn = e.target.closest('button[data-action]');
+          const claimBtn = e.target.closest('button[data-claim-btn]');
+          const replyBtn = e.target.closest('button[data-reply-btn]');
+          if (!statusBtn && !claimBtn && !replyBtn) return;
+          const card = (statusBtn || claimBtn || replyBtn).closest('.sg-card');
           const requestId = card.dataset.id;
-          const newStatus = btn.dataset.action;
-          card.querySelectorAll('button').forEach(b => b.disabled = true);
-          const { status: s2, data: d2 } = await callAdminFn({ action: 'update-status', requestId, status: newStatus });
-          if (s2 !== 200) {
-            alert(d2.error || 'Could not update this request — please try again.');
-            card.querySelectorAll('button').forEach(b => b.disabled = false);
+
+          if (statusBtn) {
+            const newStatus = statusBtn.dataset.action;
+            card.querySelectorAll('button').forEach(b => b.disabled = true);
+            const { status: s2, data: d2 } = await callAdminFn({ action: 'update-status', requestId, status: newStatus });
+            if (s2 !== 200) {
+              alert(d2.error || 'Could not update this request — please try again.');
+              card.querySelectorAll('button').forEach(b => b.disabled = false);
+              return;
+            }
+            const row = allRequests.find(r => r.id === requestId);
+            if (row) row.status = newStatus;
+            renderRequests();
             return;
           }
-          const row = allRequests.find(r => r.id === requestId);
-          if (row) row.status = newStatus;
-          renderRequests();
+
+          if (claimBtn) {
+            claimBtn.disabled = true;
+            const { status: s2, data: d2 } = await callAdminFn({ action: 'claim', requestId });
+            if (s2 !== 200) {
+              alert(d2.error || 'Could not claim this request — please try again.');
+              claimBtn.disabled = false;
+              return;
+            }
+            const row = allRequests.find(r => r.id === requestId);
+            if (row) {
+              row.response = row.response || {};
+              row.response.claimed_by = session.user.id;
+              row.response.claimed_by_name = session.user.user_metadata?.full_name || session.user.email;
+            }
+            renderRequests();
+            return;
+          }
+
+          if (replyBtn) {
+            const textarea = card.querySelector('[data-reply-input]');
+            const replyMessage = textarea.value.trim();
+            if (!replyMessage) { textarea.focus(); return; }
+            replyBtn.disabled = true; replyBtn.textContent = 'Sending…';
+            const { status: s2, data: d2 } = await callAdminFn({ action: 'reply', requestId, replyMessage });
+            if (s2 !== 200) {
+              alert(d2.error || 'Could not send this reply — please try again.');
+              replyBtn.disabled = false; replyBtn.textContent = 'Send Reply';
+              return;
+            }
+            const row = allRequests.find(r => r.id === requestId);
+            if (row) {
+              row.response = row.response || {};
+              row.response.reply_message = replyMessage;
+              row.response.replied_by_name = session.user.user_metadata?.full_name || session.user.email;
+              row.response.replied_at = new Date().toISOString();
+              if (row.status === 'new') row.status = 'seen';
+            }
+            renderRequests();
+          }
         });
       } catch (e) {
         console.warn('Safeguarding page failed:', e);

@@ -157,27 +157,46 @@
         </div>
       </div>
 
-      <div class="grid-row" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px">
-        <div class="card" style="text-align:center; padding:24px 16px">
-          <div style="font-size:30px; font-weight:800; color:var(--mentorship-gold)" id="statGoals">—</div>
-          <div style="font-size:12px; color:rgba(245,241,234,.6); margin-top:4px">Goals completed this week</div>
-        </div>
-        <div class="card" style="text-align:center; padding:24px 16px">
-          <div style="font-size:30px; font-weight:800; color:var(--mentorship-gold)" id="statCheckins">—</div>
-          <div style="font-size:12px; color:rgba(245,241,234,.6); margin-top:4px">Check-ins this week</div>
-        </div>
-        <div class="card" style="text-align:center; padding:24px 16px">
-          <div style="font-size:30px; font-weight:800; color:var(--mentorship-gold)" id="statActive">—</div>
-          <div style="font-size:12px; color:rgba(245,241,234,.6); margin-top:4px">Mentees active this week</div>
+      <div id="visitorStory" hidden>
+        <div class="list-card">
+          <div class="list-card-top"><div class="list-card-title">What community looks like here</div></div>
+          <div class="list-card-desc">
+            You get a mentor who shows up on purpose, week after week — not a checklist, a relationship.
+            You get a small, private space to be honest about how you're actually doing. You get to be seen
+            working on something real, and to see other young people doing the same. That's what this page
+            shows once you're signed in: the real, current pulse of goals kept, check-ins logged, and people
+            showing up for each other this week.
+          </div>
+          <div class="list-card-actions">
+            <a class="list-card-btn primary" href="/mentorship/join.html">Join the Community →</a>
+            <a class="list-card-btn" href="/mentorship/philosophy.html">Read Our Philosophy</a>
+          </div>
         </div>
       </div>
 
-      <div class="list-card">
-        <div class="list-card-top"><div class="list-card-title">You're part of something bigger</div></div>
-        <div class="list-card-desc">
-          Every goal set, every check-in logged, every session attended — that's a real young person
-          choosing to grow, right alongside you. The numbers above are real, drawn from what our
-          community is doing this week. You're not walking this alone.
+      <div id="memberStory" hidden>
+        <div class="grid-row" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px">
+          <div class="card" style="text-align:center; padding:24px 16px">
+            <div style="font-size:30px; font-weight:800; color:var(--mentorship-gold)" id="statGoals">—</div>
+            <div style="font-size:12px; color:rgba(245,241,234,.6); margin-top:4px">Goals completed this week</div>
+          </div>
+          <div class="card" style="text-align:center; padding:24px 16px">
+            <div style="font-size:30px; font-weight:800; color:var(--mentorship-gold)" id="statCheckins">—</div>
+            <div style="font-size:12px; color:rgba(245,241,234,.6); margin-top:4px">Check-ins this week</div>
+          </div>
+          <div class="card" style="text-align:center; padding:24px 16px">
+            <div style="font-size:30px; font-weight:800; color:var(--mentorship-gold)" id="statActive">—</div>
+            <div style="font-size:12px; color:rgba(245,241,234,.6); margin-top:4px">Mentees active this week</div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-card-top"><div class="list-card-title">You're part of something bigger</div></div>
+          <div class="list-card-desc">
+            Every goal set, every check-in logged, every session attended — that's a real young person
+            choosing to grow, right alongside you. The numbers above are real, drawn from what our
+            community is doing this week. You're not walking this alone.
+          </div>
         </div>
       </div>
     </div>
@@ -253,7 +272,22 @@
     try {
       const db = await getDB();
       const { data: { user } } = await db.auth.getUser();
-      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      // Fixes the 2026-09 experience audit's finding that "Stories" was
+      // actually a live stats widget that hard-redirected anonymous
+      // visitors and, worse, could show a discouraging "0" on a quiet
+      // week to the one audience the page's name promises social proof
+      // to. Anonymous visitors now get an honest, values-based
+      // description instead — no fabricated testimonials, since none
+      // exist yet to show truthfully. The real live counters stay
+      // exactly as they were for signed-in members.
+      if (!user) {
+        $('topbarGreeting').textContent = 'Welcome 👋';
+        const accountArea = $('topbarAvatar').closest('.topbar-dropdown-wrap');
+        if (accountArea) accountArea.innerHTML = '<a href="/mentorship/login.html" class="list-card-btn primary" style="padding:8px 16px">Sign In</a>';
+        $('visitorStory').hidden = false;
+        return;
+      }
+      $('memberStory').hidden = false;
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
       const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
       $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;

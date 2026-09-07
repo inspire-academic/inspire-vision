@@ -24,6 +24,7 @@
     .epoch-domain-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .epoch-domain-label { width: 110px; flex-shrink: 0; font-size: 13px; font-weight: 700; }
     .epoch-domain-score { width: 34px; text-align: right; font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+    .voc-section-sub { font-size: 13px; color: var(--text-soft, rgba(245,241,234,.55)); font-weight: 400; line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -169,12 +170,30 @@
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:20px">
-        <div id="itemsList"></div>
-      </div>
+      <div class="voc-flow-grid">
+        <div>
+          <div class="voc-flow-progress-track"><div class="voc-flow-progress-fill" id="flowProgressFill" style="width:0%"></div></div>
+          <div class="voc-flow-dots" id="flowDots"></div>
 
-      <div class="auth-msg" id="surveyMsg"></div>
-      <button class="auth-btn" id="submitSurveyBtn" style="max-width:280px">Save My Check-In</button>
+          <div class="card voc-flow-card">
+            <div class="voc-flow-step-label" id="flowStepLabel">Step 1 of 5</div>
+            <div class="voc-flow-body" id="itemsList"></div>
+
+            <div class="auth-msg" id="surveyMsg"></div>
+            <div class="voc-flow-nav">
+              <button class="list-card-btn" id="flowBackBtn">← Back</button>
+              <div class="voc-flow-nav-spacer"></div>
+              <button class="list-card-btn primary" id="flowNextBtn">Continue →</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card voc-recap-card">
+          <div class="voc-recap-title">Answered So Far</div>
+          <div class="voc-recap-sub">Every statement here is from the published EPOCH wellbeing measure — nothing is reworded or reordered.</div>
+          <div id="recapList"></div>
+        </div>
+      </div>
 
       <div id="resultsCard" style="margin-top:24px"></div>
     </div>
@@ -254,24 +273,78 @@
   const DOMAIN_LABEL = { engagement: 'Engagement', perseverance: 'Perseverance', optimism: 'Optimism', connectedness: 'Connectedness', happiness: 'Happiness' };
   const WAVE_LABEL = { intake: 'Getting Started', '3_month': 'Three Months In', '6_month': 'Six Months In', other: 'Check-In' };
 
-  function renderItems() {
-    $('itemsList').innerHTML = EPOCH_ITEMS.map((item, i) => `
+  // Chunked into fixed groups of 4 *consecutive* items — position-based,
+  // not grouped by domain — so the published item order is preserved
+  // exactly (see the no-reordering note above) while still breaking a
+  // 20-item academic instrument into something that doesn't read as one
+  // long unpaced scroll. Reuses the same flow shell (dot-progress +
+  // recap) built for the Vocation module, per the 2026-09 experience
+  // audit's specific recommendation for this page.
+  const CHUNK_SIZE = 4;
+  const CHUNKS = [];
+  for (let i = 0; i < EPOCH_ITEMS.length; i += CHUNK_SIZE) CHUNKS.push(EPOCH_ITEMS.slice(i, i + CHUNK_SIZE));
+
+  let currentIndex = 0;
+  let answers = {}; // item code -> 1-5, persists across chunks/back-navigation
+
+  function renderChunk() {
+    const chunk = CHUNKS[currentIndex];
+    const startNum = currentIndex * CHUNK_SIZE;
+    $('itemsList').innerHTML = chunk.map((item, i) => `
       <div class="epoch-item" data-code="${item.code}">
-        <div class="epoch-item-text">${i + 1}. ${escapeHtml(item.text)}</div>
+        <div class="epoch-item-text">${startNum + i + 1}. ${escapeHtml(item.text)}</div>
         <div class="epoch-scale">
           ${SCALE.map((label, idx) => `
             <div class="epoch-opt">
-              <input type="radio" name="item-${item.code}" value="${idx + 1}" id="item-${item.code}-${idx + 1}">
+              <input type="radio" name="item-${item.code}" value="${idx + 1}" id="item-${item.code}-${idx + 1}"${answers[item.code] === idx + 1 ? ' checked' : ''}>
               <label for="item-${item.code}-${idx + 1}">${label}</label>
             </div>`).join('')}
         </div>
       </div>`).join('');
+    $('itemsList').querySelectorAll('input[type="radio"]').forEach(r => {
+      r.addEventListener('change', (e) => {
+        answers[e.target.closest('.epoch-item').dataset.code] = Number(e.target.value);
+        renderDots();
+        renderRecap();
+      });
+    });
+
+    $('flowStepLabel').textContent = `Step ${currentIndex + 1} of ${CHUNKS.length}`;
+    $('flowProgressFill').style.width = `${Math.round((currentIndex / (CHUNKS.length - 1)) * 100)}%`;
+    $('flowBackBtn').disabled = currentIndex === 0;
+    $('surveyMsg').className = 'auth-msg';
+    $('surveyMsg').textContent = '';
+    $('flowNextBtn').textContent = currentIndex === CHUNKS.length - 1 ? 'Save My Check-In' : 'Continue →';
+    renderDots();
+    renderRecap();
   }
 
-  function domainMean(responses, domain) {
+  function renderDots() {
+    $('flowDots').innerHTML = CHUNKS.map((chunk, i) => {
+      const done = chunk.every(item => answers[item.code] != null);
+      return `<button type="button" class="voc-flow-dot${i === currentIndex ? ' current' : ''}${done ? ' done' : ''}" data-goto="${i}" aria-label="Go to step ${i + 1}">${done ? '✓' : i + 1}</button>`;
+    }).join('');
+    $('flowDots').querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => { currentIndex = Number(btn.dataset.goto); renderChunk(); });
+    });
+  }
+
+  function renderRecap() {
+    const domains = ['engagement', 'perseverance', 'optimism', 'connectedness', 'happiness'];
+    $('recapList').innerHTML = domains.map(d => {
+      const codes = EPOCH_ITEMS.filter(i => i.domain === d).map(i => i.code);
+      const answeredCodes = codes.filter(c => answers[c] != null);
+      const complete = answeredCodes.length === codes.length;
+      const text = complete
+        ? `${DOMAIN_LABEL[d]}: <strong>${(answeredCodes.reduce((a, c) => a + answers[c], 0) / codes.length).toFixed(1)} / 5</strong>`
+        : `${DOMAIN_LABEL[d]}: <span style="opacity:.65">${answeredCodes.length} of ${codes.length} so far</span>`;
+      return `<div class="voc-recap-row"><div class="voc-recap-row-icon">${complete ? '✓' : '·'}</div><div class="voc-recap-row-text">${text}</div></div>`;
+    }).join('');
+  }
+
+  function domainMean(domain) {
     const codes = EPOCH_ITEMS.filter(i => i.domain === domain).map(i => i.code);
-    const vals = codes.map(c => responses[c]);
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
+    return codes.reduce((a, c) => a + answers[c], 0) / codes.length;
   }
 
   function renderResultProfile(row) {
@@ -316,30 +389,32 @@
     else $('waveSelect').value = 'other';
   }
 
-  $('submitSurveyBtn').addEventListener('click', async () => {
-    const responses = {};
-    let missing = 0;
-    EPOCH_ITEMS.forEach(item => {
-      const checked = document.querySelector(`input[name="item-${item.code}"]:checked`);
-      if (!checked) { missing++; return; }
-      responses[item.code] = Number(checked.value);
-    });
+  $('flowBackBtn').addEventListener('click', () => {
+    if (currentIndex === 0) return;
+    currentIndex--;
+    renderChunk();
+  });
+
+  $('flowNextBtn').addEventListener('click', async () => {
+    if (currentIndex < CHUNKS.length - 1) { currentIndex++; renderChunk(); return; }
+
     const msg = $('surveyMsg');
+    const missing = EPOCH_ITEMS.filter(item => answers[item.code] == null).length;
     if (missing) {
       msg.textContent = `Please answer every statement — ${missing} left to go.`;
       msg.className = 'auth-msg show error';
       return;
     }
-    const domains = { engagement: domainMean(responses, 'engagement'), perseverance: domainMean(responses, 'perseverance'), optimism: domainMean(responses, 'optimism'), connectedness: domainMean(responses, 'connectedness'), happiness: domainMean(responses, 'happiness') };
+    const domains = { engagement: domainMean('engagement'), perseverance: domainMean('perseverance'), optimism: domainMean('optimism'), connectedness: domainMean('connectedness'), happiness: domainMean('happiness') };
     const overall = Object.values(domains).reduce((a, b) => a + b, 0) / 5;
 
-    const btn = $('submitSurveyBtn');
+    const btn = $('flowNextBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     try {
       const { error } = await dbClient.schema('mentorship').from('epoch_surveys').insert({
         student_id: currentUser.id,
         wave: $('waveSelect').value,
-        responses,
+        responses: answers,
         engagement: domains.engagement.toFixed(2), perseverance: domains.perseverance.toFixed(2),
         optimism: domains.optimism.toFixed(2), connectedness: domains.connectedness.toFixed(2),
         happiness: domains.happiness.toFixed(2), overall: overall.toFixed(2),
@@ -350,9 +425,11 @@
         btn.disabled = false; btn.textContent = 'Save My Check-In';
         return;
       }
-      document.querySelectorAll('#itemsList input[type="radio"]:checked').forEach(r => { r.checked = false; });
+      answers = {};
+      currentIndex = 0;
       msg.className = 'auth-msg';
-      btn.disabled = false; btn.textContent = 'Save My Check-In';
+      btn.disabled = false;
+      renderChunk();
       await loadHistory();
       $('resultsCard').innerHTML = '<div class="empty-state"><div class="empty-state-icon">💙</div>Saved — thank you for being honest. Your profile is above.</div>';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -379,7 +456,7 @@
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
 
-      renderItems();
+      renderChunk();
       await loadHistory();
     } catch (e) {
       console.warn('Wellbeing page init failed:', e);

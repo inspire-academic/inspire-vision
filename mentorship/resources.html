@@ -139,7 +139,7 @@
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <div class="topbar-dropdown-wrap">
+      <div class="topbar-dropdown-wrap" id="accountArea">
         <button class="topbar-avatar" id="topbarAvatar" aria-label="Account menu">·</button>
         <div class="topbar-dropdown" id="profileDropdown">
           <div class="topbar-dropdown-title" id="profileDropdownName">Account</div>
@@ -149,6 +149,12 @@
     </header>
 
     <div class="content">
+
+      <div class="card" id="visitorBanner" hidden style="margin-bottom:20px; border-color:var(--mentorship-gold)">
+        <div style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.8)); line-height:1.55">
+          These are real resources every Inspire Mentorship student has access to. <a href="/mentorship/login.html" style="color:var(--mentorship-gold); font-weight:700">Sign in</a> or <a href="/mentorship/join.html" style="color:var(--mentorship-gold); font-weight:700">join</a> to use the linked tools (Check-Ins, Goals &amp; Plan, Journal) and connect with your own mentor.
+        </div>
+      </div>
 
       <div class="page-header">
         <div>
@@ -274,12 +280,26 @@
 
 <script src="/assets/supabase.js"></script>
 <script>
+  // This page's own content (general wellbeing/study/character/support
+  // guidance) is not personal or private — the 2026-09 experience audit
+  // found it and journey.html/stories.html sitting at public-looking
+  // URLs but hard-redirecting to login, meaning a prospective teen or
+  // parent could never see a shred of program content before signing
+  // up. Fix here: render for everyone; only the *linked destinations*
+  // (Check-Ins, Goals & Plan, Journal, My Mentor — each already its own
+  // auth-gated page) still require signing in, which happens naturally
+  // when a visitor clicks through, not before they can read anything.
   (async () => {
+    const $ = id => document.getElementById(id);
     try {
       const db = await getDB();
       const { data: { user } } = await db.auth.getUser();
-      if (!user) { window.location.href = '/mentorship/login.html'; return; }
-      const $ = id => document.getElementById(id);
+      if (!user) {
+        $('topbarGreeting').textContent = 'Welcome 👋';
+        $('visitorBanner').hidden = false;
+        $('accountArea').innerHTML = '<a href="/mentorship/login.html" class="list-card-btn primary" style="padding:8px 16px">Sign In</a>';
+        return;
+      }
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
       const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';
       $('topbarGreeting').textContent = `Welcome back, ${firstName} 👋`;
@@ -290,6 +310,7 @@
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
     } catch (e) {
       console.warn('Resources page auth init failed:', e);
+      $('visitorBanner').hidden = false;
     }
   })();
 </script>

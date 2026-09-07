@@ -13,6 +13,12 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .health-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+    .health-green { background: rgba(34,197,94,.15); color: #86efac; }
+    .health-amber { background: rgba(217,119,6,.18); color: #fbbf24; }
+    .health-red { background: rgba(239,68,68,.15); color: #fca5a5; }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -147,17 +153,39 @@
   const $ = id => document.getElementById(id);
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
 
-  function renderMentees(rows) {
+  // Same "silence detection" health signal admin/matching.html already
+  // computes (green <=14 days since last session/message/check-in, amber
+  // 15-30, red >30 or never) — per the 2026-09 experience audit, this
+  // existed but was admin-only. A busy volunteer mentor checking in
+  // between other commitments needs to see "who needs attention" on
+  // their OWN list, not just have it visible to a coordinator who has to
+  // go looking. Computed client-side from the same three tables, scoped
+  // by RLS to just this mentor's own assigned mentees.
+  const HEALTH_LABEL = { green: 'Active', amber: 'Quiet', red: 'Needs attention' };
+  function computeHealth(latestTs) {
+    if (!latestTs) return 'red';
+    const days = (Date.now() - latestTs) / 86400000;
+    return days <= 14 ? 'green' : days <= 30 ? 'amber' : 'red';
+  }
+
+  function renderMentees(rows, healthByStudent) {
     const list = $('menteesList');
     if (!rows.length) {
       list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div>No mentees assigned yet — check back once our team pairs you with someone.</div>';
       return;
     }
-    list.innerHTML = rows.map(r => `
+    // Needs-attention mentees float to the top — the whole point of a
+    // triage signal is that it changes what a busy mentor sees first,
+    // not just adds a badge to an unchanged list.
+    const order = { red: 0, amber: 1, green: 2 };
+    const sorted = [...rows].sort((a, b) => order[healthByStudent.get(a.student_id) || 'red'] - order[healthByStudent.get(b.student_id) || 'red']);
+    list.innerHTML = sorted.map(r => {
+      const health = healthByStudent.get(r.student_id) || 'red';
+      return `
       <div class="list-card">
         <div class="list-card-top">
           <div class="list-card-title">${escapeHtml(r.student_name)}</div>
-          <span class="badge badge-muted">Active</span>
+          <span class="health-badge health-${health}">${HEALTH_LABEL[health]}</span>
         </div>
         <div class="list-card-meta">Paired ${new Date(r.assigned_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
         <div class="list-card-actions">
@@ -165,7 +193,8 @@
           <a class="list-card-btn" href="/mentorship/mentor-portal/sessions.html?student=${r.student_id}">Sessions</a>
           <a class="list-card-btn" href="/mentorship/mentor-portal/session-notes.html?student=${r.student_id}">Session Notes</a>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }
 
   let dbClient = null;
@@ -188,8 +217,29 @@
 
       const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
         .select('*').eq('mentor_id', currentUser.id).eq('status', 'active').order('assigned_at', { ascending: false });
-      if (error) { console.warn('Load mentees failed:', error); renderMentees([]); return; }
-      renderMentees(data || []);
+      if (error) { console.warn('Load mentees failed:', error); renderMentees([], new Map()); return; }
+      const rows = data || [];
+      const studentIds = rows.map(r => r.student_id);
+      let healthByStudent = new Map();
+      if (studentIds.length) {
+        const [{ data: sessions }, { data: messages }, { data: checkins }] = await Promise.all([
+          dbClient.schema('mentorship').from('sessions').select('student_id, scheduled_at').eq('mentor_id', currentUser.id).in('student_id', studentIds),
+          dbClient.schema('mentorship').from('messages').select('student_id, created_at').eq('mentor_id', currentUser.id).in('student_id', studentIds),
+          dbClient.schema('mentorship').from('check_ins').select('student_id, created_at').in('student_id', studentIds),
+        ]);
+        const latestByStudent = new Map();
+        const bump = (studentId, ts) => {
+          if (!ts) return;
+          const t = new Date(ts).getTime();
+          const cur = latestByStudent.get(studentId);
+          if (!cur || t > cur) latestByStudent.set(studentId, t);
+        };
+        (sessions || []).forEach(s => bump(s.student_id, s.scheduled_at));
+        (messages || []).forEach(m => bump(m.student_id, m.created_at));
+        (checkins || []).forEach(c => bump(c.student_id, c.created_at));
+        healthByStudent = new Map(studentIds.map(id => [id, computeHealth(latestByStudent.get(id))]));
+      }
+      renderMentees(rows, healthByStudent);
 
     } catch (e) {
       console.warn('Mentor portal page init failed:', e);
