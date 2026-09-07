@@ -99,6 +99,7 @@
       <div class="card" style="max-width:220px; margin-bottom:24px">
         <div class="card-label">Active Mentees</div>
         <div class="card-title" id="menteeCount" style="font-size:32px">—</div>
+        <a href="/mentorship/mentor-portal/mentees.html" id="attentionPill" class="health-badge health-amber" style="display:none; margin-top:8px; text-decoration:none; width:fit-content"></a>
       </div>
 
       <div class="page-eyebrow" style="margin-bottom:12px">Your Mentees</div>
@@ -206,6 +207,15 @@
   const $ = id => document.getElementById(id);
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
 
+  // Same silence-detection health computation as mentor-portal/mentees.html
+  // — here only to drive a one-line "N need attention" rollup so a mentor
+  // sees it on the page they land on first, not one click deeper.
+  function computeHealth(latestTs) {
+    if (!latestTs) return 'red';
+    const days = (Date.now() - latestTs) / 86400000;
+    return days <= 14 ? 'green' : days <= 30 ? 'amber' : 'red';
+  }
+
   function renderMentees(rows) {
     $('menteeCount').textContent = rows.length;
     const list = $('menteesList');
@@ -262,7 +272,38 @@
       const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
         .select('*').eq('mentor_id', currentUser.id).eq('status', 'active').order('assigned_at', { ascending: false });
       if (error) { console.warn('Load mentees failed:', error); renderMentees([]); return; }
-      renderMentees(data || []);
+      const rows = data || [];
+      renderMentees(rows);
+
+      const studentIds = rows.map(r => r.student_id);
+      if (studentIds.length) {
+        const [{ data: sessions }, { data: messages }, { data: checkins }] = await Promise.all([
+          dbClient.schema('mentorship').from('sessions').select('student_id, scheduled_at').eq('mentor_id', currentUser.id).in('student_id', studentIds),
+          dbClient.schema('mentorship').from('messages').select('student_id, created_at').eq('mentor_id', currentUser.id).in('student_id', studentIds),
+          dbClient.schema('mentorship').from('check_ins').select('student_id, created_at').in('student_id', studentIds),
+        ]);
+        const latestByStudent = new Map();
+        const bump = (studentId, ts) => {
+          if (!ts) return;
+          const t = new Date(ts).getTime();
+          const cur = latestByStudent.get(studentId);
+          if (!cur || t > cur) latestByStudent.set(studentId, t);
+        };
+        (sessions || []).forEach(s => bump(s.student_id, s.scheduled_at));
+        (messages || []).forEach(m => bump(m.student_id, m.created_at));
+        (checkins || []).forEach(c => bump(c.student_id, c.created_at));
+        // "Quiet" and "Needs attention" get folded into one soft rollup
+        // here rather than reusing that stronger label — this pill covers
+        // both severities, and mentees.html's own badges (which do
+        // distinguish them) are one click away.
+        const quietOrWorse = studentIds.filter(id => computeHealth(latestByStudent.get(id)) !== 'green').length;
+        if (quietOrWorse > 0) {
+          const pill = $('attentionPill');
+          pill.textContent = `${quietOrWorse} may need a check-in`;
+          pill.className = 'health-badge health-amber';
+          pill.style.display = 'inline-block';
+        }
+      }
 
     } catch (e) {
       console.warn('Mentor portal page init failed:', e);

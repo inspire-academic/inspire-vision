@@ -2,6 +2,12 @@
 publish = "."
 functions = "netlify/functions"
 
+# Weekly mentor staleness digest — see the function's own header comment
+# for what it does. Netlify does not allow scheduled functions to be
+# invoked over public HTTP, only via this schedule.
+[functions."notify-mentor-staleness"]
+  schedule = "0 8 * * 1"
+
 [context.production]
   branch = "main"
 
