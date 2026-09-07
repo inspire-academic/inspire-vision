@@ -32,6 +32,39 @@ async function listAllUsers(admin) {
 
 const HEALTH_LABEL = { amber: 'Quiet', red: 'Needs attention' };
 
+// Pure — no I/O — so it can be unit-tested directly (see
+// tests/notify-mentor-staleness.spec.js) without a live Supabase/Resend
+// connection. exports.handler below is just this plus the network calls
+// that gather sessions/messages/checkins and send the emails.
+function groupStaleAssignmentsByMentor(assignments, sessions, messages, checkins, now = Date.now()) {
+  const latestByStudent = new Map();
+  const bump = (studentId, ts) => {
+    if (!ts) return;
+    const t = new Date(ts).getTime();
+    const cur = latestByStudent.get(studentId);
+    if (!cur || t > cur) latestByStudent.set(studentId, t);
+  };
+  (sessions || []).forEach(s => bump(s.student_id, s.scheduled_at));
+  (messages || []).forEach(m => bump(m.student_id, m.created_at));
+  (checkins || []).forEach(c => bump(c.student_id, c.created_at));
+
+  const healthFor = (studentId) => {
+    const latest = latestByStudent.get(studentId);
+    if (!latest) return 'red';
+    const days = (now - latest) / 86400000;
+    return days <= 14 ? 'green' : days <= 30 ? 'amber' : 'red';
+  };
+
+  const byMentor = new Map();
+  for (const a of assignments) {
+    const health = healthFor(a.student_id);
+    if (health === 'green') continue;
+    if (!byMentor.has(a.mentor_id)) byMentor.set(a.mentor_id, []);
+    byMentor.get(a.mentor_id).push({ name: a.student_name, health });
+  }
+  return byMentor;
+}
+
 exports.handler = async () => {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.RESEND_API_KEY) {
     console.warn('SUPABASE_SERVICE_ROLE_KEY or RESEND_API_KEY not set — skipping mentor staleness digest.');
@@ -56,32 +89,8 @@ exports.handler = async () => {
       admin.schema('mentorship').from('messages').select('student_id, created_at').in('student_id', studentIds),
       admin.schema('mentorship').from('check_ins').select('student_id, created_at').in('student_id', studentIds),
     ]);
-    const latestByStudent = new Map();
-    const bump = (studentId, ts) => {
-      if (!ts) return;
-      const t = new Date(ts).getTime();
-      const cur = latestByStudent.get(studentId);
-      if (!cur || t > cur) latestByStudent.set(studentId, t);
-    };
-    (sessions || []).forEach(s => bump(s.student_id, s.scheduled_at));
-    (messages || []).forEach(m => bump(m.student_id, m.created_at));
-    (checkins || []).forEach(c => bump(c.student_id, c.created_at));
-    const now = Date.now();
-    const healthFor = (studentId) => {
-      const latest = latestByStudent.get(studentId);
-      if (!latest) return 'red';
-      const days = (now - latest) / 86400000;
-      return days <= 14 ? 'green' : days <= 30 ? 'amber' : 'red';
-    };
-
     const usersById = new Map(users.map(u => [u.id, u]));
-    const byMentor = new Map();
-    for (const a of assignments) {
-      const health = healthFor(a.student_id);
-      if (health === 'green') continue;
-      if (!byMentor.has(a.mentor_id)) byMentor.set(a.mentor_id, []);
-      byMentor.get(a.mentor_id).push({ name: a.student_name, health });
-    }
+    const byMentor = groupStaleAssignmentsByMentor(assignments, sessions, messages, checkins);
 
     if (!byMentor.size) {
       return { statusCode: 200, body: JSON.stringify({ sent: 0, reason: 'every pairing is currently green' }) };
@@ -152,3 +161,5 @@ exports.handler = async () => {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
+
+exports.groupStaleAssignmentsByMentor = groupStaleAssignmentsByMentor;
