@@ -48,6 +48,17 @@ function credsForMentor() {
   return email && password ? { email, password } : null;
 }
 
+// Admin coverage (mentor-training-comprehension / admin-matching-context
+// specs) needs an account whose email is on the real ADMIN_EMAILS
+// allowlist (netlify/functions/_lib/adminAuth.js) — set
+// TEST_ADMIN_EMAIL/TEST_ADMIN_PASSWORD to enable it, same opt-in pattern
+// as the mentor/mentee fixtures above.
+function credsForAdmin() {
+  const email = process.env.TEST_ADMIN_EMAIL;
+  const password = process.env.TEST_ADMIN_PASSWORD;
+  return email && password ? { email, password } : null;
+}
+
 // This suite's own webServer (see playwright.config.js) serves the static
 // site only, deliberately without Netlify Functions — fine for every
 // pre-existing test here, but the parent-link/parent-report flow calls
@@ -125,6 +136,7 @@ module.exports = {
   trackConsoleErrors,
   credsForMentee,
   credsForMentor,
+  credsForAdmin,
   functionsBaseUrl,
   loginAs,
   loginAsAt,

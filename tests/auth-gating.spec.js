@@ -16,9 +16,7 @@ const privatePages = [
   '/mentorship/dashboard/mentor.html',
   '/mentorship/dashboard/growth-compass.html',
   '/mentorship/dashboard/prayer-support.html',
-  '/mentorship/journey.html',
-  '/mentorship/resources.html',
-  '/mentorship/stories.html',
+  '/mentorship/mentor-onboarding/training.html',
   '/mentorship/mentor-portal/',
   '/mentorship/mentor-portal/mentees.html',
   '/mentorship/mentor-portal/sessions.html',
@@ -49,6 +47,14 @@ const privatePages = [
 // one page in the module that's public by design (token-gated, not
 // session-gated; see vocation-report-generation.spec.js for its own
 // no-token/bad-token coverage).
+//
+// mentorship/journey.html, resources.html, and stories.html are ALSO
+// deliberately not in this list, as of the 2026-09 experience audit —
+// they used to hard-redirect an anonymous visitor to login.html (like
+// everything else here), but now show a visitor preview + sign-in
+// prompt instead (renderVisitorPreview() / #visitorBanner /
+// #visitorStory). See public-pages.spec.js's "Visitor preview" describe
+// block for that behavior's own coverage.
 
 test.describe('Unauthenticated visitors are redirected to login', () => {
   for (const path of privatePages) {

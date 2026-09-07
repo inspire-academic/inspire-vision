@@ -36,6 +36,36 @@ test.describe('Mentorship public pages — must not be the coming-soon stub', ()
   }
 });
 
+test.describe('Visitor preview — no redirect, real content, sign-in prompt', () => {
+  // Regression target: journey.html, resources.html, and stories.html
+  // used to hard-redirect an anonymous visitor straight to login.html
+  // (like every other private page in auth-gating.spec.js). The 2026-09
+  // experience audit changed that deliberately — an anonymous visitor
+  // should see honest, non-personal content plus a clear sign-in/join
+  // prompt, not be bounced before seeing anything. This guards against
+  // that redirect silently coming back.
+  const pages = [
+    { path: '/mentorship/journey.html', mustContain: 'Start Your Journey' },
+    { path: '/mentorship/resources.html', mustContain: 'Sign in' },
+    { path: '/mentorship/stories.html', mustContain: 'What community looks like here' },
+  ];
+
+  for (const { path, mustContain } of pages) {
+    test(`${path} stays put for an anonymous visitor and shows a sign-in prompt`, async ({ page }) => {
+      const tracker = trackConsoleErrors(page);
+      await page.goto(path);
+      // Give the auth check (a real Supabase getUser() round-trip) time
+      // to resolve and pick the visitor branch — same margin
+      // auth-gating.spec.js uses for the opposite (redirect) case.
+      await page.waitForTimeout(2000);
+      expect(page.url()).toContain(path);
+      await expect(page.locator('body')).toContainText(mustContain);
+      await expect(page.locator('a:has-text("Sign In"), a:has-text("Sign in")').first()).toBeVisible();
+      tracker.assertNoErrors();
+    });
+  }
+});
+
 test.describe('Mentorship auth pages', () => {
   test('login page renders the sign-in form', async ({ page }) => {
     const tracker = trackConsoleErrors(page);
