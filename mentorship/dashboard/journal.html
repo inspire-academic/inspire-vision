@@ -168,6 +168,8 @@
         </form>
       </div>
 
+      <div id="journalNote" class="card" style="margin-bottom:20px; border-left:3px solid var(--mentorship-gold)"></div>
+
       <div id="entriesList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading your journal…</div>
       </div>
@@ -246,6 +248,16 @@
   let currentUser = null;
 
   function renderEntries(rows) {
+    // A single warm, low-key note rather than a full stat-card row — per
+    // the 2026-09 experience audit's call that journaling should keep a
+    // gentler register than tracked "growth" pages; a private space
+    // doesn't need to be visually turned into a metrics dashboard to
+    // stop reading as flat next to the rest of the redesigned dashboard.
+    const noteEl = $('journalNote');
+    noteEl.innerHTML = rows.length
+      ? `<div style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.8))"><strong>${rows.length}</strong> ${rows.length === 1 ? 'entry' : 'entries'} so far — this space is completely private, only you can ever read it.</div>`
+      : `<div style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.8))">Nothing here yet — whenever you're ready. This space is completely private, only you can ever read it.</div>`;
+
     const list = $('entriesList');
     if (!rows.length) {
       list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div>No entries yet. This space is completely private — only you can see it.</div>';

@@ -182,6 +182,8 @@
         </form>
       </div>
 
+      <div id="goalsSummary" class="voc-deliverable-grid" style="margin-bottom:20px"></div>
+
       <div id="goalsList">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading your goals…</div>
       </div>
@@ -269,7 +271,43 @@
   let dbClient = null;
   let currentUser = null;
 
+  // Replaces having no summary at all above a bare list — per the 2026-09
+  // experience audit, this page read as visibly flatter/older than the
+  // redesigned Vocation module sitting right next to it in the same
+  // sidebar. Reuses that module's deliverable-card pattern rather than
+  // inventing a new one.
+  function renderGoalsSummary(goals) {
+    const active = goals.filter(g => g.status !== 'completed');
+    const completed = goals.filter(g => g.status === 'completed');
+    const priority = goals.find(g => g.is_priority) || active[0];
+    const cards = [
+      {
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        name: 'Active Goals', stat: active.length, statLabel: active.length === 1 ? 'in progress' : 'in progress',
+        next: active.length === 0 ? 'Add your first goal above.' : 'Something to grow into, not a checklist.',
+      },
+      {
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>',
+        name: 'Completed', stat: completed.length, statLabel: completed.length === 1 ? 'goal completed' : 'goals completed',
+        next: completed.length === 0 ? 'Your first completed goal will show here.' : 'Real progress, kept on record.',
+      },
+      {
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+        name: "This Month's Focus", stat: '', statLabel: '',
+        next: priority ? escapeHtml(priority.title) : 'Mark a goal as priority to feature it here.',
+      },
+    ];
+    $('goalsSummary').innerHTML = cards.map(c => `
+      <div class="card voc-deliverable-card">
+        <div class="voc-deliverable-icon">${c.icon}</div>
+        <div class="voc-deliverable-name">${c.name}</div>
+        ${c.stat !== '' ? `<div class="voc-deliverable-stat"><strong>${c.stat}</strong> ${c.statLabel}</div>` : ''}
+        <div class="voc-deliverable-next">${c.next}</div>
+      </div>`).join('');
+  }
+
   function renderGoals(goals, latestCheckinByGoal) {
+    renderGoalsSummary(goals);
     const list = $('goalsList');
     if (!goals.length) {
       list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div>No goals yet — add your first one above.</div>';

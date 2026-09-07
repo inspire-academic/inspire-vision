@@ -157,8 +157,8 @@
         </div>
       </div>
 
-      <div class="page-eyebrow" style="margin-bottom:12px">Achievements</div>
-      <div id="achievementsGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-bottom:28px">
+      <div class="page-eyebrow" style="margin-bottom:12px">Milestones</div>
+      <div id="achievementsGrid" class="voc-deliverable-grid" style="margin-bottom:28px">
         <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
       </div>
 
@@ -261,23 +261,52 @@
     return longest;
   }
 
+  // Was six emoji/"unlocked" badges (🌱🎯🔥📝🤝🏆) — the exact childish
+  // gamification pattern the 2026-09 experience audit flagged as reading
+  // juvenile for 16-19-year-olds, and which the Vocation module was
+  // deliberately redesigned to avoid in favor of named, ongoing
+  // deliverables (Discovery Notebook, Career Map) instead of lock/unlock
+  // badges. Reusing that exact same card pattern (.voc-deliverable-*,
+  // real SVG icons, current stat + next-milestone line) here for the
+  // same reason — this data is a running record of real progress, not a
+  // collectible to unlock.
+  const MILESTONE_ICONS = {
+    goals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>',
+    streak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>',
+    checkins: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+    sessions: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  };
+
   function renderAchievements(goals, checkins, sessions) {
     const completedGoals = goals.filter(g => g.status === 'completed').length;
     const streak = longestStreak(checkins);
     const completedSessions = sessions.filter(s => s.status === 'completed').length;
-    const badges = [
-      { icon: '🌱', label: 'First Steps', desc: 'Set your first goal', unlocked: goals.length >= 1 },
-      { icon: '🎯', label: 'Goal Getter', desc: 'Complete a goal', unlocked: completedGoals >= 1 },
-      { icon: '🔥', label: 'Consistency', desc: '3-day check-in streak', unlocked: streak >= 3 },
-      { icon: '📝', label: 'Reflective', desc: '5 check-ins logged', unlocked: checkins.length >= 5 },
-      { icon: '🤝', label: 'Committed', desc: 'Attend a mentor session', unlocked: completedSessions >= 1 },
-      { icon: '🏆', label: 'Growth Champion', desc: 'Complete 3 goals', unlocked: completedGoals >= 3 },
+
+    const milestones = [
+      {
+        icon: MILESTONE_ICONS.goals, name: 'Goals Set', stat: goals.length, statLabel: goals.length === 1 ? 'goal set' : 'goals set',
+        next: goals.length === 0 ? 'Set your first goal to get started.' : `${completedGoals} of ${goals.length} completed so far.`,
+      },
+      {
+        icon: MILESTONE_ICONS.streak, name: 'Check-In Streak', stat: streak, statLabel: streak === 1 ? 'day streak' : 'day streak',
+        next: streak >= 3 ? 'Great consistency — keep it going.' : 'Check in 3 days in a row to build momentum.',
+      },
+      {
+        icon: MILESTONE_ICONS.checkins, name: 'Reflection Log', stat: checkins.length, statLabel: checkins.length === 1 ? 'check-in logged' : 'check-ins logged',
+        next: checkins.length === 0 ? 'Your first check-in starts this log.' : 'Every check-in here is part of your record.',
+      },
+      {
+        icon: MILESTONE_ICONS.sessions, name: 'Mentor Sessions', stat: completedSessions, statLabel: completedSessions === 1 ? 'session attended' : 'sessions attended',
+        next: completedSessions === 0 ? 'Your first session will show up here.' : 'Showing up consistently is what makes this work.',
+      },
     ];
-    $('achievementsGrid').innerHTML = badges.map(b => `
-      <div class="card" style="text-align:center; padding:18px 12px; opacity:${b.unlocked ? '1' : '.4'}">
-        <div style="font-size:28px; margin-bottom:6px">${b.icon}</div>
-        <div style="font-size:12px; font-weight:800; margin-bottom:2px">${b.label}</div>
-        <div style="font-size:10px; color:rgba(245,241,234,.5)">${b.unlocked ? 'Unlocked' : b.desc}</div>
+
+    $('achievementsGrid').innerHTML = milestones.map(m => `
+      <div class="card voc-deliverable-card">
+        <div class="voc-deliverable-icon">${m.icon}</div>
+        <div class="voc-deliverable-name">${escapeHtml(m.name)}</div>
+        <div class="voc-deliverable-stat"><strong>${m.stat}</strong> ${escapeHtml(m.statLabel)}</div>
+        <div class="voc-deliverable-next">${escapeHtml(m.next)}</div>
       </div>`).join('');
   }
 
@@ -326,11 +355,37 @@
       </div>`).join('');
   }
 
+  // Fixes the 2026-09 experience audit's finding that this page (a
+  // public-looking URL) hard-redirected anonymous visitors to login
+  // with zero preview of what "My Journey" actually is. Achievement
+  // *types* are fixed program content, not personal data, so they're
+  // safe to show truthfully to a visitor — only the personalized
+  // challenges/timeline (which genuinely require a real account's data)
+  // stay behind sign-in.
+  function renderVisitorPreview() {
+    $('topbarGreeting').textContent = 'Welcome 👋';
+    const accountArea = document.getElementById('topbarAvatar').closest('.topbar-dropdown-wrap');
+    if (accountArea) accountArea.innerHTML = '<a href="/mentorship/login.html" class="list-card-btn primary" style="padding:8px 16px">Sign In</a>';
+    $('achievementsGrid').innerHTML = [
+      { icon: MILESTONE_ICONS.goals, name: 'Goals Set', desc: 'Tracks every goal you set and complete.' },
+      { icon: MILESTONE_ICONS.streak, name: 'Check-In Streak', desc: 'Builds as you check in consistently.' },
+      { icon: MILESTONE_ICONS.checkins, name: 'Reflection Log', desc: 'A running record of every check-in.' },
+      { icon: MILESTONE_ICONS.sessions, name: 'Mentor Sessions', desc: 'Counts sessions with your mentor.' },
+    ].map(m => `
+      <div class="card voc-deliverable-card" style="opacity:.6">
+        <div class="voc-deliverable-icon">${m.icon}</div>
+        <div class="voc-deliverable-name">${m.name}</div>
+        <div class="voc-deliverable-next">${m.desc}</div>
+      </div>`).join('');
+    $('challengesList').innerHTML = '<div class="card" style="text-align:center; padding:24px"><div style="font-size:13px; color:var(--text-muted, rgba(245,241,234,.75))">Active challenges and your growth timeline appear here once you\'re signed in.</div><a href="/mentorship/join.html" class="list-card-btn primary" style="margin-top:12px; display:inline-block">Start Your Journey →</a></div>';
+    $('timelineList').innerHTML = '';
+  }
+
   (async () => {
     try {
       dbClient = await getDB();
       const { data: { user } } = await dbClient.auth.getUser();
-      if (!user) { window.location.href = '/mentorship/login.html'; return; }
+      if (!user) { renderVisitorPreview(); return; }
       currentUser = user;
       const firstWord = s => (s || '').trim().split(/\s+/)[0] || '';
       const firstName = firstWord(user.user_metadata?.full_name) || firstWord(user.user_metadata?.name) || 'Friend';

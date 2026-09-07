@@ -260,6 +260,7 @@
 
   let dbClient = null;
   let currentUser = null;
+  let currentAssignment = null;
 
   // Until this session, this page never looked at mentor_assignments at
   // all — a mentee whose pairing ended just saw stale session history
@@ -383,12 +384,37 @@
     const el = $('mentorSummary');
     const upcoming = sessions.find(s => s.status === 'scheduled' && new Date(s.scheduled_at) > new Date());
     if (!upcoming) {
+      // Was one generic message for two very different situations — the
+      // 2026-09 experience audit flagged this specifically: for a
+      // student with no mentor at all yet, this is the single most
+      // emotionally important relationship in the product reduced to a
+      // passive dead end, no timeline, no sense of what happens next.
+      // Now distinguishes "matched, nothing scheduled yet" (show the
+      // real mentor) from "not matched yet" (explain the actual process
+      // instead of just a "Learn About Mentors" link to nowhere new).
+      if (currentAssignment && currentAssignment.status === 'active') {
+        const mentorName = currentAssignment.mentor_name || 'Your Mentor';
+        el.innerHTML = `
+          <div class="card">
+            <div class="card-label">Your Mentor</div>
+            <div class="checkin-mentor" style="margin:10px 0 16px">
+              <div class="checkin-mentor-avatar">${mentorName[0]?.toUpperCase() || '?'}</div>
+              <div><div class="checkin-mentor-name">${escapeHtml(mentorName)}</div><div class="checkin-mentor-role">Your Mentor</div></div>
+            </div>
+            <div class="list-card-desc">No session scheduled right now — your mentor will reach out to set the next one up. You can message them below in the meantime.</div>
+          </div>`;
+        return;
+      }
       el.innerHTML = `
         <div class="card" style="text-align:center; padding:36px 24px">
           <div style="font-size:32px; margin-bottom:10px">🤝</div>
-          <div class="card-title" style="margin-bottom:8px">No mentor session scheduled yet</div>
-          <div class="list-card-desc" style="margin-bottom:16px">Once you're matched with a mentor, your upcoming sessions will show up here.</div>
-          <a class="list-card-btn primary" href="/mentorship/mentors.html" style="display:inline-block">Learn About Mentors</a>
+          <div class="card-title" style="margin-bottom:8px">Your mentor match is being arranged</div>
+          <div class="list-card-desc" style="margin-bottom:16px; max-width:440px; margin-left:auto; margin-right:auto">
+            Our team reviews every mentor before a match is made, so this isn't automatic — it usually takes a little while.
+            You'll see your mentor's name appear right here the moment you're matched, and everything else on this dashboard
+            works in the meantime.
+          </div>
+          <a class="list-card-btn primary" href="/mentorship/philosophy.html" style="display:inline-block">Why We Do It This Way</a>
         </div>`;
       return;
     }
@@ -503,6 +529,7 @@
       const { data, error } = await dbClient.schema('mentorship').from('mentor_assignments')
         .select('*').eq('student_id', currentUser.id).order('assigned_at', { ascending: false }).limit(1).maybeSingle();
       if (error) { console.warn('Load assignment failed:', error); return; }
+      currentAssignment = data;
       renderClosureCard(data);
       renderPulseCard(data);
     } catch (e) {
@@ -538,7 +565,11 @@
       const avatarUrl = user.user_metadata?.avatar_url;
       if (avatarUrl) { avatarEl.style.backgroundImage = `url('${avatarUrl}')`; avatarEl.style.backgroundSize = 'cover'; avatarEl.textContent = ''; }
       else avatarEl.textContent = firstName[0]?.toUpperCase() || '?';
-      await Promise.all([loadSessions(), loadMessages(), loadAssignment(), loadRecaps()]);
+      // loadAssignment runs first (a single fast row lookup) so
+      // currentAssignment is set before renderSummary needs it to tell
+      // "matched, nothing scheduled" apart from "not matched yet".
+      await loadAssignment();
+      await Promise.all([loadSessions(), loadMessages(), loadRecaps()]);
     } catch (e) {
       console.warn('Mentor page init failed:', e);
       renderSummary([]);

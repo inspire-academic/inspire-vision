@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="/assets/css/tokens.css">
   <link rel="stylesheet" href="/assets/styles.css">
   <link rel="stylesheet" href="/mentorship/css/mentorship.css">
+  <style>
+    .pg-reply-box { margin-top: 10px; padding: 10px 12px; border-left: 3px solid var(--mentorship-gold); background: var(--card-bg2, rgba(255,255,255,.05)); border-radius: 0 8px 8px 0; }
+    .pg-reply-box .pg-reply-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--mentorship-gold); margin-bottom: 4px; }
+    .pg-reply-box .pg-reply-text { font-size: 13px; line-height: 1.5; color: var(--text, #F5F1EA); white-space: pre-wrap; }
+  </style>
 </head>
 <body>
 <div class="app">
@@ -269,6 +274,12 @@
     }
     list.innerHTML = rows.map(r => {
       const date = new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+      // A reply here means someone on the team actually read and responded
+      // to this — previously a request could sit marked "seen" with
+      // nothing ever visible back to the student who sent it.
+      const reply = r.response?.reply_message
+        ? `<div class="pg-reply-box"><div class="pg-reply-label">Reply from the team</div><div class="pg-reply-text">${escapeHtml(r.response.reply_message)}</div></div>`
+        : '';
       return `
         <div class="list-card">
           <div class="list-card-top">
@@ -277,6 +288,7 @@
           </div>
           <div class="list-card-desc">${escapeHtml(r.message)}</div>
           <div class="list-card-meta">${date}</div>
+          ${reply}
         </div>`;
     }).join('');
   }
@@ -286,7 +298,18 @@
       const { data, error } = await dbClient.schema('mentorship').from('help_requests')
         .select('*').eq('student_id', currentUser.id).order('created_at', { ascending: false });
       if (error) { console.warn('Load help requests failed:', error); renderRequests([]); return; }
-      renderRequests(data || []);
+
+      // help_request_responses (mentorship_schema_v23) is where any staff
+      // claim/reply lives — RLS only lets this student SELECT their own
+      // rows here, and they can never write to it (see that migration).
+      const ids = (data || []).map(r => r.id);
+      let responsesById = {};
+      if (ids.length) {
+        const { data: responses } = await dbClient.schema('mentorship').from('help_request_responses')
+          .select('*').in('request_id', ids);
+        responsesById = Object.fromEntries((responses || []).map(r => [r.request_id, r]));
+      }
+      renderRequests((data || []).map(r => ({ ...r, response: responsesById[r.id] || null })));
     } catch (e) {
       console.warn('Load help requests failed:', e);
       renderRequests([]);
