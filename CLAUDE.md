@@ -38,6 +38,27 @@ domain/repo, inspireacademic.org):
 | Health & Wellbeing™ | Not yet built — homepage links to `coming-soon.html` |
 | Faith & Spiritual Formation™ | Partially built — `pages/inspire-faith.html`, `admin/faith-admin.html` exist; homepage nav/footer still link to `coming-soon.html` |
 
+## THE LIVING LANGUAGE PROJECT (added 2026-09-08)
+
+A fifth, non-cardinal initiative — Krobo-first language preservation and
+learning, campaign name **100 Voices of Krobo**. Lives at
+`living-language/`, own visual identity (deep heritage green / warm gold
+/ parchment / terracotta — see `living-language/css/living-language.css`
+header comment), linked from the main nav/footer as "Living Language"
+rather than folded into the Our Pillars cardinal dropdown. Landing page,
+100 Voices gallery, a working Learn Krobo sample lesson, Family Voices
+concept page, the full Preserve a Voice 12-step intake, and an
+admin/corpus review prototype are all real and interactive; recording/
+audio upload and the Join the Movement form are placeholders. No new
+Supabase schema yet — Preserve a Voice submissions persist to
+`localStorage` via `living-language/js/store.js`, deliberately kept
+swappable for a real `living_language.*` schema later. See
+`living-language/README.md` for the full architecture, content model,
+and — importantly — a documented language-verification mistake made and
+corrected during this build (an invented Krobo phrase was used as lesson
+content and had to be replaced): read that section before adding any new
+Krobo-language content to this module.
+
 ## DESIGN-SYSTEM COLOUR — resolved 2026-07-09
 
 `assets/css/tokens.css` is this platform's single source of truth for

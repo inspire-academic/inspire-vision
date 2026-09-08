@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123521">
+<title>Preserve a Voice — The Living Language Project | Inspire Vision</title>
+<meta name="description" content="Record something in Krobo for a child who has not yet been born. Start the Preserve a Voice intake — about the speaker, what's being preserved, and clear permissions for how it may be used.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/living-language/css/living-language.css">
+</head>
+<body class="ll">
+
+<header class="ll-header">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="34" height="34">
+      <span class="ll-brand-copy"><strong>Inspire Vision</strong><small>The Living Language Project</small></span>
+    </a>
+    <nav class="ll-nav" aria-label="Primary navigation">
+      <a href="/living-language/index.html">Home</a>
+      <a href="/living-language/about.html">About</a>
+      <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/learn.html">Learn</a>
+      <a href="/living-language/family-voices.html">Family Voices</a>
+      <a href="/living-language/get-involved.html">Get Involved</a>
+    </nav>
+    <div class="ll-header-actions">
+      <a class="btn btn-gold btn-sm" href="/living-language/get-involved.html">Support the Project</a>
+      <button class="ll-icon-btn ll-menu-btn" id="llMenuBtn" aria-label="Open navigation" aria-expanded="false" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="ll-mobile-nav" id="llMobileNav">
+    <a href="/living-language/index.html">Home</a>
+    <a href="/living-language/about.html">About</a>
+    <a href="/living-language/100-voices.html">100 Voices</a>
+    <a href="/living-language/learn.html">Learn</a>
+    <a href="/living-language/family-voices.html">Family Voices</a>
+    <a href="/living-language/get-involved.html">Get Involved</a>
+  </div>
+</header>
+
+<section class="ll-page-hero">
+  <div class="wrap">
+    <span class="eyebrow">100 Voices of Krobo</span>
+    <h1>Preserve a Voice</h1>
+    <p>Record something in Krobo for a child who has not yet been born. This intake takes about five minutes — nothing is published until our language team has reviewed it.</p>
+  </div>
+</section>
+
+<section class="ll-section">
+  <div class="wrap ll-intake-shell">
+    <div class="ll-intake-steps-nav" id="llStepsNav"></div>
+    <div class="ll-intake-card" id="llIntakeCard"></div>
+  </div>
+</section>
+
+<footer class="ll-footer">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="30" height="30">
+      <span class="ll-brand-copy"><strong style="color:var(--ll-white)">Inspire Vision</strong><small>People &middot; Heritage &middot; Brighter Tomorrows</small></span>
+    </a>
+    <nav class="ll-footer-links" aria-label="Footer navigation">
+      <a href="/living-language/index.html">Home</a>
+      <a href="/living-language/about.html">About</a>
+      <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/learn.html">Learn</a>
+      <a href="/living-language/family-voices.html">Family Voices</a>
+      <a href="/living-language/get-involved.html">Get Involved</a>
+    </nav>
+  </div>
+  <div class="wrap ll-footer-bottom">
+    <span>&copy; 2026 Inspire Vision — The Living Language Project. All rights reserved.</span>
+    <span>A more inclusive tomorrow starts with our stories.</span>
+  </div>
+</footer>
+
+<script src="/living-language/js/data.js"></script>
+<script src="/living-language/js/store.js"></script>
+<script>
+const llMenuBtn = document.getElementById('llMenuBtn');
+const llMobileNav = document.getElementById('llMobileNav');
+llMenuBtn?.addEventListener('click', () => {
+  const open = llMobileNav.classList.toggle('open');
+  llMenuBtn.setAttribute('aria-expanded', String(open));
+});
+llMobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  llMobileNav.classList.remove('open');
+  llMenuBtn?.setAttribute('aria-expanded', 'false');
+}));
+
+/* ── Preserve a Voice — 12-step intake wizard ──────────────────────
+   Persists via LivingLanguageStore (mock/local for MVP — see store.js
+   header comment). Access levels and permission flags follow the
+   rights model exactly: four independent booleans, never one vague
+   consent checkbox. */
+(function () {
+  const form = {
+    speakerName: '', speakerRelation: '', speakerAgeRange: '',
+    community: '', variantOther: '',
+    contentTypes: [],
+    recordingNote: '',
+    kroboTranscription: '',
+    englishMeaning: '',
+    culturalNotes: '',
+    accessLevel: '',
+    permTechTraining: false,
+    permSyntheticVoice: false,
+    permCommercialReuse: false,
+    permResearchReuse: false,
+    consentGiven: false,
+    submitterEmail: ''
+  };
+
+  const STEP_TITLES = [
+    'About the Speaker', 'Community', 'What Are You Preserving?', 'Recording',
+    'Krobo Transcription', 'English Meaning', 'Cultural Notes', 'Access Level',
+    'Technology-Use Permissions', 'Synthetic Voice Permission', 'Review & Consent', 'Submitted'
+  ];
+  let step = 0;
+  const card = document.getElementById('llIntakeCard');
+  const nav = document.getElementById('llStepsNav');
+
+  function renderNav() {
+    nav.innerHTML = STEP_TITLES.map((_, i) => {
+      const cls = i < step ? 'done' : (i === step ? 'current' : '');
+      return `<div class="ll-intake-dot ${cls}"></div>`;
+    }).join('');
+  }
+
+  function go(delta) { step = Math.max(0, Math.min(STEP_TITLES.length - 1, step + delta)); render(); }
+
+  function stepChrome(bodyHtml, { back = true, nextLabel = 'Continue', onNext = null, hideFooter = false } = {}) {
+    card.innerHTML = `
+      <div class="ll-intake-step-count">Step ${step + 1} of ${STEP_TITLES.length - 1} &middot; ${STEP_TITLES[step]}</div>
+      ${bodyHtml}
+      ${hideFooter ? '' : `
+      <div class="ll-intake-footer">
+        ${back ? '<button class="btn btn-outline-dark btn-sm" id="llBack" type="button">&larr; Back</button>' : '<span></span>'}
+        <button class="btn btn-gold" id="llNext" type="button">${nextLabel}</button>
+      </div>`}
+    `;
+    document.getElementById('llBack')?.addEventListener('click', () => go(-1));
+    document.getElementById('llNext')?.addEventListener('click', () => {
+      if (onNext && onNext() === false) return;
+      go(1);
+    });
+    renderNav();
+  }
+
+  function field(labelHtml, inner) {
+    return `<div class="ll-field"><label>${labelHtml}</label>${inner}</div>`;
+  }
+
+  function render() {
+    if (step === 0) return renderAboutSpeaker();
+    if (step === 1) return renderCommunity();
+    if (step === 2) return renderContentTypes();
+    if (step === 3) return renderRecording();
+    if (step === 4) return renderKroboText();
+    if (step === 5) return renderEnglishMeaning();
+    if (step === 6) return renderCulturalNotes();
+    if (step === 7) return renderAccessLevel();
+    if (step === 8) return renderTechPermission();
+    if (step === 9) return renderSyntheticVoicePermission();
+    if (step === 10) return renderReview();
+    if (step === 11) return renderSubmitted();
+  }
+
+  function renderAboutSpeaker() {
+    stepChrome(`
+      <p class="hint">Tell us a little about the person whose voice is being preserved.</p>
+      ${field('Speaker\'s name', `<input type="text" id="fSpeakerName" value="${form.speakerName}" placeholder="e.g. Grandma Akosua">`)}
+      ${field('Your relationship to the speaker', `<input type="text" id="fSpeakerRelation" value="${form.speakerRelation}" placeholder="e.g. granddaughter, neighbour, self">`)}
+      ${field('Approximate age range <span class="optional">(optional)</span>', `
+        <select id="fAgeRange">
+          <option value="">Prefer not to say</option>
+          <option ${form.speakerAgeRange==='under18'?'selected':''} value="under18">Under 18</option>
+          <option ${form.speakerAgeRange==='18-39'?'selected':''} value="18-39">18–39</option>
+          <option ${form.speakerAgeRange==='40-59'?'selected':''} value="40-59">40–59</option>
+          <option ${form.speakerAgeRange==='60plus'?'selected':''} value="60plus">60+</option>
+        </select>`)}
+    `, { back: false, onNext: () => {
+      form.speakerName = document.getElementById('fSpeakerName').value.trim();
+      form.speakerRelation = document.getElementById('fSpeakerRelation').value.trim();
+      form.speakerAgeRange = document.getElementById('fAgeRange').value;
+      if (!form.speakerName) { alert('Please enter the speaker\'s name.'); return false; }
+    }});
+  }
+
+  function renderCommunity() {
+    const options = [
+      ['Manya', 'Manya Krobo'], ['Yilo', 'Yilo Krobo'], ['Other', 'Other Krobo / Dangme community'], ['Unsure', 'Not sure']
+    ];
+    stepChrome(`
+      <p class="hint">Krobo has real community variation — Manya and Yilo usage is preserved, not flattened into one standard.</p>
+      <div class="ll-radio-grid cols-2">
+        ${options.map(([val, label]) => `
+          <label class="ll-radio-card">
+            <input type="radio" name="fCommunity" value="${val}" ${form.community===val?'checked':''}>
+            <span>${label}</span>
+          </label>`).join('')}
+      </div>
+    `, { onNext: () => {
+      const checked = document.querySelector('input[name=fCommunity]:checked');
+      if (!checked) { alert('Please choose a community / variant.'); return false; }
+      form.community = checked.value;
+    }});
+  }
+
+  function renderContentTypes() {
+    const types = ['Word','Phrase','Proverb','Story','Song','Prayer','Memory','Cultural explanation','Other'];
+    stepChrome(`
+      <p class="hint">Select everything that applies — you can preserve more than one kind of content in a session.</p>
+      <div class="ll-radio-grid cols-2">
+        ${types.map(t => `
+          <label class="ll-radio-card">
+            <input type="checkbox" name="fContentType" value="${t}" ${form.contentTypes.includes(t)?'checked':''}>
+            <span>${t}</span>
+          </label>`).join('')}
+      </div>
+    `, { onNext: () => {
+      form.contentTypes = Array.from(document.querySelectorAll('input[name=fContentType]:checked')).map(el => el.value);
+      if (!form.contentTypes.length) { alert('Please select at least one type of content.'); return false; }
+    }});
+  }
+
+  function renderRecording() {
+    stepChrome(`
+      <p class="hint">Recording and upload will connect to real audio capture once the platform's media pipeline is built. For now, describe the recording so our team knows what to expect.</p>
+      <div class="ll-upload-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+        <strong>Recording upload — placeholder</strong>
+        Real audio capture/upload is not wired up in this MVP build.
+      </div>
+      ${field('Notes about this recording <span class="optional">(optional)</span>', `<textarea id="fRecordingNote" placeholder="e.g. Recorded on a phone during Sunday visit, about 3 minutes">${form.recordingNote}</textarea>`)}
+    `, { onNext: () => { form.recordingNote = document.getElementById('fRecordingNote').value.trim(); } });
+  }
+
+  function renderKroboText() {
+    stepChrome(`
+      <p class="hint">If you already know how it's written in Krobo, add it here. This is optional — our language team can help transcribe it during review.</p>
+      ${field('Krobo transcription <span class="optional">(optional)</span>', `<textarea id="fKrobo" placeholder="Type in Krobo if you know it">${form.kroboTranscription}</textarea>`)}
+    `, { onNext: () => { form.kroboTranscription = document.getElementById('fKrobo').value.trim(); } });
+  }
+
+  function renderEnglishMeaning() {
+    stepChrome(`
+      <p class="hint">A rough English meaning helps our reviewers, even if it's not a perfect translation.</p>
+      ${field('English meaning <span class="optional">(optional)</span>', `<textarea id="fEnglish" placeholder="What does it mean, roughly?">${form.englishMeaning}</textarea>`)}
+    `, { onNext: () => { form.englishMeaning = document.getElementById('fEnglish').value.trim(); } });
+  }
+
+  function renderCulturalNotes() {
+    stepChrome(`
+      <p class="hint">Is there a story, occasion, or context behind this? This helps future learners understand it, not just translate it.</p>
+      ${field('Cultural notes <span class="optional">(optional)</span>', `<textarea id="fCultural" placeholder="e.g. Said only at outdoorings, or a phrase Grandpa used every morning">${form.culturalNotes}</textarea>`)}
+    `, { onNext: () => { form.culturalNotes = document.getElementById('fCultural').value.trim(); } });
+  }
+
+  function renderAccessLevel() {
+    const levels = [
+      ['PUBLIC', 'Public', 'Visible to anyone visiting the site.'],
+      ['COMMUNITY', 'Community', 'Visible to signed-in Krobo community members.'],
+      ['FAMILY_ONLY', 'Family Only', 'Visible only to your family\'s account.'],
+      ['RESEARCH_WITH_PERMISSION', 'Research (with permission)', 'Shared only with approved researchers.'],
+      ['ARCHIVE_ONLY', 'Archive Only', 'Preserved, but not shown anywhere yet.']
+    ];
+    stepChrome(`
+      <p class="hint">Who should be able to see this? Preservation does not automatically mean public — you decide.</p>
+      <div class="ll-radio-grid">
+        ${levels.map(([val,label,desc]) => `
+          <label class="ll-radio-card">
+            <input type="radio" name="fAccess" value="${val}" ${form.accessLevel===val?'checked':''}>
+            <span>${label}<span class="desc">${desc}</span></span>
+          </label>`).join('')}
+      </div>
+    `, { onNext: () => {
+      const checked = document.querySelector('input[name=fAccess]:checked');
+      if (!checked) { alert('Please choose who can see this.'); return false; }
+      form.accessLevel = checked.value;
+    }});
+  }
+
+  function toggleRow(id, label, desc, checked) {
+    return `
+      <div class="ll-permission-row">
+        <div><div class="label">${label}</div><div class="desc">${desc}</div></div>
+        <label class="ll-toggle">
+          <input type="checkbox" id="${id}" ${checked ? 'checked' : ''}>
+          <span class="track"></span><span class="thumb"></span>
+        </label>
+      </div>`;
+  }
+
+  function renderTechPermission() {
+    stepChrome(`
+      <p class="hint">Preservation and technology use are separate decisions. You can preserve this voice without permitting any of the uses below.</p>
+      ${toggleRow('fPermTech', 'Technology training permitted', 'Allow this content to help train language-learning tools (e.g. speech recognition).', form.permTechTraining)}
+      ${toggleRow('fPermCommercial', 'Commercial reuse permitted', 'Allow this content to be used in paid products or materials.', form.permCommercialReuse)}
+      ${toggleRow('fPermResearch', 'Research reuse permitted', 'Allow approved academic researchers to study this content.', form.permResearchReuse)}
+    `, { onNext: () => {
+      form.permTechTraining = document.getElementById('fPermTech').checked;
+      form.permCommercialReuse = document.getElementById('fPermCommercial').checked;
+      form.permResearchReuse = document.getElementById('fPermResearch').checked;
+    }});
+  }
+
+  function renderSyntheticVoicePermission() {
+    stepChrome(`
+      <p class="hint"><strong>This one is separate on purpose.</strong> Recording a voice does not imply permission to synthetically reproduce it. Off by default.</p>
+      ${toggleRow('fPermSynthetic', 'Synthetic voice permitted', 'Allow this voice to ever be used to generate synthetic speech.', form.permSyntheticVoice)}
+    `, { onNext: () => { form.permSyntheticVoice = document.getElementById('fPermSynthetic').checked; } });
+  }
+
+  function renderReview() {
+    const rows = [
+      ['Speaker', `${form.speakerName}${form.speakerRelation ? ' (' + form.speakerRelation + ')' : ''}`],
+      ['Community', form.community],
+      ['Content types', form.contentTypes.join(', ')],
+      ['Krobo transcription', form.kroboTranscription || '—'],
+      ['English meaning', form.englishMeaning || '—'],
+      ['Cultural notes', form.culturalNotes || '—'],
+      ['Access level', form.accessLevel],
+      ['Technology training', form.permTechTraining ? 'Permitted' : 'Not permitted'],
+      ['Commercial reuse', form.permCommercialReuse ? 'Permitted' : 'Not permitted'],
+      ['Research reuse', form.permResearchReuse ? 'Permitted' : 'Not permitted'],
+      ['Synthetic voice', form.permSyntheticVoice ? 'Permitted' : 'Not permitted']
+    ];
+    stepChrome(`
+      <p class="hint">Please review before submitting. Nothing is public yet — this goes to our language team's review queue.</p>
+      <dl style="margin:0;">
+        ${rows.map(([k,v]) => `<div class="ll-summary-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+      </dl>
+      ${field('Your email <span class="optional">(optional, for follow-up)</span>', `<input type="email" id="fEmail" value="${form.submitterEmail}" placeholder="you@example.com">`)}
+      <div class="ll-consent-box">
+        <input type="checkbox" id="fConsent" ${form.consentGiven ? 'checked' : ''}>
+        <label for="fConsent" style="font-size:13px;color:var(--ll-ink-soft);">I confirm I have the right to share this recording, and I understand it will be reviewed by the Living Language team before any use consistent with the permissions I've selected above.</label>
+      </div>
+    `, { nextLabel: 'Submit for Review', onNext: () => {
+      form.submitterEmail = document.getElementById('fEmail').value.trim();
+      form.consentGiven = document.getElementById('fConsent').checked;
+      if (!form.consentGiven) { alert('Please confirm consent to continue.'); return false; }
+      const result = LivingLanguageStore.submit(Object.assign({}, form));
+      form._submissionId = result.id;
+    }});
+  }
+
+  function renderSubmitted() {
+    stepChrome(`
+      <div style="text-align:center;padding:20px 0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--ll-green)" stroke-width="1.6" width="56" height="56" style="margin-bottom:18px;"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9" stroke-width="2"/></svg>
+        <h2>Thank you</h2>
+        <p class="hint">This submission (${form._submissionId || 'pending'}) has been saved to the review queue with status <strong>Pending Review</strong>. Our language team will follow up${form.submitterEmail ? ' at ' + form.submitterEmail : ''}.</p>
+        <p style="font-size:12px;color:var(--ll-ink-mute);margin-bottom:24px;">MVP note: this submission is stored locally in your browser for this demo, not on a permanent server yet.</p>
+        <a class="btn btn-gold" href="/living-language/100-voices.html">Explore 100 Voices &rarr;</a>
+      </div>
+    `, { back: false, hideFooter: true });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

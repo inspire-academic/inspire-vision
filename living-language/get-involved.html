@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123521">
+<title>Get Involved — The Living Language Project | Inspire Vision</title>
+<meta name="description" content="Join the movement to preserve Krobo — record a voice, support a recording day, or partner with 100 Voices of Krobo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/living-language/css/living-language.css">
+</head>
+<body class="ll">
+
+<header class="ll-header">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="34" height="34">
+      <span class="ll-brand-copy"><strong>Inspire Vision</strong><small>The Living Language Project</small></span>
+    </a>
+    <nav class="ll-nav" aria-label="Primary navigation">
+      <a href="/living-language/index.html">Home</a>
+      <a href="/living-language/about.html">About</a>
+      <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/learn.html">Learn</a>
+      <a href="/living-language/family-voices.html">Family Voices</a>
+      <a href="/living-language/get-involved.html" class="active">Get Involved</a>
+    </nav>
+    <div class="ll-header-actions">
+      <button class="ll-icon-btn ll-menu-btn" id="llMenuBtn" aria-label="Open navigation" aria-expanded="false" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="ll-mobile-nav" id="llMobileNav">
+    <a href="/living-language/index.html">Home</a>
+    <a href="/living-language/about.html">About</a>
+    <a href="/living-language/100-voices.html">100 Voices</a>
+    <a href="/living-language/learn.html">Learn</a>
+    <a href="/living-language/family-voices.html">Family Voices</a>
+    <a href="/living-language/get-involved.html">Get Involved</a>
+  </div>
+</header>
+
+<section class="ll-page-hero">
+  <div class="wrap">
+    <span class="eyebrow">100 Voices of Krobo</span>
+    <h1>Be Part of a Living Legacy</h1>
+    <p>Whether you're a fluent speaker, a family member, a teacher or a traditional leader — there's a place for you in this movement.</p>
+  </div>
+</section>
+
+<section class="ll-section">
+  <div class="wrap ll-pillars-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="ll-pillar ll-pillar-1">
+      <div class="ll-pillar-icon"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 19v3"/></svg></div>
+      <div><h3>Record Something in Krobo</h3><p>Say something for a child who has not yet been born — a greeting, a memory, a proverb.</p></div>
+    </div>
+    <div class="ll-pillar ll-pillar-2">
+      <div class="ll-pillar-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div><h3>Host a Recording Day</h3><p>Bring your family, church, school or community group together to preserve voices.</p></div>
+    </div>
+    <div class="ll-pillar ll-pillar-3">
+      <div class="ll-pillar-icon"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></div>
+      <div><h3>Partner as a Traditional Leader</h3><p>Guide the project as a custodian, adviser or patron from the earliest stage.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="ll-section" style="padding-top:0;">
+  <div class="wrap" style="max-width:640px;margin:0 auto;text-align:center;">
+    <span class="eyebrow" style="color:var(--ll-terracotta);">Traditional leadership proposition</span>
+    <p style="font-family:var(--ll-serif);font-style:italic;font-size:22px;color:var(--ll-green);line-height:1.5;margin:14px 0;">&ldquo;We are not asking technology to replace our elders. We are using technology so their voices can continue teaching our children long after they are gone.&rdquo;</p>
+  </div>
+</section>
+
+<section class="ll-section" style="padding-top:0;">
+  <div class="wrap ll-corridor" style="max-width:640px;margin:0 auto;">
+    <span class="eyebrow">Stay connected</span>
+    <h2 style="font-size:22px;margin-bottom:10px;">Join the Movement</h2>
+    <p class="lede" style="margin-bottom:18px;">Leave your details and we'll be in touch about recording days, family archives and how to get involved. This form does not collect payment or account credentials.</p>
+    <form id="llJoinForm" style="display:grid;gap:14px;" onsubmit="event.preventDefault(); document.getElementById('llJoinDone').hidden=false; this.hidden=true;">
+      <div class="ll-field" style="margin-bottom:0;"><label>Your name</label><input type="text" required placeholder="Full name"></div>
+      <div class="ll-field" style="margin-bottom:0;"><label>Email</label><input type="email" required placeholder="you@example.com"></div>
+      <div class="ll-field" style="margin-bottom:0;"><label>How would you like to be involved? <span class="optional">(optional)</span></label><textarea placeholder="e.g. I'd like to record my grandmother's stories"></textarea></div>
+      <button class="btn btn-gold" type="submit">Join the Movement &rarr;</button>
+    </form>
+    <div id="llJoinDone" hidden style="text-align:center;padding:20px 0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--ll-green)" stroke-width="1.6" width="44" height="44" style="margin-bottom:12px;"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9" stroke-width="2"/></svg>
+      <p style="font-weight:700;">Thank you for joining the movement.</p>
+      <p style="font-size:12.5px;color:var(--ll-ink-mute);">MVP note: this form does not yet send anywhere — connect it to a real intake (e.g. the shared Supabase project) before launch.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="ll-footer">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="30" height="30">
+      <span class="ll-brand-copy"><strong style="color:var(--ll-white)">Inspire Vision</strong><small>People &middot; Heritage &middot; Brighter Tomorrows</small></span>
+    </a>
+    <nav class="ll-footer-links" aria-label="Footer navigation">
+      <a href="/living-language/index.html">Home</a>
+      <a href="/living-language/about.html">About</a>
+      <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/learn.html">Learn</a>
+      <a href="/living-language/family-voices.html">Family Voices</a>
+      <a href="/living-language/get-involved.html">Get Involved</a>
+    </nav>
+  </div>
+  <div class="wrap ll-footer-bottom">
+    <span>&copy; 2026 Inspire Vision — The Living Language Project. All rights reserved.</span>
+    <span>A more inclusive tomorrow starts with our stories.</span>
+  </div>
+</footer>
+
+<script>
+const llMenuBtn = document.getElementById('llMenuBtn');
+const llMobileNav = document.getElementById('llMobileNav');
+llMenuBtn?.addEventListener('click', () => {
+  const open = llMobileNav.classList.toggle('open');
+  llMenuBtn.setAttribute('aria-expanded', String(open));
+});
+llMobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  llMobileNav.classList.remove('open');
+  llMenuBtn?.setAttribute('aria-expanded', 'false');
+}));
+</script>
+</body>
+</html>

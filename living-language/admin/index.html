@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123521">
+<title>Corpus Admin — The Living Language Project | Inspire Vision</title>
+<meta name="description" content="Internal prototype: speakers, recordings, language entries, stories, lessons and the verification review queue.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/living-language/css/living-language.css">
+</head>
+<body class="ll ll-admin">
+
+<header class="ll-header">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="34" height="34">
+      <span class="ll-brand-copy"><strong>Inspire Vision</strong><small>Living Language &middot; Internal Admin</small></span>
+    </a>
+    <nav class="ll-nav" aria-label="Primary navigation">
+      <a href="/living-language/index.html">&larr; Back to public site</a>
+    </nav>
+  </div>
+</header>
+
+<div class="ll-admin-shell">
+  <aside class="ll-admin-sidebar" id="llAdminNav">
+    <button data-view="overview" class="active" type="button">Overview</button>
+    <button data-view="review" type="button">Review Queue</button>
+    <button data-view="speakers" type="button">Speakers</button>
+    <button data-view="recordings" type="button">Recordings</button>
+    <button data-view="entries" type="button">Language Entries</button>
+    <button data-view="stories" type="button">Stories</button>
+    <button data-view="lessons" type="button">Lessons</button>
+  </aside>
+
+  <main class="ll-admin-main" id="llAdminMain"></main>
+</div>
+
+<script src="/living-language/js/data.js"></script>
+<script src="/living-language/js/store.js"></script>
+<script>
+/* Internal prototype only — noindex'd, not linked from public nav.
+   Access control note: this MVP build has no server-side admin auth
+   gate yet (unlike mentorship's requireAdmin()-gated Netlify functions
+   — see project CLAUDE.md). Before this ships beyond a local demo it
+   needs the same pattern: a real session check, not just noindex. */
+
+const main = document.getElementById('llAdminMain');
+const nav = document.getElementById('llAdminNav');
+let currentView = 'overview';
+
+function statusPill(status) {
+  return `<span class="ll-status-pill ll-status-${status}">${status.replace(/_/g, ' ')}</span>`;
+}
+
+function renderOverview() {
+  const s = LivingLanguage.speakers.length;
+  const r = LivingLanguage.languageEntries.length;
+  const pendingSubmissions = LivingLanguageStore.listSubmissions().filter(x => x.reviewStatus === 'PENDING_REVIEW').length;
+  const lessons = LivingLanguage.lessons.length;
+  main.innerHTML = `
+    <div class="ll-admin-head">
+      <div><h1>Corpus Overview</h1><p>Prototype admin screen — Krobo First MVP.</p></div>
+    </div>
+    <div class="ll-admin-note">No technology-generated language content may automatically become VERIFIED. Every status change here represents a human decision.</div>
+    <div class="ll-admin-stats">
+      <div class="ll-admin-stat"><strong>${s}</strong><span>Speakers</span></div>
+      <div class="ll-admin-stat"><strong>${r}</strong><span>Language Entries</span></div>
+      <div class="ll-admin-stat"><strong>${pendingSubmissions}</strong><span>Pending Review</span></div>
+      <div class="ll-admin-stat"><strong>${lessons}</strong><span>Published Lessons</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--ll-ink-mute);">Use the sidebar to review incoming Preserve a Voice submissions, or browse the seed corpus below.</p>
+  `;
+}
+
+function renderReview() {
+  const submissions = LivingLanguageStore.listSubmissions().slice().reverse();
+  main.innerHTML = `
+    <div class="ll-admin-head">
+      <div><h1>Review Queue</h1><p>Live submissions from the Preserve a Voice flow (stored locally in this browser for the demo).</p></div>
+    </div>
+    ${submissions.length === 0 ? `<p style="color:var(--ll-ink-mute);font-size:13.5px;">No submissions yet — try the <a href="/living-language/preserve.html" style="color:var(--ll-terracotta);font-weight:700;">Preserve a Voice</a> flow to see one appear here.</p>` : `
+    <table class="ll-admin-table">
+      <thead><tr><th>Speaker</th><th>Community</th><th>Content</th><th>Access</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${submissions.map(sub => `
+          <tr>
+            <td><strong>${sub.speakerName || '—'}</strong><br><span style="color:var(--ll-ink-mute);font-size:12px;">${sub.speakerRelation || ''}</span></td>
+            <td>${sub.community || '—'}</td>
+            <td>${(sub.contentTypes || []).join(', ') || '—'}</td>
+            <td>${sub.accessLevel || '—'}</td>
+            <td>${statusPill(sub.reviewStatus || 'PENDING_REVIEW')}</td>
+            <td style="font-size:12px;color:var(--ll-ink-mute);">${new Date(sub.submittedAt).toLocaleDateString()}</td>
+            <td>
+              <div class="ll-admin-actions">
+                <button class="ll-admin-btn approve" data-id="${sub.id}" data-action="VALID_COMMUNITY_VARIANT">Verify</button>
+                <button class="ll-admin-btn reject" data-id="${sub.id}" data-action="REJECTED">Reject</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`}
+  `;
+  main.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      LivingLanguageStore.updateSubmissionStatus(btn.dataset.id, btn.dataset.action);
+      renderReview();
+    });
+  });
+}
+
+function renderSpeakers() {
+  main.innerHTML = `
+    <div class="ll-admin-head"><div><h1>Speakers</h1><p>${LivingLanguage.speakers.length} seed profiles.</p></div></div>
+    <table class="ll-admin-table">
+      <thead><tr><th>Name</th><th>Community</th><th>Variant</th><th>Visibility</th><th>Tech Use</th><th>Synthetic Voice</th><th>Counts</th></tr></thead>
+      <tbody>
+        ${LivingLanguage.speakers.map(sp => `
+          <tr>
+            <td><strong>${sp.displayName}</strong></td>
+            <td>${sp.community}</td>
+            <td>${sp.variant}</td>
+            <td>${sp.visibility}</td>
+            <td>${sp.technologyUsePermitted ? 'Permitted' : 'Not permitted'}</td>
+            <td>${sp.syntheticVoicePermitted ? 'Permitted' : 'Not permitted'}</td>
+            <td>${sp.counts.stories}s / ${sp.counts.phrases}p / ${sp.counts.proverbs}pr</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderRecordings() {
+  main.innerHTML = `
+    <div class="ll-admin-head"><div><h1>Recordings</h1><p>No recordings ingested yet in this MVP — media pipeline is a future module (see README).</p></div></div>
+    <p style="color:var(--ll-ink-mute);font-size:13.5px;">Recordings will appear here once audio capture/upload is wired up. Preserve a Voice submissions currently arrive as text-only intake — see Review Queue.</p>
+  `;
+}
+
+function renderEntries() {
+  main.innerHTML = `
+    <div class="ll-admin-head"><div><h1>Language Entries</h1><p>${LivingLanguage.languageEntries.length} entries in the seed corpus.</p></div></div>
+    <table class="ll-admin-table">
+      <thead><tr><th>Canonical Form</th><th>Meaning</th><th>Variant</th><th>Verification</th><th>Access</th><th>Source</th></tr></thead>
+      <tbody>
+        ${LivingLanguage.languageEntries.map(e => `
+          <tr>
+            <td style="font-family:var(--ll-serif);font-size:15px;">${e.canonicalForm}</td>
+            <td style="max-width:260px;">${e.meaning}</td>
+            <td>${e.variant}</td>
+            <td>${statusPill(e.verificationStatus)}</td>
+            <td>${e.accessRights}</td>
+            <td style="font-size:12px;color:var(--ll-ink-mute);">${e.source}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderStories() {
+  main.innerHTML = `
+    <div class="ll-admin-head"><div><h1>Stories</h1><p>${LivingLanguage.stories.length} seed stories.</p></div></div>
+    <table class="ll-admin-table">
+      <thead><tr><th>Title</th><th>Speaker</th><th>Access</th><th>Notes</th></tr></thead>
+      <tbody>
+        ${LivingLanguage.stories.map(st => {
+          const sp = LivingLanguage.speakers.find(s => s.id === st.speakerId);
+          return `<tr><td><strong>${st.title}</strong></td><td>${sp ? sp.displayName : st.speakerId}</td><td>${st.accessLevel}</td><td style="font-size:12.5px;color:var(--ll-ink-mute);">${st.culturalNotes || '—'}</td></tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderLessons() {
+  main.innerHTML = `
+    <div class="ll-admin-head"><div><h1>Lessons</h1><p>${LivingLanguage.lessons.length} lesson unit(s).</p></div></div>
+    <table class="ll-admin-table">
+      <thead><tr><th>Title</th><th>Level</th><th>Unit</th><th>Status</th><th>Content Items</th></tr></thead>
+      <tbody>
+        ${LivingLanguage.lessons.map(l => `
+          <tr><td><strong>${l.title}</strong></td><td>${l.level}</td><td>${l.unit}</td><td>${l.publicationStatus}</td><td>${l.contentItems.length}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+const views = { overview: renderOverview, review: renderReview, speakers: renderSpeakers, recordings: renderRecordings, entries: renderEntries, stories: renderStories, lessons: renderLessons };
+
+nav.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-view]');
+  if (!btn) return;
+  nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentView = btn.dataset.view;
+  views[currentView]();
+});
+
+renderOverview();
+</script>
+</body>
+</html>
