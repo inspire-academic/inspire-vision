@@ -128,6 +128,9 @@ button,input{font:inherit}
   background:#f5ead4;display:grid;place-items:center;color:var(--gold)
 }
 .next-step .badge svg{width:30px;height:30px;fill:currentColor}
+.next-step .badge svg.cross-icon{fill:none;stroke:currentColor;stroke-width:1.8}
+.next-step-kicker{margin:0;font:italic 400 12px/1 var(--serif);color:#68777d}
+.next-step-title{font:400 26px/1.05 var(--serif);margin:2px 0 8px;color:var(--ink)}
 .next-step p{font-size:13px;line-height:1.35;margin:9px 0 14px;color:#43565c}
 .community-card{background:linear-gradient(135deg,#0b535a,#0a4148);color:#fff;border:0;padding:20px;display:flex;gap:14px}
 .community-card h2{color:#fff}
@@ -276,6 +279,40 @@ button,input{font:inherit}
   .media-row{grid-template-columns:1fr;text-align:center}
   .media-row .thumb{width:100%;height:140px;margin:0 auto}
   .media-row audio{width:100%}
+}
+
+/* Solid-gradient hero — a photo-free variant of .page-hero for a page
+   meant to read as its own special "studies" destination rather than
+   another photographed subpage. Reuses .page-hero's layout, just
+   without the darkening overlay a photo needs. */
+.creed-hero{background:linear-gradient(135deg,var(--teal-deep),var(--teal))}
+.creed-hero:before{content:none}
+
+/* Apostles' Creed study cards — each document gets its own accent
+   colour lifted from its actual PDF cover (teal/purple/navy), so the
+   three feel like distinct, real works rather than generic list items. */
+.creed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.creed-card{border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 6px 24px rgba(16,45,56,.10);display:flex;flex-direction:column}
+.creed-card .accent{height:7px}
+.creed-card.teal .accent{background:linear-gradient(90deg,#0b4a51,#1a7a84)}
+.creed-card.purple .accent{background:linear-gradient(90deg,#7b2d6e,#a8478f)}
+.creed-card.navy .accent{background:linear-gradient(90deg,#0c2b37,#1c4a5c)}
+.creed-card .body{padding:26px 24px 24px;display:flex;flex-direction:column;flex:1}
+.creed-card .icon{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;margin-bottom:16px}
+.creed-card .icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6}
+.creed-card.teal .icon{background:#dbe7e4;color:#1a5b64}
+.creed-card.purple .icon{background:#f0dced;color:#7b2d6e}
+.creed-card.navy .icon{background:#dde5ea;color:#0c2b37}
+.creed-card .edition-tag{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.creed-card.teal .edition-tag{color:#1a7a84}
+.creed-card.purple .edition-tag{color:#a8478f}
+.creed-card.navy .edition-tag{color:#1c4a5c}
+.creed-card h3{font:400 22px/1.2 var(--serif);margin:0 0 10px}
+.creed-card p{font-size:13px;line-height:1.6;color:#5a6d73;margin:0 0 20px;flex:1}
+.creed-card .btn{align-self:flex-start}
+
+@media(max-width:850px){
+  .creed-grid{grid-template-columns:1fr}
 }
 
 /* Accessibility */
