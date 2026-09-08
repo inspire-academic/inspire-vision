@@ -413,3 +413,105 @@
   .ll-admin-sidebar button.active{ border-bottom-color: var(--ll-gold); }
   .ll-admin-stats{ grid-template-columns:1fr 1fr; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   LEARN KLO
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Dashboard hero + mode toggle ─────────────────────────────────── */
+.ll-learn-hero{ background: var(--ll-green); padding: 52px 24px 40px; text-align:center; }
+.ll-learn-hero .eyebrow{ color: var(--ll-gold-bright); display:block; margin-bottom:8px; }
+.ll-learn-hero h1{ color: var(--ll-white); font-size: clamp(30px,4vw,44px); margin-bottom:10px; }
+.ll-learn-hero p{ color: rgba(255,255,255,.8); font-size:15.5px; max-width:520px; margin:0 auto 26px; }
+.ll-mode-toggle{ display:inline-flex; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:4px; gap:2px; }
+.ll-mode-toggle button{ border:none; background:none; color: rgba(255,255,255,.75); font-weight:700; font-size:13.5px; padding:9px 20px; border-radius:999px; cursor:pointer; }
+.ll-mode-toggle button.active{ background: var(--ll-gold); color: var(--ll-green-deep); }
+
+/* ── Level / progress panel ───────────────────────────────────────── */
+.ll-level-panel{ background: var(--ll-white); border:1px solid var(--ll-line); border-radius: var(--ll-radius); padding:24px 28px; box-shadow: var(--ll-shadow-soft); display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-top:-46px; position:relative; z-index:2; margin-bottom:10px; }
+.ll-level-panel-info strong{ display:block; font-family: var(--ll-serif); font-size:19px; margin-bottom:4px; }
+.ll-level-panel-info span{ font-size:13px; color: var(--ll-ink-mute); }
+.ll-level-progress-bar{ width:180px; height:8px; border-radius:999px; background: var(--ll-line); overflow:hidden; }
+.ll-level-progress-fill{ height:100%; background: var(--ll-gold); }
+
+/* ── Lesson cards grid ─────────────────────────────────────────────── */
+.ll-lesson-cards{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+.ll-lesson-card2{ background: var(--ll-white); border:1px solid var(--ll-line); border-radius: var(--ll-radius); padding:22px; box-shadow: var(--ll-shadow-soft); display:flex; flex-direction:column; gap:10px; text-align:left; }
+.ll-lesson-card2-icon{ width:44px; height:44px; border-radius:12px; background: var(--ll-paper-deep); display:flex; align-items:center; justify-content:center; }
+.ll-lesson-card2-icon svg{ width:22px; height:22px; stroke: var(--ll-green); fill:none; stroke-width:1.6; }
+.ll-lesson-card2 h3{ font-size:16.5px; }
+.ll-lesson-card2 .type{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color: var(--ll-terracotta); }
+.ll-lesson-card2 .desc{ font-size:13px; color: var(--ll-ink-soft); flex:1; }
+.ll-lesson-card2 .meta{ font-size:11.5px; color: var(--ll-ink-mute); display:flex; align-items:center; gap:8px; }
+.ll-lesson-card2 .status-badge{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; }
+.ll-lesson-card2 .status-badge.new{ background: var(--ll-paper-deep); color: var(--ll-ink-mute); }
+.ll-lesson-card2 .status-badge.in_progress{ background: var(--ll-gold-tint); color: var(--ll-gold-deep); }
+.ll-lesson-card2 .status-badge.completed{ background:#EBF1E7; color: var(--ll-green); }
+.ll-lesson-card2 .status-badge.verified{ background:#EBF1E7; color: var(--ll-green); }
+.ll-lesson-card2 a.btn{ margin-top:4px; text-align:center; }
+
+@media (max-width: 1080px){ .ll-lesson-cards{ grid-template-columns:1fr 1fr; } }
+@media (max-width: 620px){ .ll-lesson-cards{ grid-template-columns:1fr; } .ll-level-panel{ margin-top:0; } }
+
+/* ── Lesson player chrome (shared by every lesson type) ───────────── */
+.ll-lesson-player{ max-width:680px; margin:0 auto; }
+.ll-lesson-topbar{ display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+.ll-lesson-exit{ font-size:13px; font-weight:700; color: var(--ll-terracotta); flex-shrink:0; }
+.ll-lesson-title{ font-family: var(--ll-serif); font-size:16px; color: var(--ll-ink-mute); }
+.ll-lesson-body{ background: var(--ll-white); border:1px solid var(--ll-line); border-radius: var(--ll-radius); padding:32px; box-shadow: var(--ll-shadow-soft); min-height:320px; }
+.ll-lesson-lede{ color: var(--ll-ink-soft); font-size:14px; line-height:1.6; margin-bottom:22px; }
+
+/* ── Alphabet ──────────────────────────────────────────────────────── */
+.ll-letter-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+.ll-letter-card{ aspect-ratio:1; border:1.5px solid var(--ll-line); border-radius:12px; background: var(--ll-paper-deep); font-family: var(--ll-serif); font-size:22px; font-weight:600; color: var(--ll-green); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.ll-letter-card:hover{ border-color: var(--ll-gold); }
+.ll-letter-card small{ font-size:11px; color: var(--ll-ink-mute); font-weight:400; }
+.ll-back-link{ background:none; border:none; color: var(--ll-terracotta); font-weight:700; font-size:13px; cursor:pointer; padding:0; margin-bottom:18px; }
+.ll-letter-panel{ text-align:center; }
+.ll-letter-panel-glyph{ font-family: var(--ll-serif); font-size:64px; color: var(--ll-green); margin-bottom:20px; }
+.ll-letter-panel-glyph span{ font-size:34px; color: var(--ll-ink-mute); margin-left:10px; }
+.ll-letter-panel-audios{ display:flex; gap:12px; justify-content:center; margin-bottom:22px; flex-wrap:wrap; }
+.ll-letter-panel-example{ background: var(--ll-paper-deep); border-radius:10px; padding:14px; margin-bottom:20px; font-size:13px; text-align:left; }
+.ll-letter-panel-example strong{ display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color: var(--ll-terracotta); margin-bottom:4px; }
+.ll-letter-panel-example span{ color: var(--ll-ink-mute); }
+
+@media (max-width: 620px){ .ll-letter-grid{ grid-template-columns:repeat(4,1fr); } }
+@media (max-width: 420px){ .ll-letter-grid{ grid-template-columns:repeat(3,1fr); } }
+
+/* ── AudioButton component ────────────────────────────────────────── */
+.ll-audio-btn{ display:inline-flex; align-items:center; gap:10px; background: var(--ll-green); color:#fff; border:none; border-radius:999px; padding:12px 20px; font-weight:700; font-size:13.5px; cursor:pointer; text-align:left; }
+.ll-audio-btn svg{ width:20px; height:20px; flex-shrink:0; }
+.ll-audio-btn--prepared{ background: var(--ll-paper-deep); color: var(--ll-ink-mute); cursor:not-allowed; }
+.ll-audio-btn--prepared small{ display:block; font-weight:400; font-size:10.5px; opacity:.85; }
+
+/* ── RecordWidget component ───────────────────────────────────────── */
+.ll-record-widget{ margin-bottom:20px; }
+.ll-record-btn{ display:flex; align-items:center; gap:10px; width:100%; justify-content:center; background: var(--ll-terracotta-tint); color: var(--ll-terracotta-deep); border:1.5px dashed var(--ll-terracotta); border-radius:12px; padding:13px; font-weight:700; font-size:13.5px; cursor:pointer; }
+.ll-record-btn svg{ width:18px; height:18px; }
+.ll-record-status{ font-size:12px; color: var(--ll-ink-mute); text-align:center; margin-top:8px; }
+.ll-record-rerecord{ background:none; border:none; color: var(--ll-terracotta); font-weight:700; text-decoration:underline; cursor:pointer; padding:0; font-size:12px; }
+
+/* ── See & Say ─────────────────────────────────────────────────────── */
+.ll-see-say{ text-align:center; }
+.ll-see-say-image{ width:180px; height:180px; margin:0 auto 20px; border-radius:16px; background: var(--ll-paper-deep); display:flex; align-items:center; justify-content:center; }
+.ll-see-say-image svg{ width:60px; height:60px; stroke: var(--ll-ink-mute); }
+.ll-see-say-prompt{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color: var(--ll-terracotta); font-weight:700; margin-bottom:4px; }
+.ll-see-say-en{ font-family: var(--ll-serif); font-size:24px; margin-bottom:20px; }
+.ll-see-say-word{ margin-top:18px; font-size:15px; }
+.ll-prepared-note{ color: var(--ll-ink-mute); font-size:13px; font-style:italic; }
+
+/* ── Prepared / "fully wired, awaiting content" shells ────────────── */
+.ll-prepared-badge{ display:flex; align-items:flex-start; gap:10px; background: var(--ll-gold-tint); color: var(--ll-gold-deep); border-radius:10px; padding:14px 16px; font-size:13px; font-weight:600; margin-bottom:18px; }
+.ll-prepared-badge svg{ width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+.ll-prepared-mockup{ opacity:.85; }
+.ll-picture-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px; }
+.ll-picture-tile{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 10px; border-radius:12px; border:1.5px solid var(--ll-line); background: var(--ll-paper-deep); }
+.ll-picture-tile svg{ width:34px; height:34px; stroke: var(--ll-ink-mute); }
+.ll-picture-tile span{ font-size:12px; color: var(--ll-ink-mute); }
+.ll-conversation-mockup{ display:flex; flex-direction:column; gap:12px; }
+.ll-conversation-turn{ display:flex; }
+.ll-conversation-turn:nth-child(even){ justify-content:flex-end; }
+
+/* ── Verified-phrase step engine (shares tokens/options with the
+   archive's original sample lesson) ──────────────────────────────── */
+.ll-verified-badge{ font-size:11.5px; color: var(--ll-green); background:#EBF1E7; display:inline-block; padding:4px 10px; border-radius:999px; margin-bottom:14px; font-weight:700; }

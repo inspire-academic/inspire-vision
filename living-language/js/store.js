@@ -75,5 +75,66 @@
     writeAll([]);
   }
 
-  global.LivingLanguageStore = { submit, listSubmissions, updateSubmissionStatus, clearAll };
+  /* ── Learn Klo progress (local-first per the handoff brief §24 —
+     "Do not block MVP on account creation") ──────────────────────── */
+  const MODE_KEY = 'livingLanguage.learn.mode.v1';
+  const PROGRESS_KEY = 'livingLanguage.learn.progress.v1';
+
+  function getLearnerMode() {
+    try { return window.localStorage.getItem(MODE_KEY) || null; }
+    catch (err) { return null; }
+  }
+
+  function setLearnerMode(mode) {
+    try { window.localStorage.setItem(MODE_KEY, mode); return true; }
+    catch (err) { console.warn('[LivingLanguageStore] could not set learner mode', err); return false; }
+  }
+
+  function readProgress() {
+    try {
+      const raw = window.localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (err) { return {}; }
+  }
+
+  function writeProgress(progress) {
+    try { window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); return true; }
+    catch (err) { console.warn('[LivingLanguageStore] could not write progress', err); return false; }
+  }
+
+  function getProgress() {
+    return readProgress();
+  }
+
+  function getLessonProgress(lessonId) {
+    return readProgress()[lessonId] || { status: 'new', itemsSeen: [], startedAt: null, completedAt: null };
+  }
+
+  function markLessonStarted(lessonId) {
+    const progress = readProgress();
+    if (!progress[lessonId]) progress[lessonId] = { status: 'in_progress', itemsSeen: [], startedAt: new Date().toISOString(), completedAt: null };
+    else if (progress[lessonId].status === 'new') progress[lessonId].status = 'in_progress';
+    writeProgress(progress);
+  }
+
+  function markItemSeen(lessonId, itemId) {
+    const progress = readProgress();
+    if (!progress[lessonId]) progress[lessonId] = { status: 'in_progress', itemsSeen: [], startedAt: new Date().toISOString(), completedAt: null };
+    if (!progress[lessonId].itemsSeen.includes(itemId)) progress[lessonId].itemsSeen.push(itemId);
+    writeProgress(progress);
+  }
+
+  function markLessonCompleted(lessonId) {
+    const progress = readProgress();
+    if (!progress[lessonId]) progress[lessonId] = { status: 'in_progress', itemsSeen: [], startedAt: new Date().toISOString(), completedAt: null };
+    progress[lessonId].status = 'completed';
+    progress[lessonId].completedAt = new Date().toISOString();
+    writeProgress(progress);
+  }
+
+  global.LivingLanguageStore = {
+    submit, listSubmissions, updateSubmissionStatus, clearAll,
+    getLearnerMode, setLearnerMode,
+    getProgress, getLessonProgress, markLessonStarted, markItemSeen, markLessonCompleted
+  };
 })(window);

@@ -21,17 +21,26 @@ Flat-file structure, matching `mentorship/`'s top-level pattern:
 living-language/
 ├── index.html          Landing page
 ├── 100-voices.html     100 Voices of Krobo — speaker gallery
-├── learn.html           Learn Krobo — one working sample lesson
 ├── family-voices.html    Family Voices — private archive concept
 ├── preserve.html           Preserve a Voice — 12-step intake wizard
 ├── about.html                 Cultural Covenant, hierarchy of authority
 ├── get-involved.html            Join the movement
 ├── admin/index.html               Internal corpus/review prototype (noindex'd)
-├── css/living-language.css          Module design system
+├── learn/
+│   ├── index.html                   Learn Klo dashboard — mode toggle, level progress, 9 lesson cards
+│   ├── lesson.html                    Generic lesson player, reads a hash slug (#alphabet, #things-in-my-home, ...)
+│   └── CONTENT-GAP-REPORT.md            What the human team still needs to supply, lesson by lesson
+├── css/living-language.css          Module design system (incl. Learn Klo components)
 └── js/
-    ├── data.js                      Typed schema + seed/demo content
-    └── store.js                       Mock persistence (Preserve submissions)
+    ├── data.js                      Archive schema + seed/demo content (Speaker/Recording/LanguageEntry/...)
+    ├── learn-data.js                 Learn Klo schema + seed content (AlphabetItem/VocabularyItem/Lesson)
+    ├── learn-engine.js                Reusable lesson engine — one player, five lesson types
+    └── store.js                        Mock persistence (Preserve submissions, learner mode, lesson progress)
 ```
+
+`living-language/learn.html` (the original single sample lesson) was
+retired in favour of the full Learn Klo section below — a
+`netlify.toml` redirect sends the old URL to `learn/index.html`.
 
 Linked from the main site nav (`index.html`) and footer as "Living
 Language" / "The Living Language Project" — deliberately not folded into
@@ -96,6 +105,59 @@ If you extend the corpus, hold this same line: real supplied/verified
 text only, or an unmistakable structural placeholder — never a
 plausible-sounding invented phrase, pending badge or not.
 
+## Learn Klo (added as the project's next stage, per the Krobo Learn handoff brief)
+
+A full lesson system living at `living-language/learn/`, distinct from
+(and superseding) the original single sample lesson. One generic player
+(`lesson.html`) drives five reusable lesson types — `alphabet`,
+`see_and_say`, `listen_and_find`, `conversation`, `verified_phrase` —
+against content defined in `js/learn-data.js`, per the brief's own
+instruction to build "a small number of excellent reusable lesson
+types" rather than one-off pages per lesson.
+
+**Content honesty, stricter here than anywhere else in the module:** the
+Learn Klo handoff brief's own planning notes floated two Krobo words
+("Chimi" for calabash, "Kopo" for cup) and explicitly said not to
+publish them as fact. Given the mistake already made and corrected once
+on this project (see "Language-verification discipline" above), none of
+that is in `learn-data.js` — not even as a marked-draft form. The 44
+seeded vocabulary items carry an English concept and nothing else;
+`kloWrittenForm`, `audioNatural`, and every other Krobo-content field
+stay empty until a real collection pass happens. Where a lesson can't
+show real content, it shows an honest **"being prepared"** state (see
+`learn-engine.js`'s `audioButtonHtml` and `renderPreparedShell`) — never
+synthetic speech, never an invented-but-plausible word.
+
+**What's genuinely real vs. a wired shell**, per lesson:
+
+| Lesson | Status |
+|---|---|
+| The Founding Phrase | Fully real — migrated from the original sample lesson, only verified content |
+| Meet the Krobo Alphabet | Real, interactive letter grid using the brief's supplied letter shapes; names/sounds/audio honestly "being prepared" |
+| Things in My Home / My Family / Food / Numbers & Colours / Greetings | Real, working See & Say engine; every item shows "Krobo written form not yet available" since none is collected yet |
+| Listen & Find / My First Krobo Conversation | Real, fully wired UI in preview mode — blocked entirely on native audio, disclosed as such |
+
+Learner mode (Young/Adult) and per-lesson progress (started/completed,
+items seen) persist via `LivingLanguageStore` (localStorage), extending
+the same mock-persistence pattern as Preserve a Voice submissions — see
+`js/store.js`.
+
+A reusable local-only **practice recording widget** (mic permission
+requested only on click, playback, re-record, never uploaded) is wired
+into the Alphabet lesson, per the brief's §41 privacy requirements.
+
+See `living-language/learn/CONTENT-GAP-REPORT.md` for the exact,
+field-by-field checklist of what the human team needs to collect before
+each lesson can go from "wired" to "live."
+
+**Known test-environment note:** the step-transition animations (e.g.
+"correct answer → advance after 700ms") use `setTimeout`, which some
+browsers throttle heavily on backgrounded/hidden tabs — this showed up
+during automated testing in this session (confirmed via
+`document.visibilityState`/`hasFocus()`, reproduced even on a fresh
+tab) and is not a code defect; a normal foregrounded browser tab is
+unaffected.
+
 ## Backend / persistence
 
 No new Supabase schema was created for this MVP. The repo already runs a
@@ -120,7 +182,7 @@ placeholder — it doesn't submit anywhere yet.
 |---|---|
 | Landing page, all sections | Real, responsive, matches approved reference |
 | 100 Voices gallery | Real, filterable, permissions-aware (family-only speaker renders locked) |
-| Learn Krobo sample lesson | Real, fully interactive 3-step lesson with progress + success state |
+| Learn Klo dashboard + engine | Real — mode toggle, progress, 9 lessons; see the per-lesson table above for content status |
 | Family Voices | Real concept page, demo data only (as specified) |
 | Preserve a Voice | Real 12-step wizard, writes to local mock store |
 | Admin/corpus prototype | Real read views + a real, working review-queue action loop |
@@ -136,3 +198,5 @@ placeholder — it doesn't submit anywhere yet.
 - Real Supabase schema for `living_language.*`, once the vertical slice is validated — swap `js/store.js`'s `localStorage` calls for real inserts.
 - "Join the Movement" form needs a real destination (e.g. `vision.subscribers` or a dedicated table).
 - 100-Voices gallery, Learn pathway and corpus admin should all grow from real reviewed 100 Voices recordings as those come in — nothing here should be treated as a template for inventing more Krobo content.
+- Learn Klo content collection — see `living-language/learn/CONTENT-GAP-REPORT.md` for the full checklist. Highest-leverage first pass: alphabet letter names/sounds, then Greetings (smallest vocabulary set), then Home and Family.
+- Learn Klo's admin/editing workflow — vocabulary and alphabet content currently lives in `js/learn-data.js` as code, not an editable table. The brief calls for eventual non-technical editing (§33); that should ride along with the real Supabase migration above, alongside the existing archive admin.
