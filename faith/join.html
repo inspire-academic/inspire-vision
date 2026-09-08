@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b3f47">
+<title>Join the Journey — Inspire Faith™</title>
+<meta name="description" content="Create your free Inspire Faith account to save your place, submit prayer requests, and pick up your studies where you left off.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/faith/css/faith.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/faith/index.html" class="brand" aria-label="Inspire Faith home">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 40 48" fill="none">
+        <path d="M19 45c1-12 2-23 4-34" stroke="#0b4a51" stroke-width="2"/>
+        <path d="M22 12C15 12 10 8 8 2c8 0 13 4 14 10Z" fill="#0b4a51"/>
+        <path d="M21 22C12 22 6 18 3 10c10 0 16 4 18 12Z" fill="#0b4a51"/>
+        <path d="M19 32C11 33 5 29 1 22c9-1 15 3 18 10Z" fill="#0b4a51"/>
+        <path d="M23 28c7-1 12-5 14-12-8 0-13 4-14 12Z" fill="#315f6a"/>
+      </svg>
+    </span>
+    <span class="brand-copy"><strong>Inspire Faith</strong><small>Faith for Real Life</small></span>
+  </a>
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="/faith/index.html">Home</a>
+    <a href="/faith/bible-study.html">Bible Study</a>
+    <a href="/coming-soon.html">Learning</a>
+    <a href="/faith/prayer.html">Prayer</a>
+    <a href="/coming-soon.html">Community</a>
+    <a href="/faith/resources.html">Resources</a>
+    <a href="/coming-soon.html">Life &amp; Growth</a>
+    <a href="/coming-soon.html">About</a>
+  </nav>
+  <div class="header-actions">
+    <a class="btn btn-outline signin" href="/faith/login.html">Sign In</a>
+  </div>
+</header>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <p class="eyebrow">Inspire Faith</p>
+    <h1>Join the Journey</h1>
+    <p class="sub">Create your free account to save your place, submit prayer requests, and pick up your studies right where you left off.</p>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <form id="joinForm">
+      <div class="field">
+        <label for="fullName">Full name</label>
+        <input type="text" id="fullName" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required minlength="8" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" required minlength="8" autocomplete="new-password">
+      </div>
+      <button type="submit" class="auth-submit" id="submitBtn">Create My Account</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a href="/faith/login.html">Sign in</a></p>
+  </div>
+</main>
+
+<script src="/assets/supabase.js"></script>
+<script>
+const form = document.getElementById('joinForm');
+const msg = document.getElementById('authMsg');
+const btn = document.getElementById('submitBtn');
+
+function showMsg(text, type) {
+  msg.textContent = text;
+  msg.className = 'auth-msg show ' + type;
+}
+
+(async () => {
+  const db = await getDB();
+  const { data: { session } } = await db.auth.getSession();
+  if (session) window.location.href = '/faith/dashboard.html';
+})();
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fullName = document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+
+  if (password !== confirmPassword) {
+    showMsg("Passwords don't match.", 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account…';
+  try {
+    const db = await getDB();
+    const { data, error } = await db.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, faith_member: true } },
+    });
+    if (error) {
+      showMsg(error.message || 'Could not create your account — please try again.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Create My Account';
+      return;
+    }
+    if (data.session) {
+      window.location.href = '/faith/dashboard.html';
+    } else {
+      showMsg('Account created! Check your email to confirm it, then sign in.', 'success');
+      form.reset();
+      btn.disabled = false;
+      btn.textContent = 'Create My Account';
+    }
+  } catch (err) {
+    console.warn('Signup failed:', err);
+    showMsg('Something went wrong — please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Create My Account';
+  }
+});
+</script>
+</body>
+</html>

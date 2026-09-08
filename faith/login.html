@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b3f47">
+<title>Sign In — Inspire Faith™</title>
+<meta name="description" content="Sign in to your Inspire Faith account.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/faith/css/faith.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/faith/index.html" class="brand" aria-label="Inspire Faith home">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 40 48" fill="none">
+        <path d="M19 45c1-12 2-23 4-34" stroke="#0b4a51" stroke-width="2"/>
+        <path d="M22 12C15 12 10 8 8 2c8 0 13 4 14 10Z" fill="#0b4a51"/>
+        <path d="M21 22C12 22 6 18 3 10c10 0 16 4 18 12Z" fill="#0b4a51"/>
+        <path d="M19 32C11 33 5 29 1 22c9-1 15 3 18 10Z" fill="#0b4a51"/>
+        <path d="M23 28c7-1 12-5 14-12-8 0-13 4-14 12Z" fill="#315f6a"/>
+      </svg>
+    </span>
+    <span class="brand-copy"><strong>Inspire Faith</strong><small>Faith for Real Life</small></span>
+  </a>
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="/faith/index.html">Home</a>
+    <a href="/faith/bible-study.html">Bible Study</a>
+    <a href="/coming-soon.html">Learning</a>
+    <a href="/faith/prayer.html">Prayer</a>
+    <a href="/coming-soon.html">Community</a>
+    <a href="/faith/resources.html">Resources</a>
+    <a href="/coming-soon.html">Life &amp; Growth</a>
+    <a href="/coming-soon.html">About</a>
+  </nav>
+  <div class="header-actions">
+    <a class="btn btn-gold join" href="/faith/join.html">Join the Journey</a>
+  </div>
+</header>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <p class="eyebrow">Inspire Faith</p>
+    <h1>Welcome Back</h1>
+    <p class="sub">Sign in to pick up your studies, prayer requests, and saved resources.</p>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="auth-submit" id="submitBtn">Sign In</button>
+    </form>
+
+    <p class="auth-switch"><a href="#" id="forgotLink">Forgot your password?</a></p>
+    <p class="auth-switch">New here? <a href="/faith/join.html">Join the journey</a></p>
+  </div>
+</main>
+
+<script src="/assets/supabase.js"></script>
+<script>
+const form = document.getElementById('loginForm');
+const msg = document.getElementById('authMsg');
+const btn = document.getElementById('submitBtn');
+
+function showMsg(text, type) {
+  msg.textContent = text;
+  msg.className = 'auth-msg show ' + type;
+}
+
+(async () => {
+  const db = await getDB();
+  const { data: { session } } = await db.auth.getSession();
+  if (session) window.location.href = '/faith/dashboard.html';
+})();
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  try {
+    const db = await getDB();
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if (error) {
+      showMsg(error.message || 'Could not sign you in — please check your details.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      return;
+    }
+    window.location.href = '/faith/dashboard.html';
+  } catch (err) {
+    console.warn('Sign in failed:', err);
+    showMsg('Something went wrong — please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+});
+
+document.getElementById('forgotLink').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  if (!email) {
+    showMsg('Enter your email above first, then click "Forgot your password?" again.', 'error');
+    return;
+  }
+  try {
+    const db = await getDB();
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://inspirevision.org/faith/login.html',
+    });
+    if (error) {
+      showMsg(error.message || 'Could not send a reset email — please try again.', 'error');
+      return;
+    }
+    showMsg('Check your email for a link to reset your password.', 'success');
+  } catch (err) {
+    console.warn('Password reset failed:', err);
+    showMsg('Something went wrong — please try again.', 'error');
+  }
+});
+</script>
+</body>
+</html>

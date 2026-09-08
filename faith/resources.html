@@ -42,8 +42,8 @@
     <button class="search-btn" aria-label="Search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
     </button>
-    <a class="btn btn-outline signin" href="/coming-soon.html">Sign In</a>
-    <a class="btn btn-gold join" href="/coming-soon.html">Join the Journey</a>
+    <a class="btn btn-outline signin" href="/faith/login.html">Sign In</a>
+    <a class="btn btn-gold join" href="/faith/join.html">Join the Journey</a>
     <button class="menu-btn" id="menuBtn" aria-label="Open navigation" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
     </button>
@@ -131,6 +131,7 @@ mobileNav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
 }));
 </script>
 <script src="/assets/supabase.js"></script>
+<script src="/faith/js/faith-auth.js"></script>
 <script>
   const escapeHtml = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
   const bookIcon = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';

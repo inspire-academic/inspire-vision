@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b3f47">
+<title>My Faith — Inspire Faith™</title>
+<meta name="description" content="Your Inspire Faith dashboard — prayer requests and your studies, in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/faith/css/faith.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/faith/index.html" class="brand" aria-label="Inspire Faith home">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 40 48" fill="none">
+        <path d="M19 45c1-12 2-23 4-34" stroke="#0b4a51" stroke-width="2"/>
+        <path d="M22 12C15 12 10 8 8 2c8 0 13 4 14 10Z" fill="#0b4a51"/>
+        <path d="M21 22C12 22 6 18 3 10c10 0 16 4 18 12Z" fill="#0b4a51"/>
+        <path d="M19 32C11 33 5 29 1 22c9-1 15 3 18 10Z" fill="#0b4a51"/>
+        <path d="M23 28c7-1 12-5 14-12-8 0-13 4-14 12Z" fill="#315f6a"/>
+      </svg>
+    </span>
+    <span class="brand-copy"><strong>Inspire Faith</strong><small>Faith for Real Life</small></span>
+  </a>
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="/faith/index.html">Home</a>
+    <a href="/faith/bible-study.html">Bible Study</a>
+    <a href="/coming-soon.html">Learning</a>
+    <a href="/faith/prayer.html">Prayer</a>
+    <a href="/coming-soon.html">Community</a>
+    <a href="/faith/resources.html">Resources</a>
+    <a href="/coming-soon.html">Life &amp; Growth</a>
+    <a href="/coming-soon.html">About</a>
+  </nav>
+  <div class="header-actions">
+    <button class="search-btn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
+    </button>
+    <a class="btn btn-outline signin" href="/faith/login.html">Sign In</a>
+    <a class="btn btn-gold join" href="/faith/join.html">Join the Journey</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open navigation" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+  <a href="/faith/index.html">Home</a><a href="/faith/bible-study.html">Bible Study</a><a href="/coming-soon.html">Learning</a><a href="/faith/prayer.html">Prayer</a>
+  <a href="/coming-soon.html">Community</a><a href="/faith/resources.html">Resources</a><a href="/coming-soon.html">Life &amp; Growth</a><a href="/coming-soon.html">About</a>
+</nav>
+
+<main>
+<section class="dash-hero">
+  <div class="wrap">
+    <p class="eyebrow">My Faith</p>
+    <h1 id="greeting">Welcome back</h1>
+    <p>Your prayer requests and your studies, kept in one place.</p>
+  </div>
+</section>
+
+<div class="wrap" style="padding:30px 0 50px">
+  <div class="dash-grid">
+    <div class="dash-panel">
+      <h2>Prayer Requests</h2>
+      <p class="panel-sub">Write down what's on your heart. Only you can see this list.</p>
+
+      <form id="prayerForm" style="margin-bottom:22px">
+        <div class="field">
+          <label for="requestText">A new prayer request</label>
+          <textarea id="requestText" required placeholder="What would you like to bring before God today?"></textarea>
+        </div>
+        <button type="submit" class="auth-submit" id="prayerSubmitBtn" style="width:auto;padding-inline:24px">Add Request</button>
+      </form>
+
+      <div class="prayer-list" id="prayerList">
+        <p style="font-size:13px;color:#8a9a9f">Loading your requests…</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="quick-link-card">
+        <h3>Studies on the Apostles' Creed</h3>
+        <p>Pick up where you left off — two study guides and a workbook.</p>
+        <a class="btn btn-outline-gold" href="/faith/apostles-creed.html">Continue Studying <span>→</span></a>
+      </div>
+      <div class="quick-link-card">
+        <h3>Resources</h3>
+        <p>Books, sermons, and podcasts from Inspire Faith.</p>
+        <a class="btn btn-outline-gold" href="/faith/resources.html">Browse Resources <span>→</span></a>
+      </div>
+      <div class="quick-link-card">
+        <h3>Account</h3>
+        <p id="accountEmail" style="color:var(--ink);font-weight:600"></p>
+        <button type="button" class="btn btn-outline" id="signOutBtn" style="align-self:flex-start">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer class="footer" id="about">
+  <div class="footer-main wrap">
+    <div>
+      <a href="/faith/index.html" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 48" fill="none"><path d="M19 45c1-12 2-23 4-34" stroke="#0b4a51" stroke-width="2"/><path d="M22 12C15 12 10 8 8 2c8 0 13 4 14 10Z" fill="#0b4a51"/><path d="M21 22C12 22 6 18 3 10c10 0 16 4 18 12Z" fill="#0b4a51"/><path d="M19 32C11 33 5 29 1 22c9-1 15 3 18 10Z" fill="#0b4a51"/></svg>
+        </span>
+        <span class="brand-copy"><strong>Inspire Faith</strong><small>Faith for Real Life</small></span>
+      </a>
+      <div class="social" aria-label="Social links"><span>f</span><span>◎</span><span>▶</span><span>𝕏</span><span>in</span></div>
+    </div>
+    <div class="footer-links"><a href="/coming-soon.html">Contact</a><a href="/coming-soon.html">Help</a><a href="/coming-soon.html">Privacy</a><a href="/coming-soon.html">Terms</a></div>
+    <div class="footer-note"><strong>A brighter<br>tomorrow is possible.</strong><br>— Together</div>
+  </div>
+  <div class="copyright wrap">© 2026 Inspire Faith. All rights reserved.</div>
+</footer>
+
+<script src="/assets/supabase.js"></script>
+<script src="/faith/js/faith-auth.js"></script>
+<script>
+const menuBtn=document.getElementById('menuBtn');
+const mobileNav=document.getElementById('mobileNav');
+menuBtn?.addEventListener('click',()=>{
+  const open=mobileNav.style.display==='block';
+  mobileNav.style.display=open?'none':'block';
+  menuBtn.setAttribute('aria-expanded',String(!open));
+});
+
+let db, userId;
+
+function timeAgo(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function renderRequests(rows) {
+  const list = document.getElementById('prayerList');
+  if (!rows.length) {
+    list.innerHTML = '<p style="font-size:13px;color:#8a9a9f">No prayer requests yet — add your first one above.</p>';
+    return;
+  }
+  list.innerHTML = rows.map(r => `
+    <div class="prayer-item" data-id="${r.id}">
+      <p>${r.request_text.replace(/</g, '&lt;')}</p>
+      <div class="meta">
+        <span class="pill ${r.is_answered ? 'pill-answered' : 'pill-waiting'}">${r.is_answered ? 'Answered' : 'Waiting'}</span>
+        <time>${timeAgo(r.created_at)}</time>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        ${r.is_answered ? '' : '<button type="button" class="mark-answered">Mark Answered</button>'}
+        <button type="button" class="remove">Remove</button>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.mark-answered').forEach(el => el.addEventListener('click', async (e) => {
+    const id = e.target.closest('.prayer-item').dataset.id;
+    await db.schema('vision').from('prayer_requests').update({ is_answered: true }).eq('id', id);
+    loadRequests();
+  }));
+  list.querySelectorAll('.remove').forEach(el => el.addEventListener('click', async (e) => {
+    const id = e.target.closest('.prayer-item').dataset.id;
+    await db.schema('vision').from('prayer_requests').delete().eq('id', id);
+    loadRequests();
+  }));
+}
+
+async function loadRequests() {
+  const { data, error } = await db.schema('vision').from('prayer_requests')
+    .select('*').eq('user_id', userId).order('created_at', { ascending: false });
+  if (error) {
+    console.warn('Could not load prayer requests:', error);
+    document.getElementById('prayerList').innerHTML = '<p style="font-size:13px;color:#a34b40">Could not load your requests — please refresh.</p>';
+    return;
+  }
+  renderRequests(data);
+}
+
+document.getElementById('prayerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const textarea = document.getElementById('requestText');
+  const text = textarea.value.trim();
+  if (!text) return;
+  const btn = document.getElementById('prayerSubmitBtn');
+  btn.disabled = true;
+  const { error } = await db.schema('vision').from('prayer_requests').insert({ user_id: userId, request_text: text });
+  btn.disabled = false;
+  if (error) {
+    console.warn('Could not add prayer request:', error);
+    return;
+  }
+  textarea.value = '';
+  loadRequests();
+});
+
+document.getElementById('signOutBtn').addEventListener('click', async () => {
+  await db.auth.signOut();
+  window.location.href = '/faith/index.html';
+});
+
+(async () => {
+  db = await getDB();
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) {
+    window.location.href = '/faith/login.html';
+    return;
+  }
+  userId = session.user.id;
+  const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+  document.getElementById('greeting').textContent = `Welcome back, ${name}`;
+  document.getElementById('accountEmail').textContent = session.user.email;
+  loadRequests();
+})();
+</script>
+</body>
+</html>

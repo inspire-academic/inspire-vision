@@ -315,6 +315,71 @@ button,input{font:inherit}
   .creed-grid{grid-template-columns:1fr}
 }
 
+/* Member header state — swapped in by faith/js/faith-auth.js once a
+   session check resolves, replacing the Sign In / Join the Journey
+   pills for a signed-in visitor. Hidden by default so a not-yet-loaded
+   session never flashes the wrong state. */
+.member-chip{display:none;align-items:center;gap:10px;text-decoration:none;padding:5px 14px 5px 5px;border-radius:999px;border:1px solid var(--line);background:#fff}
+.member-chip .avatar{width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font:600 12px/1 var(--sans)}
+.member-chip span{font-size:13px;font-weight:600;color:var(--ink)}
+.signout-btn{display:none;border:0;background:transparent;color:#68777d;font-size:12px;font-weight:600;cursor:pointer;padding:8px 2px}
+.mobile-nav .member-row{display:none;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f0eee9}
+.mobile-nav .member-row .avatar{width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font:600 13px/1 var(--sans);flex:0 0 auto}
+.mobile-nav .member-row div{flex:1}
+.mobile-nav .member-row strong{display:block;font-size:13px}
+.mobile-nav .member-row button{border:0;background:transparent;color:var(--rose);font-size:11px;font-weight:700;padding:0;cursor:pointer}
+
+/* Auth pages — join.html / login.html. Its own quiet moment rather than
+   a page-hero: a signup/signin form is a task, not a destination, so it
+   gets a calm centered card instead of the marketing-page treatment. */
+.auth-shell{min-height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;padding:48px 20px;background:linear-gradient(180deg,var(--cream),var(--paper))}
+.auth-card{width:100%;max-width:420px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:36px 34px 32px}
+.auth-card .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+.auth-card h1{font:400 30px/1.1 var(--serif);margin:0 0 8px;color:var(--ink)}
+.auth-card .sub{font-size:13.5px;line-height:1.5;color:#5a6d73;margin:0 0 24px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.field input,.field textarea{width:100%;border:1px solid #d7d2c8;border-radius:8px;padding:11px 13px;font-size:14px;font-family:var(--sans);background:#fff}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+.field textarea{resize:vertical;min-height:90px}
+.auth-submit{width:100%;border:0;border-radius:999px;min-height:44px;background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.auth-submit:disabled{opacity:.65;cursor:default}
+.auth-msg{display:none;font-size:12.5px;line-height:1.5;padding:10px 13px;border-radius:8px;margin-bottom:16px}
+.auth-msg.show.error{display:block;background:#fbe9e7;color:#9b3a2f}
+.auth-msg.show.success{display:block;background:#e7f1e4;color:#33622e}
+.auth-switch{margin-top:22px;text-align:center;font-size:13px;color:#5a6d73}
+.auth-switch a{color:var(--teal);font-weight:600;text-decoration:none}
+.auth-switch a:hover{text-decoration:underline}
+
+/* Member dashboard — My Faith */
+.dash-hero{background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:44px 0}
+.dash-hero .wrap p.eyebrow{color:#f3d896;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}
+.dash-hero h1{margin:0 0 6px;font:400 clamp(28px,3.4vw,40px)/1.05 var(--serif)}
+.dash-hero p{margin:0;max-width:520px;font-size:14px;line-height:1.5;color:rgba(255,255,255,.88)}
+.dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;align-items:start}
+.dash-panel{border:1px solid #ece8e1;border-radius:10px;background:#fff;box-shadow:0 3px 12px rgba(16,45,56,.06);padding:24px 24px 22px}
+.dash-panel h2{font:400 20px/1.1 var(--serif);margin:0 0 4px}
+.dash-panel .panel-sub{font-size:12.5px;color:#68777d;margin:0 0 18px}
+.prayer-list{display:flex;flex-direction:column;gap:12px}
+.prayer-item{border:1px solid #ece8e1;border-radius:8px;padding:14px 16px;background:var(--cream)}
+.prayer-item p{margin:0 0 10px;font-size:13.5px;line-height:1.55;color:var(--ink)}
+.prayer-item .meta{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.prayer-item time{font-size:11px;color:#7a8a8f}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-radius:999px;padding:3px 10px}
+.pill-waiting{background:#f7eed6;color:var(--gold)}
+.pill-answered{background:#e2ede0;color:#3f6b3a}
+.prayer-item .actions{display:flex;gap:14px}
+.prayer-item .actions button{border:0;background:transparent;font-size:11.5px;font-weight:700;cursor:pointer;padding:0}
+.prayer-item .actions .mark-answered{color:#3f6b3a}
+.prayer-item .actions .remove{color:#a34b40}
+.quick-link-card{border:1px solid #ece8e1;border-radius:10px;background:#fff;box-shadow:0 3px 12px rgba(16,45,56,.06);padding:22px;display:flex;flex-direction:column;gap:10px}
+.quick-link-card h3{font:400 17px/1.2 var(--serif);margin:0}
+.quick-link-card p{font-size:12.5px;line-height:1.5;color:#5a6d73;margin:0}
+
+@media(max-width:850px){
+  .dash-grid{grid-template-columns:1fr}
+}
+
 /* Accessibility */
 :focus-visible{outline:3px solid rgba(199,145,34,.55);outline-offset:3px}
 
@@ -348,6 +413,7 @@ button,input{font:inherit}
 @media(max-width:620px){
   .wrap{width:min(100% - 24px,1180px)}
   .site-header .join{display:none}
+  .site-header .member-chip,.site-header .signout-btn{display:none!important}
   .brand-copy strong{font-size:20px}
   .hero{min-height:570px;background-position:65% center}
   .hero-content{padding-top:40px}
