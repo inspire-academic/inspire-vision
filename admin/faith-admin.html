@@ -489,7 +489,15 @@ function fmtDate(d) {
 
 /* ════════════════════════════════════════════════════════════
    AUTH
+   The real access gate is Postgres RLS (see
+   supabase/vision_schema_faith_content.sql — every table and storage
+   bucket write is restricted to ADMIN_EMAIL there, regardless of what
+   happens client-side). This check is just so a signed-in-but-not-
+   authorized visitor sees a clear message instead of a confusing wall
+   of silent Supabase permission errors on every save.
 ═══════════════════════════════════════════════════════════ */
+const ADMIN_EMAIL = 'inspire.science.uk@gmail.com';
+
 getDB(async (db) => {
   const { data: { session } } = await db.auth.getSession();
   if (session) showAdmin(session);
@@ -501,6 +509,13 @@ getDB(async (db) => {
 });
 
 function showAdmin(session) {
+  if ((session.user.email || '').toLowerCase() !== ADMIN_EMAIL) {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-screen').style.display = 'none';
+    showMsg('login-msg', `${session.user.email} is not authorized for Faith admin — signing out.`, 'error');
+    getDB((db) => db.auth.signOut());
+    return;
+  }
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
   document.getElementById('user-email-display').textContent = session.user.email;
