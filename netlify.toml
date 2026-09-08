@@ -24,6 +24,19 @@ functions = "netlify/functions"
   to = "/mentorship/mentor-portal/"
   status = 301
 
+# The old single-page Faith attempt (different, older navy/gold design
+# system than the approved /faith/ module built 2026-09) was never
+# linked from the homepage nav, but stayed live and reachable at its
+# direct URL — which is exactly how three fake demo sermons/podcasts
+# sat published and visible on it for months without anyone noticing.
+# force=true is required here since the file itself still exists at
+# this path — without it, Netlify serves the file instead of redirecting.
+[[redirects]]
+  from = "/pages/inspire-faith.html"
+  to = "/faith/index.html"
+  status = 301
+  force = true
+
 # Pink & Powerful (Brovelyn Childcare Services x Inspire Health & Wellbeing)
 # — canonical route serves the page file without changing the URL; the two
 # originally-requested URLs (raw "&" and percent-encoded "%26", plus the
