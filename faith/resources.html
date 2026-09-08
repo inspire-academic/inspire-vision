@@ -144,6 +144,7 @@ mobileNav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
     if (!rows.length) { grid.innerHTML = '<div class="empty-shelf">Nothing published here yet — check back soon.</div>'; return; }
     grid.innerHTML = rows.map(b => `
       <div class="book-card">
+        ${b.link_url ? `<button class="save-btn" aria-label="Save this book" data-type="book" data-title="${escapeHtml(b.title + (b.edition_label ? ' — ' + b.edition_label : ''))}" data-url="${escapeHtml(b.link_url)}"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg></button>` : ''}
         <div class="cover" ${b.cover_image_url ? `style="background-image:url('${b.cover_image_url}')"` : ''}>${b.cover_image_url ? '' : bookIcon}</div>
         <div class="body">
           ${b.edition_label ? `<span class="edition">${escapeHtml(b.edition_label)}</span>` : ''}
@@ -152,6 +153,7 @@ mobileNav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
           ${b.link_url ? `<a class="btn btn-gold" href="${escapeHtml(b.link_url)}" target="_blank" rel="noopener">${escapeHtml(b.link_text || 'Read Now')} <span>→</span></a>` : ''}
         </div>
       </div>`).join('');
+    window.initFaithSaveButtons?.();
   }
 
   function renderSermons(rows) {
@@ -163,9 +165,13 @@ mobileNav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
       <div class="media-row">
         <div class="thumb" ${s.thumbnail_url ? `style="background-image:url('${s.thumbnail_url}')"` : ''}>${s.thumbnail_url ? '' : videoIcon}</div>
         <div><h3>${escapeHtml(s.title)}</h3><p class="meta">${escapeHtml(meta)}</p></div>
-        ${s.video_url ? `<a class="btn btn-outline-gold" href="${escapeHtml(s.video_url)}" target="_blank" rel="noopener">Watch</a>` : ''}
+        <div class="row-actions">
+          ${s.video_url ? `<a class="btn btn-outline-gold" href="${escapeHtml(s.video_url)}" target="_blank" rel="noopener">Watch</a>` : ''}
+          ${s.video_url ? `<button class="save-btn" aria-label="Save this sermon" data-type="sermon" data-title="${escapeHtml(s.title)}" data-url="${escapeHtml(s.video_url)}"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg></button>` : ''}
+        </div>
       </div>`;
     }).join('');
+    window.initFaithSaveButtons?.();
   }
 
   function renderPodcasts(rows) {
@@ -176,13 +182,18 @@ mobileNav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
       const action = p.audio_url
         ? `<audio controls preload="none" src="${escapeHtml(p.audio_url)}"></audio>`
         : (p.external_link ? `<a class="btn btn-outline-gold" href="${escapeHtml(p.external_link)}" target="_blank" rel="noopener">Listen</a>` : '');
+      const saveUrl = p.audio_url || p.external_link;
       return `
       <div class="media-row">
         <div class="thumb" ${p.thumbnail_url ? `style="background-image:url('${p.thumbnail_url}')"` : ''}>${p.thumbnail_url ? '' : micIcon}</div>
         <div><h3>${escapeHtml(p.title)}</h3><p class="meta">${escapeHtml(meta)}</p></div>
-        ${action}
+        <div class="row-actions">
+          ${action}
+          ${saveUrl ? `<button class="save-btn" aria-label="Save this episode" data-type="podcast" data-title="${escapeHtml(p.title)}" data-url="${escapeHtml(saveUrl)}"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg></button>` : ''}
+        </div>
       </div>`;
     }).join('');
+    window.initFaithSaveButtons?.();
   }
 
   (async () => {

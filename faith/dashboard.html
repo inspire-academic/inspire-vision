@@ -64,20 +64,30 @@
 
 <div class="wrap" style="padding:30px 0 50px">
   <div class="dash-grid">
-    <div class="dash-panel">
-      <h2>Prayer Requests</h2>
-      <p class="panel-sub">Write down what's on your heart. Only you can see this list.</p>
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div class="dash-panel">
+        <h2>Prayer Requests</h2>
+        <p class="panel-sub">Write down what's on your heart. Only you can see this list.</p>
 
-      <form id="prayerForm" style="margin-bottom:22px">
-        <div class="field">
-          <label for="requestText">A new prayer request</label>
-          <textarea id="requestText" required placeholder="What would you like to bring before God today?"></textarea>
+        <form id="prayerForm" style="margin-bottom:22px">
+          <div class="field">
+            <label for="requestText">A new prayer request</label>
+            <textarea id="requestText" required placeholder="What would you like to bring before God today?"></textarea>
+          </div>
+          <button type="submit" class="auth-submit" id="prayerSubmitBtn" style="width:auto;padding-inline:24px">Add Request</button>
+        </form>
+
+        <div class="prayer-list" id="prayerList">
+          <p style="font-size:13px;color:#8a9a9f">Loading your requests…</p>
         </div>
-        <button type="submit" class="auth-submit" id="prayerSubmitBtn" style="width:auto;padding-inline:24px">Add Request</button>
-      </form>
+      </div>
 
-      <div class="prayer-list" id="prayerList">
-        <p style="font-size:13px;color:#8a9a9f">Loading your requests…</p>
+      <div class="dash-panel">
+        <h2>Saved Resources</h2>
+        <p class="panel-sub">Books, sermons, podcasts, and studies you've bookmarked.</p>
+        <div class="prayer-list" id="savedList">
+          <p style="font-size:13px;color:#8a9a9f">Loading your saved resources…</p>
+        </div>
       </div>
     </div>
 
@@ -202,6 +212,45 @@ document.getElementById('signOutBtn').addEventListener('click', async () => {
   window.location.href = '/faith/index.html';
 });
 
+const resourceTypeLabels = { book: 'Book', sermon: 'Sermon', podcast: 'Podcast', study: 'Study' };
+
+function renderSaved(rows) {
+  const list = document.getElementById('savedList');
+  if (!rows.length) {
+    list.innerHTML = '<p style="font-size:13px;color:#8a9a9f">Nothing saved yet — look for the bookmark icon on Resources or the Creed studies.</p>';
+    return;
+  }
+  list.innerHTML = rows.map(r => `
+    <div class="prayer-item" data-id="${r.id}">
+      <p><a href="${r.resource_url.replace(/"/g, '&quot;')}" target="_blank" rel="noopener" style="color:var(--ink);font-weight:600;text-decoration:none">${r.resource_title.replace(/</g, '&lt;')}</a></p>
+      <div class="meta">
+        <span class="pill pill-waiting">${resourceTypeLabels[r.resource_type] || r.resource_type}</span>
+        <time>${timeAgo(r.created_at)}</time>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button type="button" class="remove">Remove</button>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.remove').forEach(el => el.addEventListener('click', async (e) => {
+    const id = e.target.closest('.prayer-item').dataset.id;
+    await db.schema('vision').from('saved_resources').delete().eq('id', id);
+    loadSaved();
+  }));
+}
+
+async function loadSaved() {
+  const { data, error } = await db.schema('vision').from('saved_resources')
+    .select('*').eq('user_id', userId).order('created_at', { ascending: false });
+  if (error) {
+    console.warn('Could not load saved resources:', error);
+    document.getElementById('savedList').innerHTML = '<p style="font-size:13px;color:#a34b40">Could not load your saved resources — please refresh.</p>';
+    return;
+  }
+  renderSaved(data);
+}
+
 (async () => {
   db = await getDB();
   const { data: { session } } = await db.auth.getSession();
@@ -214,6 +263,7 @@ document.getElementById('signOutBtn').addEventListener('click', async () => {
   document.getElementById('greeting').textContent = `Welcome back, ${name}`;
   document.getElementById('accountEmail').textContent = session.user.email;
   loadRequests();
+  loadSaved();
 })();
 </script>
 </body>
