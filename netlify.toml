@@ -14,6 +14,20 @@ functions = "netlify/functions"
 [context.staging]
   branch = "staging"
 
+# Lords Consult "Idea to Impact" diagnostic tenant (Tenants/lords-consult/)
+# — path-based hosting per BUILD-BRIEF.md section 2, option 2. Tenant key
+# is "lords-consult" throughout the schema/functions even though the public
+# URL says "partners" — see CLAUDE.md for the tenant-boundary rationale.
+[[redirects]]
+  from = "/partners/lords-consult"
+  to = "/Tenants/lords-consult/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/partners/lords-consult/"
+  to = "/Tenants/lords-consult/index.html"
+  status = 200
+
 [[redirects]]
   from = "/mentorship/dashboard"
   to = "/mentorship/dashboard/"

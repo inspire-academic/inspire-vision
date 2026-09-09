@@ -155,6 +155,77 @@ assets/images/mentorship/
 └── icons/             ← icon.svg (brand mark, added 2026-07-25 for manifest.json)
 ```
 
+## TENANTS — externally-branded sub-products
+
+`Tenants/` (added 2026-09-09) holds products built *for* an external
+organisation and hosted *on* Inspire Vision infrastructure — distinct
+from the four cardinals above, which are Inspire's own brands. Each
+tenant is self-contained: its own static assets, its own
+`schema_name` in Supabase (not `vision.*`), its own Netlify Functions,
+reachable at `/partners/<tenant-key>` (path-based, not a subdomain —
+see the tenant's own build brief for why). Do not let a tenant's
+business logic leak into the global Inspire shell (`assets/nav.js`,
+`assets/css/tokens.css`, etc.) — the whole point is that a tenant can
+later move to its own domain with no rebuild.
+
+### lords-consult — "Idea to Impact" diagnostic
+
+Built from a supplied CC pack (`Lords_Consult_Idea_to_Impact_CC_Pack.zip`,
+not committed — its `BUILD-BRIEF.md` is the source of truth for the
+full multi-phase product vision; ask Eric if you need the original zip).
+Live at `/partners/lords-consult` → `Tenants/lords-consult/index.html`
+(redirect in `netlify.toml`). Tenant key throughout schema/functions is
+`lords_consult`/`lords-consult` even though the public URL segment says
+"partners".
+
+**As of 2026-09-09, Phase 0 + Phase 1 only** (the brief's own section 17
+"immediate implementation sequence" goes much further — payment,
+booking, adviser CRM, a 13-domain paid diagnostic, formation/banking
+workspace — all deliberately deferred, see below):
+
+- `Tenants/lords-consult/index.html` / `styles.css` / `script.js` — the
+  landing page, kept visually faithful to the supplied
+  `landing-reference.png` concept image (not committed — QA reference
+  only). Assets in `Tenants/lords-consult/assets/` (logo + concept
+  photography; the large reference PNG was deliberately not shipped to
+  production).
+- The 12-question diagnostic now does real Structure Fit × Venture
+  Readiness scoring (`SCORING` table + `scoreDiagnostic()` in
+  `script.js`) instead of the supplied prototype's fake "answers are
+  ready for the scoring engine" placeholder screen. Produces one of 5
+  result families (commercial business / social enterprise-CIC /
+  charity-CIO / pilot-first / specialist review) with a confidence band,
+  3 next steps, and a route to the contact-capture form — matching
+  BUILD-BRIEF.md sections 6–7. The scoring weights are a reasonable
+  first pass, not a validated instrument — expect Eric/Lords Consult to
+  want to tune them once real responses come in.
+- Every completed diagnostic persists to `lords_consult.diagnostic_sessions`
+  and every submitted contact form to `lords_consult.leads`
+  (`supabase/lords_consult_schema.sql`) via the same **client-inserts-
+  directly-with-anon-key-then-notify** pattern as
+  `pages/pink-powerful-registration.html` — not a Netlify Function doing
+  the write. This was a deliberate choice to match the existing
+  public-form convention in this repo rather than invent a new one; RLS
+  is public-INSERT / authenticated-SELECT only, same shape as
+  `vision_schema.sql`, not the heavier assignment-gated pattern from
+  `mentorship_schema*.sql` (there's no visitor account/session here to
+  scope anything to).
+- `netlify/functions/notify-lords-consult-lead.js` emails the organiser
+  when a lead is captured (mirrors `notify-pink-powerful.js`). Needs two
+  new env vars in Netlify, neither configured yet: `RESEND_API_KEY`
+  (reuse the existing one) and `LORDS_CONSULT_NOTIFY_EMAIL`.
+
+**Deliberately NOT built yet** (all still just described in
+BUILD-BRIEF.md): payment/booking (no Stripe/GoCardless or Cal.com/
+Calendly integration exists anywhere in this repo), the adviser/CRM
+dashboard (leads currently have to be queried directly in Supabase),
+the 13-domain paid diagnostic, the formation and banking-readiness
+workspaces, analytics/funnel events, and migration tooling to a
+Lords-Consult-owned domain. The privacy/consent copy in the contact
+form is interim, honest wording, not legally-reviewed copy — replace it
+before treating this as a real production launch (BUILD-BRIEF.md
+section 13 flags the same thing).
+
 ## SHARED INFRASTRUCTURE (pre-existing, not part of this build)
 
 - `assets/css/tokens.css` — design tokens, single source of truth (see conflict note above)
