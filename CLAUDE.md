@@ -231,10 +231,27 @@ workspace — all deliberately deferred, see below):
   `vision_schema.sql`, not the heavier assignment-gated pattern from
   `mentorship_schema*.sql` (there's no visitor account/session here to
   scope anything to).
+- **2026-09-09 — a brand-new schema needs two things beyond
+  `CREATE SCHEMA`/RLS policies, or every request 404s/403s from the
+  browser even though the SQL ran clean.** `lords_consult_schema.sql`
+  alone left the live form failing with "we could not save your
+  details" for two stacked reasons, each its own error once fixed one
+  at a time: (1) the schema wasn't in Project Settings -> Data API ->
+  Exposed schemas — PostgREST doesn't serve a schema over REST just
+  because it exists (`vision`/`mentorship` already had this done,
+  which is why they never hit it); (2) even once exposed, `anon`/
+  `authenticated` had no Postgres-level `GRANT USAGE` on the schema —
+  RLS policies only gate *rows*, they don't substitute for the schema/
+  table GRANT PostgREST checks first. Fixed by exposing the schema in
+  the dashboard, then running `supabase/lords_consult_schema_v2_fix_grants.sql`
+  (same shape as `mentorship_schema_v3_fix_grants.sql`, which hit the
+  service_role version of this exact gotcha). Any future new schema in
+  this repo needs both steps, not just the grants file.
 - `netlify/functions/notify-lords-consult-lead.js` emails the organiser
-  when a lead is captured (mirrors `notify-pink-powerful.js`). Needs two
-  new env vars in Netlify, neither configured yet: `RESEND_API_KEY`
-  (reuse the existing one) and `LORDS_CONSULT_NOTIFY_EMAIL`.
+  when a lead is captured (mirrors `notify-pink-powerful.js`). Both env
+  vars are configured in Netlify: `RESEND_API_KEY` (shared, reused from
+  the other notify functions) and `LORDS_CONSULT_NOTIFY_EMAIL` (set to
+  `office@lordsconsult.com,admin@inspireacademic.org`).
 
 **Deliberately NOT built yet** (all still just described in
 BUILD-BRIEF.md): payment/booking (no Stripe/GoCardless or Cal.com/
