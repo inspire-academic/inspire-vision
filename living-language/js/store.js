@@ -75,6 +75,62 @@
     writeAll([]);
   }
 
+  /**
+   * Approved (non-pending, non-rejected) submissions whose contentTypes
+   * include the given type, respecting each submission's own accessLevel.
+   * This is the community-corpus "round trip": a Preserve a Voice
+   * submission that names e.g. "Proverb (Abɛ)" as a content type and gets
+   * approved in the admin Review Queue will surface here for
+   * /living-language/community/proverbs.html (and the other three
+   * category pages) to render — nothing is invented, only real reviewed
+   * contributions ever appear.
+   * @param {string} contentType - e.g. 'Proverb (Abɛ)', 'Funny saying (Muo ni)'
+   * @param {string} [viewerAccess] - 'PUBLIC' (default) or 'COMMUNITY'; never
+   *   returns FAMILY_ONLY / RESEARCH_WITH_PERMISSION / ARCHIVE_ONLY content.
+   */
+  function listApprovedByContentType(contentType, viewerAccess) {
+    const access = viewerAccess || 'PUBLIC';
+    const visible = access === 'COMMUNITY' ? ['PUBLIC', 'COMMUNITY'] : ['PUBLIC'];
+    return readAll().filter(r =>
+      Array.isArray(r.contentTypes) && r.contentTypes.includes(contentType) &&
+      r.reviewStatus && r.reviewStatus !== 'PENDING_REVIEW' && r.reviewStatus !== 'REJECTED' &&
+      visible.includes(r.accessLevel)
+    );
+  }
+
+  /* ── Krobo naming suggestions (Folk Songs/Dirges/Chants, Folk Tales —
+     categories with no supplied Krobo name yet). Kept in their own
+     localStorage bucket, separate from content submissions, so they show
+     up in their own admin queue rather than mixed into corpus review. ── */
+  const NAMING_KEY = 'livingLanguage.namingSuggestions.v1';
+
+  function readNamingSuggestions() {
+    try {
+      const raw = window.localStorage.getItem(NAMING_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (err) { return []; }
+  }
+
+  function writeNamingSuggestions(records) {
+    try { window.localStorage.setItem(NAMING_KEY, JSON.stringify(records)); return true; }
+    catch (err) { console.warn('[LivingLanguageStore] could not write naming suggestions', err); return false; }
+  }
+
+  /**
+   * @param {{sectionLabel:string, suggestedName:string, reasoning?:string, submitterName?:string}} suggestion
+   */
+  function submitNamingSuggestion(suggestion) {
+    const records = readNamingSuggestions();
+    const id = 'name-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+    records.push(Object.assign({ id, submittedAt: new Date().toISOString() }, suggestion));
+    writeNamingSuggestions(records);
+    return { ok: true, id, storedLocallyOnly: true };
+  }
+
+  function listNamingSuggestions() {
+    return readNamingSuggestions();
+  }
+
   /* ── Learn Klo progress (local-first per the handoff brief §24 —
      "Do not block MVP on account creation") ──────────────────────── */
   const MODE_KEY = 'livingLanguage.learn.mode.v1';
@@ -134,6 +190,8 @@
 
   global.LivingLanguageStore = {
     submit, listSubmissions, updateSubmissionStatus, clearAll,
+    listApprovedByContentType,
+    submitNamingSuggestion, listNamingSuggestions,
     getLearnerMode, setLearnerMode,
     getProgress, getLessonProgress, markLessonStarted, markItemSeen, markLessonCompleted
   };

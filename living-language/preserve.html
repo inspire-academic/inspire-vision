@@ -23,6 +23,7 @@
       <a href="/living-language/index.html">Home</a>
       <a href="/living-language/about.html">About</a>
       <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/community/index.html">Community Voices</a>
       <a href="/living-language/learn/index.html">Learn</a>
       <a href="/living-language/family-voices.html">Family Voices</a>
       <a href="/living-language/get-involved.html">Get Involved</a>
@@ -38,6 +39,7 @@
     <a href="/living-language/index.html">Home</a>
     <a href="/living-language/about.html">About</a>
     <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/community/index.html">Community Voices</a>
     <a href="/living-language/learn/index.html">Learn</a>
     <a href="/living-language/family-voices.html">Family Voices</a>
     <a href="/living-language/get-involved.html">Get Involved</a>
@@ -69,6 +71,7 @@
       <a href="/living-language/index.html">Home</a>
       <a href="/living-language/about.html">About</a>
       <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/community/index.html">Community Voices</a>
       <a href="/living-language/learn/index.html">Learn</a>
       <a href="/living-language/family-voices.html">Family Voices</a>
       <a href="/living-language/get-involved.html">Get Involved</a>
@@ -213,21 +216,27 @@ llMobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () =
     }});
   }
 
+  const CONTENT_TYPES = ['Word','Phrase','Proverb (Abɛ)','Funny saying (Muo ni)','Story','Folk tale','Song / Dirge / Chant','Prayer','Memory','Cultural explanation','Other'];
+
   function renderContentTypes() {
-    const types = ['Word','Phrase','Proverb','Story','Song','Prayer','Memory','Cultural explanation','Other'];
     stepChrome(`
       <p class="hint">Select everything that applies — you can preserve more than one kind of content in a session.</p>
       <div class="ll-radio-grid cols-2">
-        ${types.map(t => `
+        ${CONTENT_TYPES.map(t => `
           <label class="ll-radio-card">
             <input type="checkbox" name="fContentType" value="${t}" ${form.contentTypes.includes(t)?'checked':''}>
             <span>${t}</span>
           </label>`).join('')}
       </div>
+      <p class="hint" id="llAbeHint" style="margin-top:14px;margin-bottom:0;${form.contentTypes.includes('Proverb (Abɛ)') ? '' : 'display:none;'}">The spelling &ldquo;Abɛ&rdquo; is a working label — exact spelling is pending confirmation from the Krobo Language &amp; Culture Council.</p>
     `, { onNext: () => {
       form.contentTypes = Array.from(document.querySelectorAll('input[name=fContentType]:checked')).map(el => el.value);
       if (!form.contentTypes.length) { alert('Please select at least one type of content.'); return false; }
     }});
+    const abeCheckbox = document.querySelector('input[name=fContentType][value="Proverb (Abɛ)"]');
+    abeCheckbox?.addEventListener('change', () => {
+      document.getElementById('llAbeHint').style.display = abeCheckbox.checked ? '' : 'none';
+    });
   }
 
   function renderRecording() {
@@ -362,6 +371,19 @@ llMobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () =
       </div>
     `, { back: false, hideFooter: true });
   }
+
+  // Deep-link support: /preserve.html?type=Proverb%20(Ab%C9%9B) lets a
+  // community corpus page (e.g. proverbs.html's "Contribute" button)
+  // arrive with the matching content type already checked at step 3, so
+  // the visitor still gives speaker/community context but doesn't have
+  // to re-answer "what kind of content" after already clicking e.g.
+  // "Contribute a Proverb".
+  (function applyDeepLinkType() {
+    const requested = new URLSearchParams(window.location.search).get('type');
+    if (requested && CONTENT_TYPES.includes(requested)) {
+      form.contentTypes = [requested];
+    }
+  })();
 
   render();
 })();

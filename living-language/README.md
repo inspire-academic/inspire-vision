@@ -26,6 +26,12 @@ living-language/
 ├── about.html                 Cultural Covenant, hierarchy of authority
 ├── get-involved.html            Join the movement
 ├── admin/index.html               Internal corpus/review prototype (noindex'd)
+├── community/
+│   ├── index.html                    Community Voices hub — links to the four category pages below
+│   ├── muo-ni.html                     Muo ni — funny sayings & wit
+│   ├── proverbs.html                     Abɛ — proverbs (spelling pending Council confirmation)
+│   ├── folk-songs.html                     Folk Songs, Dirges & Chants (English label + naming callout)
+│   └── folk-tales.html                       Folk Tales (English label + naming callout)
 ├── learn/
 │   ├── index.html                   Learn Klo dashboard — mode toggle, level progress, 9 lesson cards
 │   ├── lesson.html                    Generic lesson player, reads a hash slug (#alphabet, #things-in-my-home, ...)
@@ -35,7 +41,8 @@ living-language/
     ├── data.js                      Archive schema + seed/demo content (Speaker/Recording/LanguageEntry/...)
     ├── learn-data.js                 Learn Klo schema + seed content (AlphabetItem/VocabularyItem/Lesson)
     ├── learn-engine.js                Reusable lesson engine — one player, five lesson types
-    └── store.js                        Mock persistence (Preserve submissions, learner mode, lesson progress)
+    ├── community.js                    Community corpus renderer — gallery + naming-callout, shared by community/*.html
+    └── store.js                        Mock persistence (Preserve submissions, learner mode, lesson progress, naming suggestions)
 ```
 
 `living-language/learn.html` (the original single sample lesson) was
@@ -158,6 +165,63 @@ during automated testing in this session (confirmed via
 tab) and is not a code defect; a normal foregrounded browser tab is
 unaffected.
 
+## Community Voices — Muo ni, Abɛ, Folk Songs & Chants, Folk Tales
+
+A fourth destination alongside 100 Voices, Family Voices and Learn Klo,
+added at Eric's request: shared communal spaces organized around
+*cultural forms* rather than individual speakers, living at
+`living-language/community/`.
+
+**Architecture — one pipeline, reused, not four bespoke wizards.** The
+existing Preserve a Voice wizard (`preserve.html`) already asked for a
+content type; its checkbox list (`CONTENT_TYPES` in that file's script)
+now includes `Funny saying (Muo ni)`, `Proverb (Abɛ)`, `Song / Dirge /
+Chant`, and `Folk tale` alongside the pre-existing Word/Phrase/Story/
+Prayer/Memory/Cultural explanation/Other. Each community page's
+"Contribute" button deep-links to `preserve.html?type=<contentType>`,
+which pre-checks that content type so a visitor doesn't have to
+re-answer "what kind of content" — same submission flow, same review
+queue, no duplicated intake logic.
+
+**The round trip, newly added.** Previously an approved Preserve a
+Voice submission never appeared anywhere public — it just sat in
+`LivingLanguageStore`'s review queue forever. `store.js` now exposes
+`listApprovedByContentType(type)`, which the four community pages (via
+the shared `js/community.js` renderer) use to actually show what the
+community has contributed once an admin approves it in the Review
+Queue — respecting each submission's own `accessLevel`, never bypassing
+FAMILY_ONLY/etc. This is the genuinely "communal" part of the feature:
+members can see each other's contributions, not just submit into a void.
+
+**Krobo-name authority, per category — do not casually change these:**
+- **Muo ni** — supplied directly by the founder, no caveat.
+- **Abɛ** — supplied by the founder, but the exact spelling is
+  explicitly *pending* confirmation from the Krobo Language & Culture
+  Council. Every place "Abɛ" appears (hero, hub tile, wizard hint) must
+  keep the pending-spelling note next to it. Do not remove that note
+  just because the term looks confident in context — see the founding
+  "Language-verification discipline" section above; this is the exact
+  same discipline applied to a new term.
+- **Folk Songs, Dirges & Chants** and **Folk Tales** — no Krobo term was
+  supplied for either. Both ship in English only, each with a small
+  "help us name this in Krobo" callout (`js/community.js`'s
+  `renderNamingCallout`) inviting the community to suggest one as a
+  first contribution. Suggestions land in their own localStorage bucket
+  (`LivingLanguageStore.listNamingSuggestions()`), separate from content
+  submissions, and surface in the admin's "Naming Suggestions" view —
+  never auto-adopted as a section's real name; a human decision (same
+  discipline as VERIFIED status) is still required before any of these
+  suggestions gets promoted into page copy.
+
+**What this explicitly does not do, by design:** no invented Krobo
+proverbs, sayings, song lyrics or tale text anywhere — every category
+page launches with zero seed entries and only fills from real reviewed
+submissions, same "being prepared" honesty as Learn Klo. No new
+Supabase schema (reuses the existing mock store). No login/auth gating
+(public-with-review, matching Preserve a Voice). Peer "vouching" on a
+submission's authenticity and an events-calendar tie-in for in-person
+collection sessions are good next ideas, not built in this pass.
+
 ## Backend / persistence
 
 No new Supabase schema was created for this MVP. The repo already runs a
@@ -185,13 +249,17 @@ placeholder — it doesn't submit anywhere yet.
 | Learn Klo dashboard + engine | Real — mode toggle, progress, 9 lessons; see the per-lesson table above for content status |
 | Family Voices | Real concept page, demo data only (as specified) |
 | Preserve a Voice | Real 12-step wizard, writes to local mock store |
-| Admin/corpus prototype | Real read views + a real, working review-queue action loop |
+| Admin/corpus prototype | Real read views + a real, working review-queue action loop, incl. Naming Suggestions |
+| Community Voices (Muo ni, Abɛ, Folk Songs & Chants, Folk Tales) | Real — submit → review → public-gallery round trip works end to end; zero seed content by design |
 | Recording/audio capture | Placeholder only — no media pipeline yet |
 | Join the Movement form | Placeholder — does not submit anywhere |
 | Homepage nav/footer links | Real |
 
 ## Open verification items / next steps
 
+- "Abɛ" spelling — pending Krobo Language & Culture Council confirmation; do not drop the pending note anywhere it appears.
+- Krobo names for "Folk Songs, Dirges & Chants" and "Folk Tales" — not yet supplied; watch the admin's Naming Suggestions view for community-proposed terms, but a human decision is still required before promoting any of them into page copy.
+- Peer "vouching"/corroboration on community-corpus submissions, and an events-calendar tie-in on `get-involved.html` for in-person collection sessions — good next ideas, not built in this pass.
 - English meaning of the founding phrase — awaiting Language Council sign-off before any public copy states it.
 - Real audio recording/upload pipeline (Preserve a Voice step 4 is currently a described placeholder).
 - Admin auth gate — `admin/index.html` is `noindex`'d and unlinked, but has no server-side session check yet (unlike mentorship's `requireAdmin()`-gated functions). Needed before this goes beyond a local demo.
