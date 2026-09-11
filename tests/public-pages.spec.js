@@ -8,7 +8,7 @@ const { trackConsoleErrors } = require('./helpers');
 
 test.describe('Homepage', () => {
   test('loads with hero and programme flyer carousel, no console errors', async ({ page }) => {
-    const tracker = trackConsoleErrors(page);
+    const tracker = await trackConsoleErrors(page);
     await page.goto('/index.html');
     await expect(page.locator('.hero h1')).toBeVisible();
     await expect(page.locator('#flyer-carousel')).toBeVisible();
@@ -27,7 +27,7 @@ test.describe('Mentorship public pages — must not be the coming-soon stub', ()
 
   for (const { path, mustContain } of pages) {
     test(`${path} has real content, no console errors`, async ({ page }) => {
-      const tracker = trackConsoleErrors(page);
+      const tracker = await trackConsoleErrors(page);
       await page.goto(path);
       await expect(page.locator('body')).not.toContainText('Coming soon — this section is being built.');
       await expect(page.locator('body')).toContainText(mustContain);
@@ -52,7 +52,7 @@ test.describe('Visitor preview — no redirect, real content, sign-in prompt', (
 
   for (const { path, mustContain } of pages) {
     test(`${path} stays put for an anonymous visitor and shows a sign-in prompt`, async ({ page }) => {
-      const tracker = trackConsoleErrors(page);
+      const tracker = await trackConsoleErrors(page);
       await page.goto(path);
       // Give the auth check (a real Supabase getUser() round-trip) time
       // to resolve and pick the visitor branch — same margin
@@ -68,21 +68,21 @@ test.describe('Visitor preview — no redirect, real content, sign-in prompt', (
 
 test.describe('Mentorship auth pages', () => {
   test('login page renders the sign-in form', async ({ page }) => {
-    const tracker = trackConsoleErrors(page);
+    const tracker = await trackConsoleErrors(page);
     await page.goto('/mentorship/login.html');
     await expect(page.locator('form')).toBeVisible();
     tracker.assertNoErrors();
   });
 
   test('join.html (become a mentee) renders the signup form', async ({ page }) => {
-    const tracker = trackConsoleErrors(page);
+    const tracker = await trackConsoleErrors(page);
     await page.goto('/mentorship/join.html');
     await expect(page.locator('form')).toBeVisible();
     tracker.assertNoErrors();
   });
 
   test('join.html shows/hides guardian fields based on the under-18 answer', async ({ page }) => {
-    const tracker = trackConsoleErrors(page);
+    const tracker = await trackConsoleErrors(page);
     await page.goto('/mentorship/join.html');
     const guardianFields = page.locator('#guardianFields');
     const guardianName = page.locator('#guardianName');
@@ -108,7 +108,7 @@ test.describe('Mentorship auth pages', () => {
   });
 
   test('mentors.html (become a mentor) renders the application form', async ({ page }) => {
-    const tracker = trackConsoleErrors(page);
+    const tracker = await trackConsoleErrors(page);
     await page.goto('/mentorship/mentors.html');
     await expect(page.locator('form')).toBeVisible();
     tracker.assertNoErrors();
