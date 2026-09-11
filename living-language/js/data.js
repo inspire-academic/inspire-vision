@@ -14,7 +14,28 @@
    new translations — see /living-language/README.md.
 
    All speaker/recording/story content below is clearly seed/demo data for
-   the MVP vertical slice, not real contributor submissions. */
+   the MVP vertical slice, not real contributor submissions.
+
+   COMMUNITY CORPUS CATEGORIES (added for the Muo ni / Abɛ / Folk Songs /
+   Folk Tales build — see /living-language/community/): these are four
+   thematic destinations layered on top of the existing content-type list
+   below, not a new data model. Krobo-name status per category, so nobody
+   downstream mistakes "supplied" for "confirmed":
+     - Muo ni (funny sayings/wit)     — Krobo name supplied by founder, no caveat.
+     - Abɛ (proverbs)                 — Krobo name supplied by founder, but the
+                                         exact spelling is explicitly PENDING
+                                         Krobo Language & Culture Council
+                                         confirmation. Every page showing "Abɛ"
+                                         must carry that pending note — do not
+                                         drop it just because the word looks
+                                         confirmed elsewhere in this file.
+     - Folk Songs, Dirges & Chants    — no Krobo name supplied yet. Ships in
+                                         English with a community "help us name
+                                         this" callout (see community.js).
+     - Folk Tales                     — same as above: English + naming callout.
+   None of these four categories may ever be seeded with example Krobo
+   proverbs, sayings, song lyrics or tale text — they launch empty and only
+   fill from real reviewed community submissions. */
 
 (function (global) {
   'use strict';

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#123521">
-<title>Family Voices — The Living Language Project | Inspire Vision</title>
-<meta name="description" content="A private family archive where a child can hear a grandparent's voice, learn its meaning, and turn it into a lesson — kept safely within the family unless they choose otherwise.">
+<title>Lesson — Learn Klo | Inspire Vision</title>
+<meta name="description" content="A Learn Klo lesson from The Living Language Project.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,14 +24,11 @@
       <a href="/living-language/about.html">About</a>
       <a href="/living-language/100-voices.html">100 Voices</a>
       <a href="/living-language/community/index.html">Community Voices</a>
-      <a href="/living-language/learn/index.html">Learn</a>
-      <a href="/living-language/family-voices.html" class="active">Family Voices</a>
+      <a href="/living-language/learn/index.html" class="active">Learn</a>
+      <a href="/living-language/family-voices.html">Family Voices</a>
       <a href="/living-language/get-involved.html">Get Involved</a>
     </nav>
     <div class="ll-header-actions">
-      <button class="ll-icon-btn" aria-label="Search" type="button">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></svg>
-      </button>
       <a class="btn btn-gold btn-sm" href="/living-language/get-involved.html">Support the Project</a>
       <button class="ll-icon-btn ll-menu-btn" id="llMenuBtn" aria-label="Open navigation" aria-expanded="false" type="button">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -50,69 +47,9 @@
   </div>
 </header>
 
-<section class="ll-page-hero">
-  <div class="wrap">
-    <span class="eyebrow">A private archive for your own family</span>
-    <h1>Family Voices</h1>
-    <p>Every family can preserve the voice of their own relatives — a grandparent's stories, phrases and proverbs, kept safely for the children who come after. This is a concept preview, shown here with demo data.</p>
-  </div>
-</section>
-
 <section class="ll-section">
-  <div class="wrap" style="max-width:900px;margin:0 auto;">
-    <div class="ll-family-card">
-      <div class="ll-family-media">
-        <img src="/assets/images/living-language/elder-interview-recording.jpg" alt="An elder being recorded during a family session">
-        <span class="ll-family-lock-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
-          Family Only
-        </span>
-      </div>
-      <div class="ll-family-body">
-        <h3>Grandpa Nartey</h3>
-        <div class="loc">Odumase-Krobo &middot; preserved by the Nartey family</div>
-        <div class="ll-family-stats">
-          <div><strong>4</strong><span>Stories</span></div>
-          <div><strong>9</strong><span>Phrases</span></div>
-          <div><strong>2</strong><span>Proverbs</span></div>
-        </div>
-        <div class="ll-family-note">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ll-terracotta-deep)" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
-          <span>This archive is visible only to signed-in members of the Nartey family. It is not shown in the public 100 Voices gallery, and technology-training use has not been permitted for these recordings.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="ll-section" style="padding-top:0;">
-  <div class="wrap">
-    <div class="ll-section-head">
-      <div>
-        <span class="eyebrow">More than an archive</span>
-        <h2>A Family Archive Becomes a Classroom</h2>
-      </div>
-      <p class="lede">A story a grandparent tells once can become something a grandchild returns to for years — heard, understood, practiced and explained.</p>
-    </div>
-    <div class="ll-classroom-steps">
-      <div class="ll-classroom-step"><strong>1. Original audio</strong><span>The recording itself, kept exactly as spoken.</span></div>
-      <div class="ll-classroom-step"><strong>2. Transcription &amp; translation</strong><span>Krobo text and English meaning, once reviewed.</span></div>
-      <div class="ll-classroom-step"><strong>3. Vocabulary &amp; pronunciation</strong><span>Sentence-by-sentence playback and practice.</span></div>
-      <div class="ll-classroom-step"><strong>4. Comprehension &amp; culture</strong><span>Age-appropriate activities and cultural context.</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="ll-cta-band">
-  <div class="wrap">
-    <div>
-      <span class="eyebrow">Your family's language, kept close</span>
-      <h2>Start Your Own Family Archive</h2>
-      <p>Record a grandparent, a parent, an aunt or uncle — for the children who will want to hear them one day.</p>
-    </div>
-    <div class="ll-cta-mid">
-      <a class="btn btn-gold" href="/living-language/preserve.html">Preserve a Family Voice &rarr;</a>
-    </div>
+  <div class="wrap ll-lesson-player" id="llLessonRoot">
+    <p style="text-align:center;color:var(--ll-ink-mute);">Loading lesson…</p>
   </div>
 </section>
 
@@ -138,6 +75,10 @@
   </div>
 </footer>
 
+<script src="/living-language/js/data.js"></script>
+<script src="/living-language/js/learn-data.js"></script>
+<script src="/living-language/js/store.js"></script>
+<script src="/living-language/js/learn-engine.js"></script>
 <script>
 const llMenuBtn = document.getElementById('llMenuBtn');
 const llMobileNav = document.getElementById('llMobileNav');
@@ -149,6 +90,24 @@ llMobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () =
   llMobileNav.classList.remove('open');
   llMenuBtn?.setAttribute('aria-expanded', 'false');
 }));
+
+// Hash-based, not a query param: some static hosts' clean-URL redirects
+// (seen locally with the `serve` dev server) drop query strings on the
+// .html → extensionless 301. A hash fragment never reaches the server,
+// so it survives regardless of host redirect behaviour.
+const slug = location.hash.replace(/^#/, '');
+const lesson = slug ? LivingLanguageLearn.getLesson(slug) : null;
+const root = document.getElementById('llLessonRoot');
+
+if (!lesson) {
+  root.innerHTML = `<div style="text-align:center;padding:40px 0;">
+    <p style="color:var(--ll-ink-mute);margin-bottom:16px;">We couldn't find that lesson.</p>
+    <a class="btn btn-gold" href="/living-language/learn/index.html">Back to Lessons &rarr;</a>
+  </div>`;
+} else {
+  document.title = lesson.title + ' — Learn Klo | Inspire Vision';
+  LivingLanguageLearnEngine.renderLesson(lesson, root);
+}
 </script>
 </body>
 </html>
