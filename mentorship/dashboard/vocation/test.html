@@ -272,12 +272,18 @@
       <textarea class="voc-textarea" id="convTakeaways"></textarea>
       <label class="voc-field-label">Did it change your thinking?</label>
       <textarea class="voc-textarea" id="convChanged"></textarea>
-      <button class="list-card-btn" id="addConvBtn">+ Log Conversation</button>`;
+      <button class="list-card-btn" id="addConvBtn">+ Log Conversation</button>
+      <div class="voc-empty" id="convError" style="display:none; color:#f87171"></div>`;
   }
   function wireConversations(container) {
     container.querySelector('#addConvBtn')?.addEventListener('click', async () => {
       const person_role = container.querySelector('#convRole').value.trim();
-      if (!person_role) return;
+      const errEl = container.querySelector('#convError');
+      if (!person_role) {
+        if (errEl) { errEl.textContent = 'Enter who you spoke with before logging this conversation.'; errEl.style.display = 'block'; }
+        return;
+      }
+      if (errEl) errEl.style.display = 'none';
       const payload = {
         student_id: currentUser.id,
         person_role,
@@ -328,13 +334,19 @@
         <option value="unchanged">Unchanged</option>
         <option value="decreased">Decreased</option>
       </select>
-      <button class="list-card-btn" id="addExpBtn">+ Log Workplace Exposure</button>`;
+      <button class="list-card-btn" id="addExpBtn">+ Log Workplace Exposure</button>
+      <div class="voc-empty" id="expError" style="display:none; color:#f87171"></div>`;
   }
   function wireExposures(container) {
     container.querySelector('#addExpBtn')?.addEventListener('click', async () => {
       const exposure_type = container.querySelector('#expType').value;
       const organisation_type = container.querySelector('#expOrg').value.trim();
-      if (!exposure_type && !organisation_type) return;
+      const errEl = container.querySelector('#expError');
+      if (!exposure_type && !organisation_type) {
+        if (errEl) { errEl.textContent = 'Select a type or enter an organisation type before logging this exposure.'; errEl.style.display = 'block'; }
+        return;
+      }
+      if (errEl) errEl.style.display = 'none';
       const payload = {
         student_id: currentUser.id,
         exposure_type: exposure_type || null,
@@ -380,12 +392,18 @@
         <option value="in_progress">In Progress</option>
         <option value="complete">Complete</option>
       </select>
-      <button class="list-card-btn" id="addExpmtBtn">+ Log Experiment</button>`;
+      <button class="list-card-btn" id="addExpmtBtn">+ Log Experiment</button>
+      <div class="voc-empty" id="expmtError" style="display:none; color:#f87171"></div>`;
   }
   function wireExperiments(container) {
     container.querySelector('#addExpmtBtn')?.addEventListener('click', async () => {
       const hypothesis = container.querySelector('#expmtHypothesis').value.trim();
-      if (!hypothesis) return;
+      const errEl = container.querySelector('#expmtError');
+      if (!hypothesis) {
+        if (errEl) { errEl.textContent = 'Write a hypothesis before logging this experiment.'; errEl.style.display = 'block'; }
+        return;
+      }
+      if (errEl) errEl.style.display = 'none';
       const status = container.querySelector('#expmtStatus').value || 'planned';
       const payload = {
         student_id: currentUser.id,

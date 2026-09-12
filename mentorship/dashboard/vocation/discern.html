@@ -177,6 +177,7 @@
         <label class="voc-field-label">What would change my mind? <span style="color:var(--mentorship-gold)">(required)</span></label>
         <textarea class="voc-textarea" id="hypChangeMind" placeholder="Be specific — this is what makes it a real hypothesis, not just a preference."></textarea>
         <button class="list-card-btn primary" id="addHypBtn">+ Add Hypothesis</button>
+        <div class="voc-save-note" id="hypError" style="display:none; color:#f87171"></div>
       </div>
 
       <div class="voc-quote-card">
@@ -292,7 +293,17 @@
   $('addHypBtn')?.addEventListener('click', async () => {
     const label = $('hypLabel').value.trim();
     const what_would_change_my_mind = $('hypChangeMind').value.trim();
-    if (!label || !what_would_change_my_mind) return;
+    const hypErrorEl = $('hypError');
+    if (!label || !what_would_change_my_mind) {
+      if (hypErrorEl) {
+        hypErrorEl.textContent = !label
+          ? 'Give this pathway a label before adding it.'
+          : 'Answer "What would change my mind?" — it\'s required so this counts as a real, falsifiable hypothesis.';
+        hypErrorEl.style.display = 'block';
+      }
+      return;
+    }
+    if (hypErrorEl) hypErrorEl.style.display = 'none';
     const payload = {
       student_id: currentUser.id,
       label,
