@@ -89,7 +89,7 @@
 .ll-nav a.active{ color: var(--ll-white); border-bottom-color: var(--ll-gold); }
 
 .ll-header-actions{ display:flex; align-items:center; gap:14px; }
-.ll-icon-btn{ background:none; border:none; color: rgba(255,255,255,.8); cursor:pointer; padding:6px; display:flex; }
+.ll-icon-btn{ background:none; border:none; color: rgba(255,255,255,.8); cursor:pointer; padding:11px; display:flex; align-items:center; justify-content:center; }
 .ll-icon-btn:hover{ color: var(--ll-white); }
 .ll-menu-btn{ display:none; }
 
@@ -164,7 +164,7 @@
 .ll-fv-stats strong{ display:block; font-size:19px; font-family: var(--ll-serif); color: var(--ll-green); }
 .ll-fv-stats span{ font-size:11px; color: var(--ll-ink-mute); text-transform:uppercase; letter-spacing:.05em; }
 .ll-fv-player{ grid-column:1 / -1; display:flex; align-items:center; gap:12px; background: var(--ll-paper-deep); border-radius:999px; padding:8px 14px; margin-top:4px; }
-.ll-fv-play{ width:32px; height:32px; border-radius:50%; background: var(--ll-green); color:var(--ll-white); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+.ll-fv-play{ width:44px; height:44px; border-radius:50%; background: var(--ll-green); color:var(--ll-white); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
 .ll-fv-wave{ flex:1; height:22px; }
 .ll-fv-time{ font-size:11px; color: var(--ll-ink-mute); white-space:nowrap; }
 .ll-fv-lesson{ grid-column:1 / -1; background: var(--ll-terracotta-tint); border-radius:10px; padding:12px 14px; }
@@ -343,7 +343,7 @@
 .ll-field{ margin-bottom:20px; }
 .ll-field label{ display:block; font-size:13px; font-weight:700; color: var(--ll-ink); margin-bottom:7px; }
 .ll-field .optional{ font-weight:400; color: var(--ll-ink-mute); text-transform:none; }
-.ll-field input[type=text],.ll-field input[type=email],.ll-field textarea,.ll-field select{ width:100%; border:1.5px solid var(--ll-line); border-radius:9px; padding:11px 13px; font-size:14.5px; font-family: var(--ll-sans); background: var(--ll-cream); color: var(--ll-ink); }
+.ll-field input[type=text],.ll-field input[type=email],.ll-field textarea,.ll-field select{ width:100%; border:1.5px solid var(--ll-line); border-radius:9px; padding:11px 13px; font-size:16px; font-family: var(--ll-sans); background: var(--ll-cream); color: var(--ll-ink); }
 .ll-field textarea{ min-height:90px; resize:vertical; }
 .ll-field input:focus,.ll-field textarea:focus,.ll-field select:focus{ outline:2px solid var(--ll-gold); border-color: var(--ll-gold); }
 .ll-radio-grid,.ll-check-grid{ display:grid; gap:9px; }
@@ -466,7 +466,7 @@
 .ll-letter-card{ aspect-ratio:1; border:1.5px solid var(--ll-line); border-radius:12px; background: var(--ll-paper-deep); font-family: var(--ll-serif); font-size:22px; font-weight:600; color: var(--ll-green); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
 .ll-letter-card:hover{ border-color: var(--ll-gold); }
 .ll-letter-card small{ font-size:11px; color: var(--ll-ink-mute); font-weight:400; }
-.ll-back-link{ background:none; border:none; color: var(--ll-terracotta); font-weight:700; font-size:13px; cursor:pointer; padding:0; margin-bottom:18px; }
+.ll-back-link{ background:none; border:none; color: var(--ll-terracotta); font-weight:700; font-size:13px; cursor:pointer; padding:10px 0; margin:-10px 0 8px; display:inline-block; }
 .ll-letter-panel{ text-align:center; }
 .ll-letter-panel-glyph{ font-family: var(--ll-serif); font-size:64px; color: var(--ll-green); margin-bottom:20px; }
 .ll-letter-panel-glyph span{ font-size:34px; color: var(--ll-ink-mute); margin-left:10px; }

@@ -54,7 +54,7 @@
 </section>
 
 <section class="ll-section">
-  <div class="wrap ll-pillars-grid" style="grid-template-columns:repeat(3,1fr);">
+  <div class="wrap ll-pillars-grid">
     <div class="ll-pillar ll-pillar-1">
       <div class="ll-pillar-icon"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 19v3"/></svg></div>
       <div><h3>Record Something in Krobo</h3><p>Say something for a child who has not yet been born — a greeting, a memory, a proverb.</p></div>
@@ -82,16 +82,17 @@
     <span class="eyebrow">Stay connected</span>
     <h2 style="font-size:22px;margin-bottom:10px;">Join the Movement</h2>
     <p class="lede" style="margin-bottom:18px;">Leave your details and we'll be in touch about recording days, family archives and how to get involved. This form does not collect payment or account credentials.</p>
-    <form id="llJoinForm" style="display:grid;gap:14px;" onsubmit="event.preventDefault(); document.getElementById('llJoinDone').hidden=false; this.hidden=true;">
-      <div class="ll-field" style="margin-bottom:0;"><label>Your name</label><input type="text" required placeholder="Full name"></div>
-      <div class="ll-field" style="margin-bottom:0;"><label>Email</label><input type="email" required placeholder="you@example.com"></div>
-      <div class="ll-field" style="margin-bottom:0;"><label>How would you like to be involved? <span class="optional">(optional)</span></label><textarea placeholder="e.g. I'd like to record my grandmother's stories"></textarea></div>
+    <form id="llJoinForm" style="display:grid;gap:14px;">
+      <div class="ll-field" style="margin-bottom:0;"><label>Your name</label><input type="text" name="name" required placeholder="Full name"></div>
+      <div class="ll-field" style="margin-bottom:0;"><label>Email</label><input type="email" name="email" required placeholder="you@example.com"></div>
+      <div class="ll-field" style="margin-bottom:0;"><label>How would you like to be involved? <span class="optional">(optional)</span></label><textarea name="message" placeholder="e.g. I'd like to record my grandmother's stories"></textarea></div>
+      <input type="text" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true">
       <button class="btn btn-gold" type="submit">Join the Movement &rarr;</button>
     </form>
     <div id="llJoinDone" hidden style="text-align:center;padding:20px 0;">
       <svg viewBox="0 0 24 24" fill="none" stroke="var(--ll-green)" stroke-width="1.6" width="44" height="44" style="margin-bottom:12px;"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9" stroke-width="2"/></svg>
       <p style="font-weight:700;">Thank you for joining the movement.</p>
-      <p style="font-size:12.5px;color:var(--ll-ink-mute);">MVP note: this form does not yet send anywhere — connect it to a real intake (e.g. the shared Supabase project) before launch.</p>
+      <p style="font-size:12.5px;color:var(--ll-ink-mute);">We'll be in touch about recording days, family archives and how to get involved.</p>
     </div>
   </div>
 </section>
@@ -118,7 +119,39 @@
   </div>
 </footer>
 
+<script src="/living-language/js/store.js"></script>
 <script>
+const llJoinForm = document.getElementById('llJoinForm');
+const llJoinDone = document.getElementById('llJoinDone');
+llJoinForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const data = new FormData(llJoinForm);
+  const entry = {
+    name: (data.get('name') || '').toString().trim(),
+    email: (data.get('email') || '').toString().trim(),
+    message: (data.get('message') || '').toString().trim(),
+    company: (data.get('company') || '').toString().trim(), // honeypot
+  };
+  if (entry.company) {
+    // Bot filled the hidden field — pretend success, save nothing.
+    llJoinDone.hidden = false;
+    llJoinForm.hidden = true;
+    return;
+  }
+  window.LivingLanguageStore?.submitJoinMovement({ name: entry.name, email: entry.email, message: entry.message });
+  try {
+    await fetch('/.netlify/functions/notify-join-movement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    });
+  } catch (err) {
+    console.warn('[Join the Movement] notification email failed (submission was still saved locally)', err);
+  }
+  llJoinDone.hidden = false;
+  llJoinForm.hidden = true;
+});
+
 const llMenuBtn = document.getElementById('llMenuBtn');
 const llMobileNav = document.getElementById('llMobileNav');
 llMenuBtn?.addEventListener('click', () => {

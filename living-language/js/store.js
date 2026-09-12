@@ -188,11 +188,44 @@
     writeProgress(progress);
   }
 
+  /* ── Join the Movement (get-involved.html waitlist) ───────────────
+     Validation-phase lead capture: the 90-day plan's "500+ sign-ups"
+     metric needs a real, countable record. Stored locally (same pattern
+     as everything else in this file) and best-effort emailed to the
+     project owner via netlify/functions/notify-join-movement.js so
+     signups don't only live in each visitor's own browser. ──────── */
+  const JOIN_KEY = 'livingLanguage.joinMovement.v1';
+
+  function readJoinSubmissions() {
+    try {
+      const raw = window.localStorage.getItem(JOIN_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (err) { return []; }
+  }
+
+  function writeJoinSubmissions(records) {
+    try { window.localStorage.setItem(JOIN_KEY, JSON.stringify(records)); return true; }
+    catch (err) { console.warn('[LivingLanguageStore] could not write join submissions', err); return false; }
+  }
+
+  function submitJoinMovement(entry) {
+    const records = readJoinSubmissions();
+    const id = 'join-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+    records.push(Object.assign({ id, submittedAt: new Date().toISOString() }, entry));
+    writeJoinSubmissions(records);
+    return { ok: true, id, storedLocallyOnly: true };
+  }
+
+  function listJoinSubmissions() {
+    return readJoinSubmissions();
+  }
+
   global.LivingLanguageStore = {
     submit, listSubmissions, updateSubmissionStatus, clearAll,
     listApprovedByContentType,
     submitNamingSuggestion, listNamingSuggestions,
     getLearnerMode, setLearnerMode,
-    getProgress, getLessonProgress, markLessonStarted, markItemSeen, markLessonCompleted
+    getProgress, getLessonProgress, markLessonStarted, markItemSeen, markLessonCompleted,
+    submitJoinMovement, listJoinSubmissions
   };
 })(window);
