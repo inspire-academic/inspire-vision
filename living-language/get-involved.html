@@ -149,7 +149,7 @@ llJoinForm?.addEventListener('submit', async (event) => {
     console.warn('[Join the Movement] notification email failed (submission was still saved locally)', err);
   }
   llJoinDone.hidden = false;
-  llJoinForm.hidden = true;
+  llJoinForm.style.display = 'none';
 });
 
 const llMenuBtn = document.getElementById('llMenuBtn');
