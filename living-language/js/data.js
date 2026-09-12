@@ -174,7 +174,7 @@
       community: 'Somanya',
       variant: VARIANT.MANYA,
       biography: 'A retired trader and grandmother of nine, Grandma Dade Ayongo has spent decades passing on Krobo proverbs and market greetings to the children of her compound in Somanya.',
-      image: '/assets/images/living-language/portrait-elder-woman.jpg',
+      image: '/assets/images/living-language/portrait-elder-woman-cropped.jpg',
       consentStatus: 'given',
       visibility: ACCESS_LEVEL.PUBLIC,
       technologyUsePermitted: true,
