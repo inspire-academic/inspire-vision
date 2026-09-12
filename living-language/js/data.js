@@ -168,12 +168,12 @@
   const SEED_SPEAKERS = [
     {
       id: 'spk-akosua',
-      displayName: 'Grandma Akosua',
-      preferredName: 'Akosua',
+      displayName: 'Grandma Dade Ayongo',
+      preferredName: 'Dade',
       birthYearApprox: 1948,
       community: 'Somanya',
       variant: VARIANT.MANYA,
-      biography: 'A retired trader and grandmother of nine, Grandma Akosua has spent decades passing on Krobo proverbs and market greetings to the children of her compound in Somanya.',
+      biography: 'A retired trader and grandmother of nine, Grandma Dade Ayongo has spent decades passing on Krobo proverbs and market greetings to the children of her compound in Somanya.',
       image: '/assets/images/living-language/portrait-elder-woman.jpg',
       consentStatus: 'given',
       visibility: ACCESS_LEVEL.PUBLIC,
@@ -184,10 +184,10 @@
     },
     {
       id: 'spk-nene-tetteh',
-      displayName: 'Nene Tetteh Ashong',
+      displayName: 'Maa Yowɛ',
       community: 'Somanya',
       variant: VARIANT.MANYA,
-      biography: 'A respected elder and campaign supporter of 100 Voices of Krobo, Nene Tetteh has offered his childhood memories and family names for preservation.',
+      biography: 'A respected elder and campaign supporter of 100 Voices of Krobo, Maa Yowɛ has offered her childhood memories and family names for preservation.',
       image: '/assets/images/living-language/portrait-somanya-elder.jpg',
       consentStatus: 'given',
       visibility: ACCESS_LEVEL.PUBLIC,
