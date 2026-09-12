@@ -121,12 +121,37 @@
 
   /* ── Alphabet lesson ──────────────────────────────────────────────
      Real, playable letter grid using the supplied letter shapes. Name/
-     sound audio is honestly "being prepared" until verified. */
+     sound audio is honestly "being prepared" until verified — and, once
+     the Supabase-backed recordings pipeline (recordings.js) has an
+     approved clip for a letter, that clip plays for real. Fetching the
+     approved-audio map is fire-and-forget: the grid renders immediately
+     with whatever learn-data.js already has, then re-renders in place
+     if approved audio shows up a moment later. A failed/slow fetch
+     never blocks the lesson — it just means "being prepared" stays
+     showing, same as always. */
   function renderAlphabet(lesson, root) {
     Store.markLessonStarted(lesson.id);
     const items = lesson.itemIds.map(id => LL.getAlphabetById(id));
 
+    if (global.LivingLanguageRecordings) {
+      global.LivingLanguageRecordings.fetchApprovedAlphabetAudio().then(audioMap => {
+        let changed = false;
+        items.forEach(item => {
+          const approved = audioMap[item.id];
+          if (!approved) return;
+          if (approved.name && item.letterNameAudio !== approved.name) { item.letterNameAudio = approved.name; changed = true; }
+          if (approved.sound && item.letterSoundAudio !== approved.sound) { item.letterSoundAudio = approved.sound; changed = true; }
+        });
+        if (!changed) return;
+        if (root.querySelector('.ll-letter-grid')) renderGrid();
+        else if (openLetterId) renderPanel(openLetterId);
+      });
+    }
+
+    let openLetterId = null;
+
     function renderGrid() {
+      openLetterId = null;
       root.innerHTML = chrome(lesson, `
         <p class="ll-lesson-lede">Tap a letter to hear it and practice. Pronunciation audio is still being collected from native speakers — each card shows exactly what's ready today.</p>
         <div class="ll-letter-grid">
@@ -138,6 +163,7 @@
     }
 
     function renderPanel(letterId) {
+      openLetterId = letterId;
       const idx = items.findIndex(i => i.id === letterId);
       const item = items[idx];
       Store.markItemSeen(lesson.id, item.id);

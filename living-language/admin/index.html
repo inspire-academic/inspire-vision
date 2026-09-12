@@ -41,8 +41,11 @@
   <main class="ll-admin-main" id="llAdminMain"></main>
 </div>
 
+<script src="/assets/supabase.js"></script>
 <script src="/living-language/js/data.js"></script>
+<script src="/living-language/js/learn-data.js"></script>
 <script src="/living-language/js/store.js"></script>
+<script src="/living-language/js/recordings.js"></script>
 <script>
 /* Internal prototype only — noindex'd, not linked from public nav.
    Access control note: this MVP build has no server-side admin auth
@@ -160,11 +163,113 @@ function renderSpeakers() {
   `;
 }
 
-function renderRecordings() {
+async function renderRecordings() {
   main.innerHTML = `
-    <div class="ll-admin-head"><div><h1>Recordings</h1><p>No recordings ingested yet in this MVP — media pipeline is a future module (see README).</p></div></div>
-    <p style="color:var(--ll-ink-mute);font-size:13.5px;">Recordings will appear here once audio capture/upload is wired up. Preserve a Voice submissions currently arrive as text-only intake — see Review Queue.</p>
+    <div class="ll-admin-head"><div><h1>Recordings</h1><p>Upload alphabet letter audio and review it before it goes live in the Learn Klo lesson. See INSPIRE-VISION-LANGUAGE-PRESERVATION-MANUAL.md for the human hand-off that gets a contributor's recording to you in the first place.</p></div></div>
+    <div class="ll-admin-note">A recording only plays in the live lesson once you click Approve below. Uploading it here does not publish it.</div>
+
+    <div class="ll-recording-upload">
+      <h3 style="font-size:15px;margin-bottom:14px;">Upload a new recording</h3>
+      <form id="llUploadForm" style="display:grid;gap:14px;grid-template-columns:1fr 1fr;max-width:640px;">
+        <div class="ll-field" style="margin-bottom:0;">
+          <label>Letter</label>
+          <select id="llUploadLetter" required>
+            ${LivingLanguageLearn.alphabet.map(l => `<option value="${l.id}">${l.uppercase} — ${l.id}</option>`).join('')}
+          </select>
+        </div>
+        <div class="ll-field" style="margin-bottom:0;">
+          <label>Clip type</label>
+          <select id="llUploadKind" required>
+            <option value="name">Letter name</option>
+            <option value="sound">Letter sound</option>
+          </select>
+        </div>
+        <div class="ll-field" style="margin-bottom:0;grid-column:1 / -1;">
+          <label>Audio file</label>
+          <input type="file" id="llUploadFile" accept="audio/*" required>
+        </div>
+        <div class="ll-field" style="margin-bottom:0;">
+          <label>Speaker name <span class="optional">(optional)</span></label>
+          <input type="text" id="llUploadSpeaker" placeholder="e.g. Grandma Dade Ayongo">
+        </div>
+        <div class="ll-field" style="margin-bottom:0;">
+          <label>Note <span class="optional">(optional)</span></label>
+          <input type="text" id="llUploadNote" placeholder="e.g. recorded at the Somanya launch corridor">
+        </div>
+        <div style="grid-column:1 / -1;">
+          <button class="btn btn-gold" type="submit">Upload recording</button>
+          <span id="llUploadStatus" style="margin-left:12px;font-size:13px;color:var(--ll-ink-mute);"></span>
+        </div>
+      </form>
+    </div>
+
+    <h3 style="font-size:15px;margin:30px 0 14px;">All recordings</h3>
+    <div id="llRecordingsTable">Loading…</div>
   `;
+
+  document.getElementById('llUploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('llUploadStatus');
+    const fileInput = document.getElementById('llUploadFile');
+    const file = fileInput.files[0];
+    if (!file) return;
+    status.textContent = 'Uploading…';
+    const result = await LivingLanguageRecordings.uploadRecording({
+      conceptId: document.getElementById('llUploadLetter').value,
+      audioKind: document.getElementById('llUploadKind').value,
+      file,
+      speakerName: document.getElementById('llUploadSpeaker').value.trim(),
+      contributorNote: document.getElementById('llUploadNote').value.trim(),
+    });
+    if (result.ok) {
+      status.textContent = '✓ Uploaded — now pending review below.';
+      e.target.reset();
+      renderRecordingsTable();
+    } else {
+      status.textContent = 'Error: ' + result.error;
+    }
+  });
+
+  renderRecordingsTable();
+}
+
+async function renderRecordingsTable() {
+  const tableWrap = document.getElementById('llRecordingsTable');
+  if (!tableWrap) return;
+  const recordings = await LivingLanguageRecordings.listAll();
+  if (!recordings.length) {
+    tableWrap.innerHTML = `<p style="color:var(--ll-ink-mute);font-size:13.5px;">No recordings uploaded yet — use the form above.</p>`;
+    return;
+  }
+  tableWrap.innerHTML = `
+    <table class="ll-admin-table">
+      <thead><tr><th>Letter</th><th>Type</th><th>Audio</th><th>Speaker</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${recordings.map(r => `
+          <tr>
+            <td><strong>${r.concept_id}</strong></td>
+            <td>${r.audio_kind}</td>
+            <td><audio controls preload="none" style="height:32px;max-width:200px;" src="${r.publicUrl}"></audio></td>
+            <td>${r.speaker_name || '—'}</td>
+            <td>${statusPill(r.verification_status)}</td>
+            <td style="font-size:12px;color:var(--ll-ink-mute);">${new Date(r.submitted_at).toLocaleDateString()}</td>
+            <td>
+              <div class="ll-admin-actions">
+                <button class="ll-admin-btn approve" data-id="${r.id}" data-action="approved" ${r.verification_status === 'approved' ? 'disabled' : ''}>Approve</button>
+                <button class="ll-admin-btn reject" data-id="${r.id}" data-action="rejected" ${r.verification_status === 'rejected' ? 'disabled' : ''}>Reject</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+  tableWrap.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      await LivingLanguageRecordings.setStatus(btn.dataset.id, btn.dataset.action);
+      renderRecordingsTable();
+    });
+  });
 }
 
 function renderEntries() {
