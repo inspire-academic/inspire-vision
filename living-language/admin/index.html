@@ -30,6 +30,7 @@
   <aside class="ll-admin-sidebar" id="llAdminNav">
     <button data-view="overview" class="active" type="button">Overview</button>
     <button data-view="review" type="button">Review Queue</button>
+    <button data-view="naming" type="button">Naming Suggestions</button>
     <button data-view="speakers" type="button">Speakers</button>
     <button data-view="recordings" type="button">Recordings</button>
     <button data-view="entries" type="button">Language Entries</button>
@@ -61,6 +62,7 @@ function renderOverview() {
   const s = LivingLanguage.speakers.length;
   const r = LivingLanguage.languageEntries.length;
   const pendingSubmissions = LivingLanguageStore.listSubmissions().filter(x => x.reviewStatus === 'PENDING_REVIEW').length;
+  const namingSuggestions = LivingLanguageStore.listNamingSuggestions().length;
   const lessons = LivingLanguage.lessons.length;
   main.innerHTML = `
     <div class="ll-admin-head">
@@ -71,6 +73,7 @@ function renderOverview() {
       <div class="ll-admin-stat"><strong>${s}</strong><span>Speakers</span></div>
       <div class="ll-admin-stat"><strong>${r}</strong><span>Language Entries</span></div>
       <div class="ll-admin-stat"><strong>${pendingSubmissions}</strong><span>Pending Review</span></div>
+      <div class="ll-admin-stat"><strong>${namingSuggestions}</strong><span>Naming Suggestions</span></div>
       <div class="ll-admin-stat"><strong>${lessons}</strong><span>Published Lessons</span></div>
     </div>
     <p style="font-size:13px;color:var(--ll-ink-mute);">Use the sidebar to review incoming Preserve a Voice submissions, or browse the seed corpus below.</p>
@@ -111,6 +114,29 @@ function renderReview() {
       renderReview();
     });
   });
+}
+
+function renderNaming() {
+  const suggestions = LivingLanguageStore.listNamingSuggestions().slice().reverse();
+  main.innerHTML = `
+    <div class="ll-admin-head">
+      <div><h1>Naming Suggestions</h1><p>Krobo names the community has suggested for sections that launched in English only (Folk Songs/Dirges/Chants, Folk Tales).</p></div>
+    </div>
+    ${suggestions.length === 0 ? `<p style="color:var(--ll-ink-mute);font-size:13.5px;">No suggestions yet.</p>` : `
+    <table class="ll-admin-table">
+      <thead><tr><th>Section</th><th>Suggested Name</th><th>Reasoning</th><th>Submitted By</th><th>Submitted</th></tr></thead>
+      <tbody>
+        ${suggestions.map(s => `
+          <tr>
+            <td><strong>${s.sectionLabel}</strong></td>
+            <td style="font-family:var(--ll-serif);font-size:15px;">${s.suggestedName}</td>
+            <td style="max-width:280px;font-size:12.5px;color:var(--ll-ink-mute);">${s.reasoning || '—'}</td>
+            <td>${s.submitterName || 'Anonymous'}</td>
+            <td style="font-size:12px;color:var(--ll-ink-mute);">${new Date(s.submittedAt).toLocaleDateString()}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`}
+  `;
 }
 
 function renderSpeakers() {
@@ -189,7 +215,7 @@ function renderLessons() {
   `;
 }
 
-const views = { overview: renderOverview, review: renderReview, speakers: renderSpeakers, recordings: renderRecordings, entries: renderEntries, stories: renderStories, lessons: renderLessons };
+const views = { overview: renderOverview, review: renderReview, naming: renderNaming, speakers: renderSpeakers, recordings: renderRecordings, entries: renderEntries, stories: renderStories, lessons: renderLessons };
 
 nav.addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-view]');

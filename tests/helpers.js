@@ -4,13 +4,33 @@
 // framework.
 
 /** Collects console errors + uncaught page errors for a page. Call
- * assertNoErrors() after the actions you want covered. */
-function trackConsoleErrors(page) {
+ * assertNoErrors() after the actions you want covered.
+ *
+ * Also blocks Cloudflare Web Analytics' beacon script (see the
+ * data-cf-beacon script tag on index.html et al.) before it can load: the
+ * beacon's own XHR to cloudflareinsights.com does a CORS preflight that
+ * this suite's local static server at http://localhost:4173 always fails
+ * (Cloudflare's preflight response only allows the bare "http://localhost"
+ * origin, not one with a port), logging a CORS + "Failed to load
+ * resource" console error on every single page load. That's an artifact
+ * of this test environment, not a real defect in any page, so every spec
+ * using this helper was failing regardless of what it actually covered.
+ * Blocking the beacon request itself (rather than pattern-matching the
+ * console noise it produces) keeps this helper a real regression net —
+ * an unrelated genuine "resource failed to load" bug elsewhere still
+ * fails the check. Fulfilling with an empty (but successful) script
+ * response, rather than route.abort(), matters here: an aborted request
+ * logs its own "Failed to load resource" console error, which would just
+ * trade one false failure for another. */
+async function trackConsoleErrors(page) {
   const errors = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(msg.text());
   });
   page.on('pageerror', (err) => errors.push(err.message));
+  await page.route('https://static.cloudflareinsights.com/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' })
+  );
   return {
     errors,
     assertNoErrors() {

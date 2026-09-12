@@ -17,7 +17,7 @@ const { trackConsoleErrors } = require('./helpers');
 test.describe('Pink & Powerful registration page', () => {
   for (const url of ['/pages/pink-powerful-registration.html', '/pink-powerful-registration']) {
     test(`loads at ${url} with real content, no console errors`, async ({ page }) => {
-      const tracker = trackConsoleErrors(page);
+      const tracker = await trackConsoleErrors(page);
       await page.goto(url);
       await expect(page).toHaveTitle(/Pink & Powerful/);
       await expect(page.locator('h1.title')).toContainText('Pink');
@@ -57,7 +57,7 @@ test.describe('Pink & Powerful registration page', () => {
   });
 
   test('required-field validation blocks submission before Supabase is ever called', async ({ page }) => {
-    const tracker = trackConsoleErrors(page);
+    const tracker = await trackConsoleErrors(page);
     await page.goto('/pages/pink-powerful-registration.html');
     await page.click('#submitButton');
     // Native HTML5 validation should keep the browser on the same page

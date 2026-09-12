@@ -46,18 +46,29 @@ learning, campaign name **100 Voices of Krobo**. Lives at
 / parchment / terracotta — see `living-language/css/living-language.css`
 header comment), linked from the main nav/footer as "Living Language"
 rather than folded into the Our Pillars cardinal dropdown. Landing page,
-100 Voices gallery, a working Learn Krobo sample lesson, Family Voices
-concept page, the full Preserve a Voice 12-step intake, and an
-admin/corpus review prototype are all real and interactive; recording/
-audio upload and the Join the Movement form are placeholders. No new
-Supabase schema yet — Preserve a Voice submissions persist to
-`localStorage` via `living-language/js/store.js`, deliberately kept
-swappable for a real `living_language.*` schema later. See
-`living-language/README.md` for the full architecture, content model,
-and — importantly — a documented language-verification mistake made and
-corrected during this build (an invented Krobo phrase was used as lesson
-content and had to be replaced): read that section before adding any new
-Krobo-language content to this module.
+100 Voices gallery, Family Voices concept page, the full Preserve a
+Voice 12-step intake, and an admin/corpus review prototype are all real
+and interactive; recording/audio upload and the Join the Movement form
+are placeholders. No new Supabase schema yet — Preserve a Voice
+submissions persist to `localStorage` via `living-language/js/store.js`,
+deliberately kept swappable for a real `living_language.*` schema later.
+
+**2026-09-08 — Learn Klo added**, the project's next stage per a
+dedicated handoff brief: a full lesson system at `living-language/learn/`
+(dashboard + one generic lesson player driving 5 reusable lesson types),
+superseding the original single sample lesson. Real, working UI/engine/
+progress-tracking throughout; actual Krobo vocabulary content is almost
+entirely NOT collected yet (only the alphabet's letter shapes and the
+one previously-verified founding phrase are real) — every other lesson
+honestly shows a "being prepared" state rather than inventing words.
+See `living-language/learn/CONTENT-GAP-REPORT.md` for exactly what the
+human team needs to supply next.
+
+See `living-language/README.md` for the full architecture, content
+model, and — importantly — a documented language-verification mistake
+made and corrected during the first build (an invented Krobo phrase was
+used as lesson content and had to be replaced): read that section
+before adding any new Krobo-language content anywhere in this module.
 
 ## DESIGN-SYSTEM COLOUR — resolved 2026-07-09
 

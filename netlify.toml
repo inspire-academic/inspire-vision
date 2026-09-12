@@ -38,6 +38,21 @@ functions = "netlify/functions"
   to = "/mentorship/mentor-portal/"
   status = 301
 
+# The Living Language Project's single-lesson learn.html was retired in
+# favour of the full Learn Klo section (living-language/learn/) — see
+# living-language/README.md. The old file no longer exists at this path,
+# so no force=true is needed (compare the inspire-faith redirect below,
+# which does need it because that file still exists).
+[[redirects]]
+  from = "/living-language/learn.html"
+  to = "/living-language/learn/index.html"
+  status = 301
+
+[[redirects]]
+  from = "/living-language/learn"
+  to = "/living-language/learn/index.html"
+  status = 301
+
 # The old single-page Faith attempt (different, older navy/gold design
 # system than the approved /faith/ module built 2026-09) was never
 # linked from the homepage nav, but stayed live and reachable at its
