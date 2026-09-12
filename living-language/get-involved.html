@@ -73,7 +73,7 @@
 <section class="ll-section" style="padding-top:0;">
   <div class="wrap" style="max-width:640px;margin:0 auto;text-align:center;">
     <span class="eyebrow" style="color:var(--ll-terracotta);">Traditional leadership proposition</span>
-    <p style="font-family:var(--ll-serif);font-style:italic;font-size:22px;color:var(--ll-green);line-height:1.5;margin:14px 0;">&ldquo;We are not asking technology to replace our elders. We are using technology so their voices can continue teaching our children long after they are gone.&rdquo;</p>
+    <p style="font-family:var(--ll-serif);font-style:italic;font-size:22px;color:var(--ll-green);line-height:1.5;margin:14px 0;">&ldquo;We want to preserve the voices of our elders so that their uniquely rich voices can continue teaching our children and posterity long after they are gone. In doing so, we carefully preserve our language, our culture and our heritage for generations to come.&rdquo;</p>
   </div>
 </section>
 
@@ -135,7 +135,7 @@ llJoinForm?.addEventListener('submit', async (event) => {
   if (entry.company) {
     // Bot filled the hidden field — pretend success, save nothing.
     llJoinDone.hidden = false;
-    llJoinForm.hidden = true;
+    llJoinForm.style.display = 'none';
     return;
   }
   window.LivingLanguageStore?.submitJoinMovement({ name: entry.name, email: entry.email, message: entry.message });
