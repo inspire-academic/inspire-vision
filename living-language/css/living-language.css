@@ -251,7 +251,6 @@
 .ll-vcard{ background: var(--ll-white); border:1px solid var(--ll-line); border-radius: var(--ll-radius); overflow:hidden; box-shadow: var(--ll-shadow-soft); }
 .ll-vcard-media{ position:relative; aspect-ratio:4/3; overflow:hidden; }
 .ll-vcard-media img{ width:100%; height:100%; object-fit:cover; }
-.ll-vcard-tag{ position:absolute; top:12px; left:12px; background: rgba(18,53,33,.85); color:var(--ll-white); font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:5px 10px; border-radius:999px; }
 .ll-vcard-body{ padding:20px; }
 .ll-vcard-name{ font-family: var(--ll-serif); font-size:18px; font-weight:600; margin-bottom:2px; }
 .ll-vcard-loc{ font-size:12.5px; color: var(--ll-ink-mute); margin-bottom:10px; }
