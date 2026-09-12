@@ -382,8 +382,8 @@
       hypotheses = hypRes.data || [];
 
       const callingPayload = (reflectionsRes.data || [])[0]?.payload;
-      if (callingPayload?.text) $('callingReflection').value = callingPayload.text;
-      if (statementRes.data?.statement) $('workingStatement').value = statementRes.data.statement;
+      if (callingPayload?.text && !$('callingReflection').value) $('callingReflection').value = callingPayload.text;
+      if (statementRes.data?.statement && !$('workingStatement').value) $('workingStatement').value = statementRes.data.statement;
 
       renderStageStepper($('stepperWrap'), progressByStage, 'discern');
 

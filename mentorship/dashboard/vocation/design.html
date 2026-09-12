@@ -506,14 +506,18 @@
       }
       actionItems = itemsRes.data || [];
 
-      $('preferredTitle').value = pathwayPlan.preferred_pathway.title || '';
-      $('preferredDesc').value = pathwayPlan.preferred_pathway.description || '';
-      $('altTitle').value = pathwayPlan.alternative_pathway.title || '';
-      $('altDesc').value = pathwayPlan.alternative_pathway.description || '';
+      // Guarded (not unconditional) — these fields are live and typeable from
+      // the moment the page paints, well before this data finishes loading.
+      // An unconditional .value= here would silently wipe out anything the
+      // student already typed in that window the instant the fetch resolved.
+      if (!$('preferredTitle').value) $('preferredTitle').value = pathwayPlan.preferred_pathway.title || '';
+      if (!$('preferredDesc').value) $('preferredDesc').value = pathwayPlan.preferred_pathway.description || '';
+      if (!$('altTitle').value) $('altTitle').value = pathwayPlan.alternative_pathway.title || '';
+      if (!$('altDesc').value) $('altDesc').value = pathwayPlan.alternative_pathway.description || '';
       wirePathwayFields();
 
       const tenYearPayload = (reflectionsRes.data || [])[0]?.payload;
-      if (tenYearPayload?.text) $('tenYearReflection').value = tenYearPayload.text;
+      if (tenYearPayload?.text && !$('tenYearReflection').value) $('tenYearReflection').value = tenYearPayload.text;
 
       renderStageStepper($('stepperWrap'), progressByStage, 'design');
 
