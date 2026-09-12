@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123521">
+<title>Language Preservation Project Manual — The Living Language Project | Inspire Vision</title>
+<meta name="description" content="A growing, plain-language handbook for volunteers and contributors helping build 100 Voices of Krobo — starting with how to upload alphabet sound recordings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/living-language/css/living-language.css">
+<style>
+  /* ── Language Preservation Manual — extends living-language.css's
+     own tokens (--ll-*) rather than inventing a parallel palette.
+     Grows with one <article class="man-chapter"> per future guide. ── */
+  code, .man-file{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+    font-size:.92em; background:var(--ll-gold-tint); color:var(--ll-terracotta-deep);
+    padding:.1em .42em; border-radius:5px; white-space:nowrap;
+  }
+
+  .man-masthead{
+    background:linear-gradient(160deg, var(--ll-green) 0%, var(--ll-green-deep) 100%);
+    padding:14px 24px 42px;
+  }
+  .man-crumb{ font-size:12.5px; color:rgba(255,255,255,.55); margin-bottom:22px; }
+  .man-crumb a{ color:rgba(255,255,255,.55); }
+  .man-crumb a:hover{ color:var(--ll-gold-bright); }
+  .man-masthead h1{
+    font-family:var(--ll-serif); color:var(--ll-cream); font-size:clamp(30px,4.6vw,46px);
+    font-weight:700; line-height:1.1; margin:0 0 14px; max-width:16ch;
+  }
+  .man-masthead p.lede{ color:rgba(255,255,255,.8); font-size:16px; max-width:56ch; margin-bottom:0; }
+  .man-meta-row{
+    display:flex; gap:22px; flex-wrap:wrap; margin-top:26px;
+    padding-top:18px; border-top:1px solid var(--ll-green-line);
+  }
+  .man-meta-item{ display:flex; flex-direction:column; gap:2px; }
+  .man-meta-item .num{ font-family:var(--ll-serif); font-size:20px; color:var(--ll-gold-bright); font-variant-numeric:tabular-nums; }
+  .man-meta-item .lbl{ font-size:11px; color:rgba(255,255,255,.55); }
+
+  .man-shell{
+    max-width:960px; margin:0 auto; padding:0 24px;
+    display:grid; grid-template-columns:200px 1fr; gap:48px; align-items:start;
+  }
+  .man-toc{ position:sticky; top:24px; padding-top:44px; }
+  .man-toc-label{ color:var(--ll-ink-mute); margin-bottom:12px; display:block; }
+  .man-toc ol{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  .man-toc li a{
+    display:block; padding:8px 0; font-size:14px; font-weight:600; color:var(--ll-ink-soft);
+    text-decoration:none; border-left:2px solid var(--ll-line); padding-left:14px;
+  }
+  .man-toc li a:hover{ color:var(--ll-terracotta-deep); border-left-color:var(--ll-terracotta); }
+  .man-toc li.upcoming{ font-size:12.5px; color:var(--ll-ink-mute); font-style:italic; padding:8px 0 8px 16px; border-left:2px dashed var(--ll-line); }
+
+  .man-main{ padding-top:44px; padding-bottom:80px; min-width:0; }
+  .man-intro{ max-width:65ch; margin-bottom:50px; }
+  .man-intro p{ font-size:16.5px; }
+
+  .man-chapter{ max-width:65ch; }
+  .man-chapter + .man-chapter{ margin-top:70px; padding-top:50px; border-top:1px solid var(--ll-line); }
+  .man-chapter-head{ display:flex; gap:20px; align-items:flex-start; margin-bottom:26px; }
+  .man-chapter-numeral{ font-family:var(--ll-serif); font-size:42px; font-weight:600; color:var(--ll-gold-deep); line-height:1; flex-shrink:0; font-variant-numeric:tabular-nums; }
+  .man-chapter-titles .eyebrow{ color:var(--ll-terracotta); display:block; margin-bottom:6px; }
+  .man-chapter-titles h2{ font-family:var(--ll-serif); color:var(--ll-green); font-size:clamp(22px,3.2vw,28px); margin:0; text-wrap:balance; }
+
+  .man-chapter h3{ font-family:var(--ll-serif); color:var(--ll-green); font-size:19px; margin:34px 0 12px; }
+  .man-chapter h4{ font-size:14.5px; color:var(--ll-terracotta-deep); text-transform:uppercase; letter-spacing:.04em; margin:0 0 10px; }
+
+  .man-letters{ display:flex; flex-wrap:wrap; gap:7px; margin:16px 0 28px; padding:16px; background:var(--ll-cream); border:1px solid var(--ll-line); border-radius:12px; }
+  .man-letters span{ font-family:var(--ll-serif); font-size:15px; font-weight:600; color:var(--ll-green); background:var(--ll-paper-deep); border-radius:7px; padding:3px 9px; min-width:1.6em; text-align:center; }
+
+  .man-table{ width:100%; border-collapse:collapse; margin:0 0 28px; font-size:14.5px; }
+  .man-table th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ll-ink-mute); font-weight:700; padding:0 14px 10px 0; border-bottom:1.5px solid var(--ll-ink); }
+  .man-table td{ padding:14px 14px 14px 0; border-bottom:1px solid var(--ll-line); vertical-align:top; color:var(--ll-ink-soft); }
+  .man-table td:first-child, .man-table th:first-child{ font-weight:700; color:var(--ll-ink); white-space:nowrap; padding-right:22px; }
+
+  .man-tips{ margin:0 0 28px; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .man-tips li{ position:relative; padding-left:22px; font-size:14.5px; color:var(--ll-ink-soft); }
+  .man-tips li::before{ content:'—'; position:absolute; left:0; color:var(--ll-gold-deep); font-weight:700; }
+
+  .man-steps{ list-style:none; margin:0 0 32px; padding:0; position:relative; }
+  .man-steps::before{ content:''; position:absolute; left:19px; top:14px; bottom:14px; width:1.5px; background:var(--ll-line); }
+  .man-step{ position:relative; padding:0 0 28px 60px; }
+  .man-step:last-child{ padding-bottom:0; }
+  .man-step-num{ position:absolute; left:0; top:0; width:40px; height:40px; border-radius:50%; background:var(--ll-green); color:var(--ll-gold-bright); font-family:var(--ll-serif); font-weight:700; font-size:16px; display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums; z-index:1; }
+  .man-step h4{ color:var(--ll-green); text-transform:none; letter-spacing:0; font-size:16.5px; font-family:var(--ll-serif); margin-bottom:6px; }
+  .man-step p{ font-size:14.5px; margin-bottom:0; }
+
+  .man-aside{ display:flex; gap:14px; align-items:flex-start; background:var(--ll-gold-tint); border-left:3px solid var(--ll-gold-deep); border-radius:0 12px 12px 0; padding:18px 20px; margin:0 0 32px; }
+  .man-aside svg{ flex-shrink:0; margin-top:2px; width:20px; height:20px; stroke:var(--ll-gold-deep); }
+  .man-aside p{ font-size:14.5px; margin-bottom:0; color:var(--ll-ink); }
+  .man-aside strong{ color:var(--ll-green); }
+
+  .man-pullquote{ font-family:var(--ll-serif); font-style:italic; font-size:19px; color:var(--ll-green); line-height:1.5; margin:32px 0; padding-left:20px; border-left:3px solid var(--ll-terracotta); }
+
+  .man-contact{ background:var(--ll-cream); border:1px solid var(--ll-line); border-radius:14px; padding:22px 24px; margin:34px 0 0; }
+  .man-contact h4{ font-size:11px; margin-bottom:8px; }
+  .man-contact p{ font-size:14.5px; margin-bottom:0; }
+
+  @media (max-width:760px){
+    .man-shell{ grid-template-columns:1fr; gap:0; }
+    .man-toc{ position:static; padding-top:26px; padding-bottom:6px; }
+    .man-toc ol{ flex-direction:row; flex-wrap:wrap; gap:10px; }
+    .man-toc li a{ border-left:none; border-bottom:2px solid var(--ll-line); padding:0 0 6px; }
+    .man-toc li.upcoming{ border:none; padding:0; }
+    .man-main{ padding-top:20px; }
+    .man-chapter-numeral{ font-size:32px; }
+    .man-step{ padding-left:52px; }
+    .man-step-num{ width:34px; height:34px; font-size:14px; }
+    .man-steps::before{ left:16px; }
+  }
+</style>
+</head>
+<body class="ll">
+
+<header class="ll-header">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="34" height="34">
+      <span class="ll-brand-copy"><strong>Inspire Vision</strong><small>The Living Language Project</small></span>
+    </a>
+    <nav class="ll-nav" aria-label="Primary navigation">
+      <a href="/living-language/index.html">Home</a>
+      <a href="/living-language/about.html">About</a>
+      <a href="/living-language/100-voices.html">100 Voices</a>
+      <a href="/living-language/community/index.html">Community Voices</a>
+      <a href="/living-language/learn/index.html">Learn</a>
+      <a href="/living-language/family-voices.html">Family Voices</a>
+      <a href="/living-language/get-involved.html">Get Involved</a>
+    </nav>
+    <div class="ll-header-actions">
+      <button class="ll-icon-btn ll-menu-btn" id="llMenuBtn" aria-label="Open navigation" aria-expanded="false" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="ll-mobile-nav" id="llMobileNav">
+    <a href="/living-language/index.html">Home</a>
+    <a href="/living-language/about.html">About</a>
+    <a href="/living-language/100-voices.html">100 Voices</a>
+    <a href="/living-language/community/index.html">Community Voices</a>
+    <a href="/living-language/learn/index.html">Learn</a>
+    <a href="/living-language/family-voices.html">Family Voices</a>
+    <a href="/living-language/get-involved.html">Get Involved</a>
+  </div>
+</header>
+
+<div class="man-masthead">
+  <div class="man-crumb"><a href="/documentation/index.html">Documentation</a> &nbsp;/&nbsp; Language Preservation Project Manual</div>
+  <h1>Language Preservation Project Manual</h1>
+  <p class="lede">A growing, plain-language handbook for everyone helping preserve Krobo and Dangme through 100&nbsp;Voices&nbsp;of&nbsp;Krobo — family members, teachers, traditional leaders, diaspora relatives, and volunteers, no technical background required.</p>
+  <div class="man-meta-row">
+    <div class="man-meta-item"><span class="num">01</span><span class="lbl">Guide published</span></div>
+    <div class="man-meta-item"><span class="num">30</span><span class="lbl">Alphabet letters awaiting real audio</span></div>
+    <div class="man-meta-item"><span class="num">0</span><span class="lbl">Recordings received so far</span></div>
+  </div>
+</div>
+
+<div class="man-shell">
+  <nav class="man-toc" aria-label="Manual contents">
+    <span class="eyebrow man-toc-label">Contents</span>
+    <ol>
+      <li><a href="#guide-1">Guide 1 — Alphabet sound recordings</a></li>
+      <li class="upcoming">More guides added here as the project grows</li>
+    </ol>
+  </nav>
+
+  <main class="man-main">
+    <section class="man-intro">
+      <p><em>100&nbsp;Voices of Krobo</em> exists to help the Krobo language remain spoken, heard, learned and remembered across generations. That only works if real people take part in building it. This manual collects simple, step-by-step guides for everyone involved — one task per chapter, in plain language. Find the guide for what's in front of you, follow the steps, and reach out if anything is unclear.</p>
+    </section>
+
+    <article class="man-chapter" id="guide-1">
+      <div class="man-chapter-head">
+        <span class="man-chapter-numeral">01</span>
+        <div class="man-chapter-titles">
+          <span class="eyebrow">Guide 1</span>
+          <h2>How to Upload Sound Recordings for the Alphabet Lessons</h2>
+        </div>
+      </div>
+
+      <h3>What this guide covers</h3>
+      <p>The Learn Klo alphabet lesson lets learners tap a letter and hear it spoken by a real Krobo voice. Right now, every letter is waiting for that real recording — we never use computer-generated or invented voices anywhere in this project. This guide explains exactly how a set of real recordings gets from a phone or microphone into the live app.</p>
+
+      <p class="man-pullquote">&ldquo;We never invent Krobo words, spellings, or pronunciations. If a letter hasn't been confirmed by a real speaker yet, the app honestly says so instead of guessing.&rdquo;</p>
+
+      <h3>The alphabet, letter by letter</h3>
+      <p>Two short clips are needed for each of the 30 letters and letter-combinations in the current working sequence:</p>
+      <div class="man-letters" aria-label="The 30-letter Krobo alphabet sequence">
+        <span>A</span><span>B</span><span>D</span><span>E</span><span>Ɛ</span><span>F</span><span>G</span><span>GB</span><span>H</span><span>I</span><span>J</span><span>K</span><span>KP</span><span>L</span><span>M</span><span>N</span><span>NG</span><span>NGM</span><span>NY</span><span>O</span><span>Ɔ</span><span>P</span><span>S</span><span>T</span><span>TS</span><span>U</span><span>V</span><span>W</span><span>Y</span><span>Z</span>
+      </div>
+
+      <h4>Before you record — what we need per letter</h4>
+      <table class="man-table">
+        <thead><tr><th>Clip</th><th>What it should contain</th></tr></thead>
+        <tbody>
+          <tr><td>Letter name</td><td>The speaker says the <em>name</em> of the letter, clearly and naturally.</td></tr>
+          <tr><td>Letter sound</td><td>The speaker demonstrates the <em>sound</em> the letter makes.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Recording tips</h4>
+      <ul class="man-tips">
+        <li>Record somewhere quiet, without background noise, wind, or echo.</li>
+        <li>Hold the microphone or phone a comfortable distance from the speaker's mouth.</li>
+        <li>Keep each clip short — just the name or sound, with a little silence before and after.</li>
+        <li>If a recording doesn't sound clean, record it again — a second take costs nothing.</li>
+        <li>A phone's built-in voice recorder app is perfectly fine for this.</li>
+      </ul>
+
+      <h3>From recording to the live app</h3>
+      <ol class="man-steps">
+        <li class="man-step">
+          <span class="man-step-num">1</span>
+          <h4>Record the sounds</h4>
+          <p>Work with a native Krobo speaker to record the "letter name" and "letter sound" clips above. It's fine to do this one letter at a time, or a few at once — you don't need all 30 before sending anything.</p>
+        </li>
+        <li class="man-step">
+          <span class="man-step-num">2</span>
+          <h4>Name your files clearly</h4>
+          <p>Give each recording a simple file name that says which letter and which clip type it is — for example, the letter "A" might produce <span class="man-file">A-name.mp3</span> and <span class="man-file">A-sound.mp3</span>. This lets our team match every recording to the right letter without guesswork.</p>
+        </li>
+        <li class="man-step">
+          <span class="man-step-num">3</span>
+          <h4>Send the recordings to the project team</h4>
+          <p>Share the audio files with whoever is coordinating the technical side (currently Eric) — a shared folder, a message with attachments, or a hand-off if you're local. There's no upload button in the app for this yet, which also means every recording gets a human look before it goes near the app.</p>
+        </li>
+        <li class="man-step">
+          <span class="man-step-num">4</span>
+          <h4>The team adds your recordings to the app</h4>
+          <p>Once received, recordings are connected to the correct letters — carefully, one at a time, so nothing gets mixed up.</p>
+        </li>
+        <li class="man-step">
+          <span class="man-step-num">5</span>
+          <h4>A native speaker or reviewer confirms accuracy</h4>
+          <p>Before a recording is marked trustworthy in the app, someone with real authority on the Krobo language confirms the name, sound and spelling are correct. A recording existing isn't the same as it being <em>approved</em> — this step protects the accuracy the whole project depends on.</p>
+        </li>
+        <li class="man-step">
+          <span class="man-step-num">6</span>
+          <h4>It goes live</h4>
+          <p>Once approved, the recording appears in the alphabet lesson for every learner to hear — checked on a real phone before it's called done.</p>
+        </li>
+      </ol>
+
+      <div class="man-aside">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2v20M2 12h20" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>
+        <p><strong>Only have a few recordings, not all 30?</strong> That's completely fine, and encouraged. Even one or two solid, clean recordings is real progress — the alphabet lesson can go live letter by letter as recordings come in, without waiting for all 30 at once.</p>
+      </div>
+
+      <div class="man-contact">
+        <h4>Who to contact</h4>
+        <p>Ready to send recordings, or have questions about equipment or format? Reach out to the project coordinator before you start recording — a quick check-in up front can save a re-recording session later.</p>
+      </div>
+    </article>
+  </main>
+</div>
+
+<footer class="ll-footer">
+  <div class="wrap">
+    <a href="/living-language/index.html" class="ll-brand" aria-label="Inspire Vision home">
+      <img src="/assets/images/Inspire_vision_Logo1.png" alt="" width="30" height="30">
+      <span class="ll-brand-copy"><strong style="color:var(--ll-white)">Inspire Vision</strong><small>People &middot; Heritage &middot; Brighter Tomorrows</small></span>
+    </a>
+    <nav class="ll-footer-links" aria-label="Footer navigation">
+      <a href="/documentation/index.html">All Documentation</a>
+      <a href="/living-language/index.html">Living Language Home</a>
+      <a href="/living-language/get-involved.html">Get Involved</a>
+    </nav>
+  </div>
+  <div class="wrap ll-footer-bottom">
+    <span>&copy; 2026 Inspire Vision — The Living Language Project. All rights reserved.</span>
+    <span>This manual will keep growing as the project comes together.</span>
+  </div>
+</footer>
+
+<script>
+const llMenuBtn = document.getElementById('llMenuBtn');
+const llMobileNav = document.getElementById('llMobileNav');
+llMenuBtn?.addEventListener('click', () => {
+  const open = llMobileNav.classList.toggle('open');
+  llMenuBtn.setAttribute('aria-expanded', String(open));
+});
+llMobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  llMobileNav.classList.remove('open');
+  llMenuBtn?.setAttribute('aria-expanded', 'false');
+}));
+</script>
+</body>
+</html>

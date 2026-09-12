@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — Inspire Vision™</title>
+  <meta name="description" content="How-to guides and training manuals for volunteers, mentors, and contributors across the Inspire Vision ecosystem.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    body { background: var(--navy); color: var(--white); min-height: 100vh; }
+
+    /* NAV — matches coming-soon.html's minimal utility-page chrome */
+    .doc-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 3rem; height: 72px; background: rgba(10,22,40,0.95);
+      border-bottom: 1px solid rgba(201,151,28,0.15); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .doc-nav a { text-decoration: none; }
+    .doc-nav-home {
+      font-size: 0.82rem; font-weight: 500; color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;
+    }
+    .doc-nav-home:hover { color: var(--clr-gold); }
+    .doc-nav-home svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* HEADER */
+    .doc-header { padding: 5rem 2rem 3.5rem; text-align: center; }
+    .doc-eyebrow {
+      display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--clr-gold); margin-bottom: 1.5rem;
+    }
+    .doc-eyebrow::before, .doc-eyebrow::after { content: ''; width: 40px; height: 1.5px; background: var(--clr-gold); opacity: 0.6; }
+    .doc-header h1 {
+      font-family: var(--font-display, 'Fraunces', serif); font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 700; line-height: 1.1; color: var(--white); margin: 0 auto 1.25rem; max-width: 16ch;
+      text-wrap: balance;
+    }
+    .doc-header p { font-size: 1.05rem; line-height: 1.7; color: rgba(255,255,255,0.65); max-width: 560px; margin: 0 auto; }
+
+    /* CONTENT SHELL */
+    .doc-shell { max-width: 900px; margin: 0 auto; padding: 0 2rem 6rem; }
+    .doc-group { margin-bottom: 3.5rem; }
+    .doc-group-head {
+      display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px;
+      padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .doc-group-head h2 { font-family: var(--font-display, 'Fraunces', serif); font-size: 1.4rem; color: var(--white); margin: 0; }
+    .doc-group-head span { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+
+    .doc-card {
+      display: flex; gap: 20px; align-items: flex-start; padding: 24px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; text-decoration: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .doc-card:hover, .doc-card:focus-visible { border-color: rgba(201,151,28,0.4); background: rgba(255,255,255,0.05); }
+    .doc-card-icon {
+      flex-shrink: 0; width: 46px; height: 46px; border-radius: 12px;
+      background: var(--clr-gold-glow); display: flex; align-items: center; justify-content: center;
+    }
+    .doc-card-icon svg { width: 22px; height: 22px; stroke: var(--clr-gold); fill: none; stroke-width: 1.7; }
+    .doc-card-body h3 { font-family: var(--font-display, 'Fraunces', serif); font-size: 1.15rem; color: var(--white); margin: 0 0 6px; }
+    .doc-card-body p { font-size: 0.92rem; line-height: 1.55; color: rgba(255,255,255,0.6); margin: 0 0 10px; }
+    .doc-card-meta { font-size: 0.78rem; color: var(--clr-gold); font-weight: 600; }
+
+    .doc-empty {
+      padding: 20px 24px; border: 1px dashed rgba(255,255,255,0.14); border-radius: 14px;
+      font-size: 0.9rem; font-style: italic; color: rgba(255,255,255,0.4);
+    }
+
+    /* FOOTER */
+    .doc-footer { text-align: center; padding: 1.5rem 3rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .doc-footer p { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+    .doc-footer p span { color: var(--clr-gold); margin: 0 0.4rem; }
+
+    @media (max-width: 640px) {
+      .doc-nav { padding: 0 1.25rem; }
+      .doc-header { padding: 3.5rem 1.25rem 2.5rem; }
+      .doc-shell { padding: 0 1.25rem 4rem; }
+      .doc-card { flex-direction: column; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="doc-nav">
+    <img src="/assets/images/Inspire_vision_Logo1.png" alt="Inspire Vision" style="height:40px;width:auto;object-fit:contain;">
+    <a href="/index.html" class="doc-nav-home">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Home
+    </a>
+  </nav>
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Inspire Vision</div>
+    <h1>Documentation &amp; Training Manuals</h1>
+    <p>Plain-language, step-by-step guides for volunteers, mentors, and contributors helping build the projects in the Inspire Vision ecosystem — no technical background required.</p>
+  </header>
+
+  <div class="doc-shell">
+    <section class="doc-group">
+      <div class="doc-group-head">
+        <h2>The Living Language Project</h2>
+        <span>100 Voices of Krobo</span>
+      </div>
+
+      <a class="doc-card" href="/documentation/living-language/language-preservation-manual.html">
+        <div class="doc-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <div class="doc-card-body">
+          <h3>Language Preservation Project Manual</h3>
+          <p>A growing handbook for family members, teachers, traditional leaders, diaspora relatives, and volunteers — starting with how to record and hand off real Krobo alphabet sound recordings.</p>
+          <span class="doc-card-meta">1 guide published →</span>
+        </div>
+      </a>
+    </section>
+
+    <section class="doc-group">
+      <div class="doc-group-head">
+        <h2>More projects</h2>
+      </div>
+      <div class="doc-empty">Documentation for Mentorship &amp; Formation, Faith &amp; Spiritual Formation, and other Inspire Vision projects will be added here as those training materials are written.</div>
+    </section>
+  </div>
+
+  <footer class="doc-footer">
+    <p>Reforming Minds <span>·</span> Renewing Hearts <span>·</span> Rebuilding Nations</p>
+  </footer>
+
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50e9f3f9548a4ce3bb5af6208dd5899d"}'></script>
+</body>
+</html>
