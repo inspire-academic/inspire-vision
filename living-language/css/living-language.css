@@ -103,10 +103,13 @@
 .ll-hero-media::after{ content:''; position:absolute; inset:0; background: linear-gradient(100deg, rgba(11,35,23,.94) 0%, rgba(11,35,23,.82) 32%, rgba(11,35,23,.42) 58%, rgba(11,35,23,.15) 100%); }
 .ll-hero-inner{ position:relative; padding: 72px 24px 56px; }
 .ll-hero-content{ max-width:640px; }
+.ll-hero-greeting{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+.ll-hero-greeting-word{ font-family: var(--ll-serif); font-weight:700; font-size: clamp(52px, 8vw, 92px); line-height:1; color: var(--ll-white); }
+.ll-hero-greeting-translation{ font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color: var(--ll-gold-bright); }
 .ll-hero .eyebrow{ color: var(--ll-gold-bright); margin-bottom:10px; display:block; }
-.ll-hero .campaign{ color: rgba(255,255,255,.72); font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; margin-bottom:18px; display:block; }
-.ll-hero h1{ font-size: clamp(34px, 4.6vw, 54px); color: var(--ll-white); margin-bottom:20px; }
+.ll-hero h1{ font-size: clamp(34px, 4.6vw, 54px); color: var(--ll-white); margin-bottom:16px; }
 .ll-hero h1 em{ font-style:normal; color: var(--ll-gold-bright); }
+.ll-hero-lead{ font-family: var(--ll-serif); font-style:italic; font-size:19px; color: rgba(255,255,255,.85); margin-bottom:14px; max-width:480px; }
 .ll-hero-copy{ font-size:17px; line-height:1.6; color: rgba(255,255,255,.86); max-width:520px; margin-bottom:30px; }
 .ll-hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:34px; }
 .ll-hero-strap{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color: rgba(255,255,255,.55); border-top:1px solid rgba(255,255,255,.18); padding-top:18px; }
