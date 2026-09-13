@@ -198,8 +198,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Explore ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">React to at least three careers across at least two different families before this stage is ready for your mentor to review.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you're ready.</div>
       </div>
     </div>
   </main>
@@ -379,15 +379,16 @@
       </div>`).join('') || '<div class="voc-empty">Nothing shortlisted yet — react to careers above as you browse.</div>';
   }
 
+  // Purely informational — never blocks "Mark Ready for Review". See
+  // discover.html's isSectionComplete comment for why: mentees should be
+  // free to move on with as little as feels right, not made to feel stuck.
   function updateGate() {
     const reacted = Object.values(reactionsByProfile);
     const distinctFamilies = new Set(reacted.map(r => profiles.find(p => p.id === r.career_profile_id)?.family_id).filter(Boolean));
     const ready = reacted.length >= 3 && distinctFamilies.size >= 2;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'You have reacted to careers across multiple families. You can mark this stage ready for your mentor.'
-      : `React to at least three careers across at least two different families before this stage is ready for review (currently ${reacted.length} reaction${reacted.length === 1 ? '' : 's'} across ${distinctFamilies.size} famil${distinctFamilies.size === 1 ? 'y' : 'ies'}).`;
+      : `You can mark this stage ready for your mentor whenever you're ready (currently ${reacted.length} reaction${reacted.length === 1 ? '' : 's'} across ${distinctFamilies.size} famil${distinctFamilies.size === 1 ? 'y' : 'ies'}).`;
   }
 
   $('markReadyBtn')?.addEventListener('click', async () => {

@@ -720,17 +720,9 @@
     const isLast = currentIndex === SECTIONS.length - 1;
     if (!isLast) { goToSection(currentIndex + 1); return; }
 
-    const incompleteSections = SECTIONS.filter(s => !isSectionComplete(s.key));
-    const hasEvidence = evidenceItems.length > 0;
-    if (incompleteSections.length || !hasEvidence) {
-      const missing = incompleteSections.map(s => s.title);
-      if (!hasEvidence) missing.push('at least one piece of evidence in Strengths & Evidence');
-      const hint = $('gateHint');
-      hint.textContent = `Still needed before this stage is ready for your mentor to review: ${missing.join(', ')}.`;
-      hint.style.display = 'block';
-      return;
-    }
-
+    // No hard requirement here — mentees should be free to mark this stage
+    // ready for their mentor with as much or as little answered as feels
+    // right to them, not made to feel stuck by a checklist.
     const btn = $('flowNextBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'discover');

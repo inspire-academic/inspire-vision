@@ -203,8 +203,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Discern ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Keep at least two active pathway hypotheses, each with a real answer to "what would change my mind," before this stage is ready for review.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you're ready.</div>
       </div>
     </div>
   </main>
@@ -334,14 +334,15 @@
   }, 700);
   $('workingStatement')?.addEventListener('input', (e) => saveStatementDebounced(e.target.value));
 
+  // Purely informational — never blocks "Mark Ready for Review". See
+  // discover.html's isSectionComplete comment for why: mentees should be
+  // free to move on with as little as feels right, not made to feel stuck.
   function updateGate() {
     const activeCount = hypotheses.filter(h => h.status === 'active' && h.what_would_change_my_mind).length;
     const ready = activeCount >= 2;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'You have at least two active, falsifiable hypotheses. You can mark this stage ready for your mentor.'
-      : `Keep at least two active pathway hypotheses alive, each with a real "what would change my mind" answer (currently ${activeCount}).`;
+      : 'Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you\'re ready.';
   }
 
   $('markReadyBtn')?.addEventListener('click', async () => {

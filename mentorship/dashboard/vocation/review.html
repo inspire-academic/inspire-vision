@@ -184,8 +184,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Review ready for mentor sign-off</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Save at least one review before this stage is ready for your mentor's sign-off.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor's sign-off whenever you're ready.</div>
       </div>
     </div>
   </main>
@@ -256,13 +256,14 @@
       </div>`).join('') || '<div class="voc-empty">No reviews saved yet — your first review will appear here.</div>';
   }
 
+  // Purely informational — never blocks "Mark Ready for Review". See
+  // discover.html's isSectionComplete comment for why: mentees should be
+  // free to move on with as little as feels right, not made to feel stuck.
   function updateGate() {
     const ready = reviews.length >= 1;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'You have saved at least one review. You can mark this stage ready for your mentor\'s sign-off.'
-      : 'Save at least one review before this stage is ready for your mentor\'s sign-off.';
+      : 'You can mark this stage ready for your mentor\'s sign-off whenever you\'re ready.';
   }
 
   $('submitReviewBtn')?.addEventListener('click', async () => {

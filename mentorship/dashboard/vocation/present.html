@@ -200,8 +200,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Present ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Add at least three talking points and prepare at least one anticipated question before this stage is ready for review.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you're ready.</div>
       </div>
     </div>
   </main>
@@ -373,13 +373,14 @@
     savePrepDebounced();
   });
 
+  // Purely informational — never blocks "Mark Ready for Review". See
+  // discover.html's isSectionComplete comment for why: mentees should be
+  // free to move on with as little as feels right, not made to feel stuck.
   function updateGate() {
     const ready = prep.talking_points.length >= 3 && prep.anticipated_questions.length >= 1;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'You have real talking points and anticipated questions prepared. You can mark this stage ready for your mentor.'
-      : `Add at least three talking points and prepare at least one anticipated question before this stage is ready for review (currently ${prep.talking_points.length} talking point${prep.talking_points.length === 1 ? '' : 's'}, ${prep.anticipated_questions.length} question${prep.anticipated_questions.length === 1 ? '' : 's'}).`;
+      : `You can mark this stage ready for your mentor whenever you're ready (currently ${prep.talking_points.length} talking point${prep.talking_points.length === 1 ? '' : 's'}, ${prep.anticipated_questions.length} question${prep.anticipated_questions.length === 1 ? '' : 's'}).`;
   }
 
   $('markReadyBtn')?.addEventListener('click', async () => {

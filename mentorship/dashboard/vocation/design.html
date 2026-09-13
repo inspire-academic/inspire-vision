@@ -225,8 +225,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Design ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Give your preferred pathway a title and add at least one action item to each of the three horizons before this stage is ready for review.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you're ready, whether or not everything above is filled in.</div>
       </div>
     </div>
   </main>
@@ -453,15 +453,17 @@
   }, 700);
   $('tenYearReflection')?.addEventListener('input', (e) => saveTenYearDebounced({ text: e.target.value }));
 
+  // Purely informational — never blocks "Mark Ready for Review". Mentees
+  // should be free to move on with as much or as little filled in as feels
+  // right to them; a hard requirement here was landing as off-putting,
+  // especially for younger mentees still figuring things out.
   function updateGate() {
     const hasPreferredTitle = !!(pathwayPlan.preferred_pathway.title && pathwayPlan.preferred_pathway.title.trim());
     const horizonsFilled = PLAN_TYPES.every(p => itemsFor(p.key).length > 0);
     const ready = hasPreferredTitle && horizonsFilled;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'Your preferred pathway is named and all three horizons have concrete items. You can mark this stage ready for your mentor.'
-      : `Give your preferred pathway a title${!horizonsFilled ? ' and add at least one item to each horizon' : ''} before this stage is ready for review.`;
+      : 'Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you\'re ready.';
     renderRecap();
   }
 
