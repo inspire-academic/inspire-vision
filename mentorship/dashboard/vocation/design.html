@@ -364,7 +364,6 @@
     container.querySelector('[data-add-item]')?.addEventListener('click', async () => {
       const titleEl = container.querySelector(`[data-item-title="${planType}"]`);
       const title = titleEl.value.trim();
-      if (!title) return;
       const descEl = container.querySelector(`[data-item-desc="${planType}"]`);
       const dateEl = container.querySelector(`[data-item-date="${planType}"]`);
       const periodEl = container.querySelector(`[data-item-period="${planType}"]`);

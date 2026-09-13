@@ -329,7 +329,6 @@
   }
   $('addTalkingPointBtn')?.addEventListener('click', () => {
     const text = $('talkingPointInput').value.trim();
-    if (!text) return;
     prep.talking_points.push({ text, done: false });
     $('talkingPointInput').value = '';
     renderTalkingPoints();
@@ -350,7 +349,6 @@
   }
   $('addEvidenceBtn')?.addEventListener('click', () => {
     const text = $('evidenceInput').value.trim();
-    if (!text) return;
     prep.evidence_checklist.push({ text, done: false });
     $('evidenceInput').value = '';
     renderEvidenceChecklist();
@@ -366,7 +364,6 @@
   }
   $('addQaBtn')?.addEventListener('click', () => {
     const question = $('qaQuestion').value.trim();
-    if (!question) return;
     prep.anticipated_questions.push({ question, answer: $('qaAnswer').value.trim() });
     $('qaQuestion').value = ''; $('qaAnswer').value = '';
     renderQaList();

@@ -293,17 +293,6 @@
   $('addHypBtn')?.addEventListener('click', async () => {
     const label = $('hypLabel').value.trim();
     const what_would_change_my_mind = $('hypChangeMind').value.trim();
-    const hypErrorEl = $('hypError');
-    if (!label || !what_would_change_my_mind) {
-      if (hypErrorEl) {
-        hypErrorEl.textContent = !label
-          ? 'Give this pathway a label before adding it.'
-          : 'Answer "What would change my mind?" — it\'s required so this counts as a real, falsifiable hypothesis.';
-        hypErrorEl.style.display = 'block';
-      }
-      return;
-    }
-    if (hypErrorEl) hypErrorEl.style.display = 'none';
     const payload = {
       student_id: currentUser.id,
       label,

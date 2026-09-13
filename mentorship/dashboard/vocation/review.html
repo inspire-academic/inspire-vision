@@ -268,7 +268,6 @@
 
   $('submitReviewBtn')?.addEventListener('click', async () => {
     const mentee_reflection = $('reviewReflection').value.trim();
-    if (!mentee_reflection) return;
     const btn = $('submitReviewBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
 
@@ -284,7 +283,7 @@
       working_statement_snapshot: statementRes.data?.statement || null,
       stage_snapshot: progressByStage,
       hypotheses_snapshot: hypRes.data || [],
-      mentee_reflection,
+      mentee_reflection: mentee_reflection || null,
     };
     const { data, error } = await dbClient.schema('mentorship').from('vocation_reviews').insert(payload).select().single();
     btn.disabled = false; btn.textContent = 'Save This Review';
