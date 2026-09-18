@@ -264,6 +264,28 @@ workspace — all deliberately deferred, see below):
   the other notify functions) and `LORDS_CONSULT_NOTIFY_EMAIL` (set to
   `office@lordsconsult.com,admin@inspireacademic.org`).
 
+- **2026-09-18 — V2 experience + methodology upgrade.** The page now
+  frames the diagnostic as the front door into PURPOSE → IDEA →
+  STRUCTURE → SYSTEM → SCALE (Business/CIC/Charity is one decision
+  inside STRUCTURE): four benefit pillars (Clarity / Confidence /
+  Direction / Impact, 2×2 on mobile), a "From Idea to Scale" section,
+  one SVG line-icon sprite in `index.html`, and a stage indicator on the
+  result screen. `script.js` is now UI only; quiz data lives in
+  `diagnostic-config.js` and pure scoring/result-model logic in
+  `diagnostic-engine.js` (`buildResultModel()` returns route, stage,
+  readiness, strengths, risks, recommendedNextStep, recommendedService,
+  consultationCTA). Scoring is unchanged — verified identical to the
+  pre-refactor code over 300k answer combinations. **Stage is inferred
+  from the readiness axis only**, and `already_operating` maps to SYSTEM
+  because nothing in the 12 questions can distinguish SYSTEM from SCALE
+  yet (see the comment in `diagnostic-config.js`). `stage` is
+  deliberately NOT written to `diagnostic_sessions`/`leads` — those
+  tables have fixed columns, so adding it needs a migration first or the
+  insert (and lead capture) breaks. `recommendedService` values are
+  working titles, not shown to visitors. The placeholder testimonial was
+  replaced with a "What you can expect" assurance panel — don't
+  reintroduce a testimonial until a real, approved one exists.
+
 **Deliberately NOT built yet** (all still just described in
 BUILD-BRIEF.md): payment/booking (no Stripe/GoCardless or Cal.com/
 Calendly integration exists anywhere in this repo), the adviser/CRM
