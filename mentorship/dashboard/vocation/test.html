@@ -272,12 +272,12 @@
       <textarea class="voc-textarea" id="convTakeaways"></textarea>
       <label class="voc-field-label">Did it change your thinking?</label>
       <textarea class="voc-textarea" id="convChanged"></textarea>
-      <button class="list-card-btn" id="addConvBtn">+ Log Conversation</button>`;
+      <button class="list-card-btn" id="addConvBtn">+ Log Conversation</button>
+      <div class="voc-empty" id="convError" style="display:none; color:#f87171"></div>`;
   }
   function wireConversations(container) {
     container.querySelector('#addConvBtn')?.addEventListener('click', async () => {
       const person_role = container.querySelector('#convRole').value.trim();
-      if (!person_role) return;
       const payload = {
         student_id: currentUser.id,
         person_role,
@@ -328,13 +328,13 @@
         <option value="unchanged">Unchanged</option>
         <option value="decreased">Decreased</option>
       </select>
-      <button class="list-card-btn" id="addExpBtn">+ Log Workplace Exposure</button>`;
+      <button class="list-card-btn" id="addExpBtn">+ Log Workplace Exposure</button>
+      <div class="voc-empty" id="expError" style="display:none; color:#f87171"></div>`;
   }
   function wireExposures(container) {
     container.querySelector('#addExpBtn')?.addEventListener('click', async () => {
       const exposure_type = container.querySelector('#expType').value;
       const organisation_type = container.querySelector('#expOrg').value.trim();
-      if (!exposure_type && !organisation_type) return;
       const payload = {
         student_id: currentUser.id,
         exposure_type: exposure_type || null,
@@ -380,12 +380,12 @@
         <option value="in_progress">In Progress</option>
         <option value="complete">Complete</option>
       </select>
-      <button class="list-card-btn" id="addExpmtBtn">+ Log Experiment</button>`;
+      <button class="list-card-btn" id="addExpmtBtn">+ Log Experiment</button>
+      <div class="voc-empty" id="expmtError" style="display:none; color:#f87171"></div>`;
   }
   function wireExperiments(container) {
     container.querySelector('#addExpmtBtn')?.addEventListener('click', async () => {
       const hypothesis = container.querySelector('#expmtHypothesis').value.trim();
-      if (!hypothesis) return;
       const status = container.querySelector('#expmtStatus').value || 'planned';
       const payload = {
         student_id: currentUser.id,
@@ -501,14 +501,9 @@
     const isLast = currentIndex === SECTIONS.length - 1;
     if (!isLast) { goToSection(currentIndex + 1); return; }
 
-    const ready = SECTIONS.every(s => s.count() > 0);
-    if (!ready) {
-      const hint = $('gateHint');
-      hint.textContent = `Log at least one entry in each category before this stage is ready for review (${SECTIONS.filter(s => s.count() === 0).map(s => s.title).join(', ')} still empty).`;
-      hint.style.display = 'block';
-      return;
-    }
-
+    // No hard requirement here — mentees should be free to mark this stage
+    // ready for their mentor with as much or as little logged as feels
+    // right to them, not made to feel stuck by a checklist.
     const btn = $('flowNextBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'test');
@@ -550,8 +545,8 @@
       renderStageStepper($('stepperWrap'), progressByStage, 'test');
 
       const stages = window.VOCATION_STAGES;
-      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
-      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      const nextStage = stages.find(s => !['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status || 'not_started')) || stages[0];
+      const doneCount = stages.filter(s => ['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status)).length;
       $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
       $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
       $('topbarNext').textContent = nextStage.label;

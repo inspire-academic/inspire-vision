@@ -298,20 +298,27 @@
         $('statementText').classList.remove('voc-empty');
       }
 
-      // Continue button routes to the first not-yet-complete stage.
+      // Continue button routes to the first stage the mentee still has work
+      // left to do on. Once a stage is ready_for_review, that's the mentee's
+      // whole part done — routing back to it (or counting it as "not done"
+      // in the progress readout below) reads as the tool having lost their
+      // work, so it counts as done here even though a mentor hasn't signed
+      // off yet.
       const stages = window.VOCATION_STAGES;
+      const DONE_FOR_MENTEE = ['ready_for_review', 'mentor_reviewed', 'complete'];
       const nextStage = stages.find(s => {
         const st = (progressByStage[s.key] || {}).status || 'not_started';
-        return st !== 'complete';
+        return !DONE_FOR_MENTEE.includes(st);
       }) || stages[0];
       $('continueBtn').href = nextStage.href;
       const hasAnyProgress = Object.keys(progressByStage).length > 0;
       $('continueBtn').lastChild.textContent = hasAnyProgress ? ' Continue Where You Left Off' : ' Start Your Journey';
 
-      // Topbar progress readout: percent of stages fully complete + what's next.
+      // Topbar progress readout: percent of stages the mentee has finished
+      // their part of (submitted for review or beyond) + what's next.
       const doneCount = stages.filter(s => {
         const st = (progressByStage[s.key] || {}).status;
-        return st === 'complete' || st === 'mentor_reviewed';
+        return DONE_FOR_MENTEE.includes(st);
       }).length;
       const pct = Math.round((doneCount / stages.length) * 100);
       $('topbarPct').textContent = pct;

@@ -177,6 +177,7 @@
         <label class="voc-field-label">What would change my mind? <span style="color:var(--mentorship-gold)">(required)</span></label>
         <textarea class="voc-textarea" id="hypChangeMind" placeholder="Be specific — this is what makes it a real hypothesis, not just a preference."></textarea>
         <button class="list-card-btn primary" id="addHypBtn">+ Add Hypothesis</button>
+        <div class="voc-save-note" id="hypError" style="display:none; color:#f87171"></div>
       </div>
 
       <div class="voc-quote-card">
@@ -202,8 +203,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Discern ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Keep at least two active pathway hypotheses, each with a real answer to "what would change my mind," before this stage is ready for review.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you're ready.</div>
       </div>
     </div>
   </main>
@@ -292,7 +293,6 @@
   $('addHypBtn')?.addEventListener('click', async () => {
     const label = $('hypLabel').value.trim();
     const what_would_change_my_mind = $('hypChangeMind').value.trim();
-    if (!label || !what_would_change_my_mind) return;
     const payload = {
       student_id: currentUser.id,
       label,
@@ -323,14 +323,15 @@
   }, 700);
   $('workingStatement')?.addEventListener('input', (e) => saveStatementDebounced(e.target.value));
 
+  // Purely informational — never blocks "Mark Ready for Review". See
+  // discover.html's isSectionComplete comment for why: mentees should be
+  // free to move on with as little as feels right, not made to feel stuck.
   function updateGate() {
     const activeCount = hypotheses.filter(h => h.status === 'active' && h.what_would_change_my_mind).length;
     const ready = activeCount >= 2;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'You have at least two active, falsifiable hypotheses. You can mark this stage ready for your mentor.'
-      : `Keep at least two active pathway hypotheses alive, each with a real "what would change my mind" answer (currently ${activeCount}).`;
+      : 'Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you\'re ready.';
   }
 
   $('markReadyBtn')?.addEventListener('click', async () => {
@@ -371,14 +372,14 @@
       hypotheses = hypRes.data || [];
 
       const callingPayload = (reflectionsRes.data || [])[0]?.payload;
-      if (callingPayload?.text) $('callingReflection').value = callingPayload.text;
-      if (statementRes.data?.statement) $('workingStatement').value = statementRes.data.statement;
+      if (callingPayload?.text && !$('callingReflection').value) $('callingReflection').value = callingPayload.text;
+      if (statementRes.data?.statement && !$('workingStatement').value) $('workingStatement').value = statementRes.data.statement;
 
       renderStageStepper($('stepperWrap'), progressByStage, 'discern');
 
       const stages = window.VOCATION_STAGES;
-      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
-      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      const nextStage = stages.find(s => !['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status || 'not_started')) || stages[0];
+      const doneCount = stages.filter(s => ['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status)).length;
       $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
       $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
       $('topbarNext').textContent = nextStage.label;

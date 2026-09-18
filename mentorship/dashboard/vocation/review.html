@@ -184,8 +184,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Review ready for mentor sign-off</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Save at least one review before this stage is ready for your mentor's sign-off.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor's sign-off whenever you're ready.</div>
       </div>
     </div>
   </main>
@@ -256,18 +256,18 @@
       </div>`).join('') || '<div class="voc-empty">No reviews saved yet — your first review will appear here.</div>';
   }
 
+  // Purely informational — never blocks "Mark Ready for Review". See
+  // discover.html's isSectionComplete comment for why: mentees should be
+  // free to move on with as little as feels right, not made to feel stuck.
   function updateGate() {
     const ready = reviews.length >= 1;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'You have saved at least one review. You can mark this stage ready for your mentor\'s sign-off.'
-      : 'Save at least one review before this stage is ready for your mentor\'s sign-off.';
+      : 'You can mark this stage ready for your mentor\'s sign-off whenever you\'re ready.';
   }
 
   $('submitReviewBtn')?.addEventListener('click', async () => {
     const mentee_reflection = $('reviewReflection').value.trim();
-    if (!mentee_reflection) return;
     const btn = $('submitReviewBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
 
@@ -283,7 +283,7 @@
       working_statement_snapshot: statementRes.data?.statement || null,
       stage_snapshot: progressByStage,
       hypotheses_snapshot: hypRes.data || [],
-      mentee_reflection,
+      mentee_reflection: mentee_reflection || null,
     };
     const { data, error } = await dbClient.schema('mentorship').from('vocation_reviews').insert(payload).select().single();
     btn.disabled = false; btn.textContent = 'Save This Review';
@@ -335,8 +335,8 @@
       renderStageStepper($('stepperWrap'), progressByStage, 'review');
 
       const stages = window.VOCATION_STAGES;
-      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
-      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      const nextStage = stages.find(s => !['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status || 'not_started')) || stages[0];
+      const doneCount = stages.filter(s => ['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status)).length;
       $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
       $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
       $('topbarNext').textContent = nextStage.label;

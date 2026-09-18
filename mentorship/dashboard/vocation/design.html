@@ -225,8 +225,8 @@
       <div class="card voc-gate-card">
         <div class="card-label">Ready to move forward?</div>
         <div class="card-title" style="margin-bottom:8px">Mark Design ready for mentor review</div>
-        <button class="list-card-btn primary" id="markReadyBtn" disabled>Mark Ready for Review</button>
-        <div class="voc-gate-hint" id="gateHint">Give your preferred pathway a title and add at least one action item to each of the three horizons before this stage is ready for review.</div>
+        <button class="list-card-btn primary" id="markReadyBtn">Mark Ready for Review</button>
+        <div class="voc-gate-hint" id="gateHint">Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you're ready, whether or not everything above is filled in.</div>
       </div>
     </div>
   </main>
@@ -364,7 +364,6 @@
     container.querySelector('[data-add-item]')?.addEventListener('click', async () => {
       const titleEl = container.querySelector(`[data-item-title="${planType}"]`);
       const title = titleEl.value.trim();
-      if (!title) return;
       const descEl = container.querySelector(`[data-item-desc="${planType}"]`);
       const dateEl = container.querySelector(`[data-item-date="${planType}"]`);
       const periodEl = container.querySelector(`[data-item-period="${planType}"]`);
@@ -453,15 +452,17 @@
   }, 700);
   $('tenYearReflection')?.addEventListener('input', (e) => saveTenYearDebounced({ text: e.target.value }));
 
+  // Purely informational — never blocks "Mark Ready for Review". Mentees
+  // should be free to move on with as much or as little filled in as feels
+  // right to them; a hard requirement here was landing as off-putting,
+  // especially for younger mentees still figuring things out.
   function updateGate() {
     const hasPreferredTitle = !!(pathwayPlan.preferred_pathway.title && pathwayPlan.preferred_pathway.title.trim());
     const horizonsFilled = PLAN_TYPES.every(p => itemsFor(p.key).length > 0);
     const ready = hasPreferredTitle && horizonsFilled;
-    const btn = $('markReadyBtn');
-    btn.disabled = !ready;
     $('gateHint').textContent = ready
       ? 'Your preferred pathway is named and all three horizons have concrete items. You can mark this stage ready for your mentor.'
-      : `Give your preferred pathway a title${!horizonsFilled ? ' and add at least one item to each horizon' : ''} before this stage is ready for review.`;
+      : 'Answer as much or as little as feels right — you can mark this stage ready for your mentor whenever you\'re ready.';
     renderRecap();
   }
 
@@ -506,20 +507,24 @@
       }
       actionItems = itemsRes.data || [];
 
-      $('preferredTitle').value = pathwayPlan.preferred_pathway.title || '';
-      $('preferredDesc').value = pathwayPlan.preferred_pathway.description || '';
-      $('altTitle').value = pathwayPlan.alternative_pathway.title || '';
-      $('altDesc').value = pathwayPlan.alternative_pathway.description || '';
+      // Guarded (not unconditional) — these fields are live and typeable from
+      // the moment the page paints, well before this data finishes loading.
+      // An unconditional .value= here would silently wipe out anything the
+      // student already typed in that window the instant the fetch resolved.
+      if (!$('preferredTitle').value) $('preferredTitle').value = pathwayPlan.preferred_pathway.title || '';
+      if (!$('preferredDesc').value) $('preferredDesc').value = pathwayPlan.preferred_pathway.description || '';
+      if (!$('altTitle').value) $('altTitle').value = pathwayPlan.alternative_pathway.title || '';
+      if (!$('altDesc').value) $('altDesc').value = pathwayPlan.alternative_pathway.description || '';
       wirePathwayFields();
 
       const tenYearPayload = (reflectionsRes.data || [])[0]?.payload;
-      if (tenYearPayload?.text) $('tenYearReflection').value = tenYearPayload.text;
+      if (tenYearPayload?.text && !$('tenYearReflection').value) $('tenYearReflection').value = tenYearPayload.text;
 
       renderStageStepper($('stepperWrap'), progressByStage, 'design');
 
       const stages = window.VOCATION_STAGES;
-      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
-      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      const nextStage = stages.find(s => !['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status || 'not_started')) || stages[0];
+      const doneCount = stages.filter(s => ['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status)).length;
       $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
       $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
       $('topbarNext').textContent = nextStage.label;

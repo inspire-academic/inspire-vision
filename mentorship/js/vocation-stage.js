@@ -94,13 +94,48 @@ window.markStageReadyForReview = async function markStageReadyForReview(dbClient
 
 // debounceAutosave(fn, ms) — generic debounce wrapper for jsonb/text
 // autosave fields (vocation_reflections, pathway_plan, etc.).
+//
+// These stage pages are plain multi-page navigation, not an SPA: clicking
+// any sidebar/stepper link to another stage tears down this page's JS
+// immediately. If a mentee types something and clicks away within the
+// debounce window, the pending setTimeout is simply discarded and
+// Supabase never sees the write — silently, with no error. Confirmed as
+// the cause of reported "it took away what I typed" reports. Every
+// debounced save registers a flush() below so it can be fired early
+// (immediately, not after the full delay) the moment the tab is hidden
+// or the page starts unloading — this can't guarantee the request
+// completes, but it gives it a real head start instead of none.
+window.__vocationAutosaveFlushers = window.__vocationAutosaveFlushers || [];
+
 window.debounceAutosave = function debounceAutosave(fn, ms = 800) {
   let timer = null;
-  return (...args) => {
+  let pendingArgs = null;
+  const runNow = () => {
+    if (timer === null) return;
     clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), ms);
+    timer = null;
+    const args = pendingArgs;
+    pendingArgs = null;
+    fn(...args);
+  };
+  window.__vocationAutosaveFlushers.push(runNow);
+  return (...args) => {
+    pendingArgs = args;
+    clearTimeout(timer);
+    timer = setTimeout(runNow, ms);
   };
 };
+
+if (!window.__vocationFlushListenersAdded) {
+  window.__vocationFlushListenersAdded = true;
+  const flushAllPendingAutosaves = () => {
+    window.__vocationAutosaveFlushers.forEach((run) => { try { run(); } catch (e) { console.warn('Autosave flush failed:', e); } });
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushAllPendingAutosaves();
+  });
+  window.addEventListener('pagehide', flushAllPendingAutosaves);
+}
 
 // saveReflection(dbClient, studentId, sectionKey, payload) — upsert into
 // vocation_reflections, the shared autosave table backing most Discover

@@ -256,6 +256,7 @@
   let reflections = {}; // section_key -> payload
   let evidenceItems = []; // rows from vocation_evidence_items
   let nominees = []; // rows from vocation_external_nominees
+  let savedSectionKeys = new Set(); // section_keys actually persisted to vocation_reflections
 
   // ── Section content (a representative MVP set from the brief's much
   // longer suggested lists — easy to extend, not exhaustive by design,
@@ -324,6 +325,7 @@
   const saveReflectionDebounced = debounceAutosave(async (sectionKey, payload) => {
     reflections[sectionKey] = payload;
     await saveReflection(dbClient, currentUser.id, sectionKey, payload);
+    savedSectionKeys.add(sectionKey);
     await markStageInProgress(dbClient, currentUser.id, 'discover');
     updateGate();
   }, 700);
@@ -394,7 +396,6 @@
     container.querySelector('#addEvidenceBtn')?.addEventListener('click', async () => {
       const title = container.querySelector('#evTitle').value.trim();
       const evidence_type = container.querySelector('#evType').value.trim() || 'other';
-      if (!title) return;
       const { data, error } = await dbClient.schema('mentorship').from('vocation_evidence_items')
         .insert({ student_id: currentUser.id, stage: 'discover', section_key: 'discover.strengths', title, evidence_type })
         .select().single();
@@ -424,14 +425,14 @@
         <input class="voc-input" id="nomRelationship" placeholder="Relationship (teacher, coach...)" style="flex:1; min-width:140px; margin-bottom:0">
       </div>
       <textarea class="voc-textarea" id="nomSummary" placeholder="What did they say?"></textarea>
-      <button class="list-card-btn" id="addNomineeBtn">+ Add What They Said</button>`;
+      <button class="list-card-btn" id="addNomineeBtn">+ Add What They Said</button>
+      <div class="voc-save-note" id="nomineeError" style="display:none; color:#f87171"></div>`;
   }
   function wireNominees(container) {
     container.querySelector('#addNomineeBtn')?.addEventListener('click', async () => {
       const name = container.querySelector('#nomName').value.trim();
       const relationship = container.querySelector('#nomRelationship').value.trim();
       const mentee_summary = container.querySelector('#nomSummary').value.trim();
-      if (!name || !relationship) return;
       const { data, error } = await dbClient.schema('mentorship').from('vocation_external_nominees')
         .insert({ student_id: currentUser.id, name, relationship, mentee_summary: mentee_summary || null })
         .select().single();
@@ -569,13 +570,29 @@
 
   function isSectionComplete(key) {
     if (key === 'discover.nominees') return nominees.length > 0;
+    // Values pre-fills its payload with a real (non-empty) default ranking
+    // so the drag list has something to show — unlike every other section's
+    // empty-by-default payload, that default alone would otherwise read as
+    // "complete" the instant the step is merely visited, before the mentee
+    // has actually saved anything. Require an actual saved row instead.
+    if (key === 'discover.values') return savedSectionKeys.has(key);
     const p = reflections[key];
     if (!p) return false;
     if (p.ratings) return Object.keys(p.ratings).length >= 3;
     if (p.selected) return p.selected.length >= 1;
     if (p.picks) return Object.keys(p.picks).length >= 3;
-    if (p.ranked) return true;
     return false;
+  }
+
+  // Refreshes anything that reflects "have I actually saved this section" —
+  // the step dots' checkmarks and the live recap — after an autosave
+  // resolves. Named to match the gate-refresh helper every other stage page
+  // defines; this page has no persistent gate UI of its own (its gate check
+  // only runs once, on the final step's Continue click) but still needs
+  // this refresh after each background save.
+  function updateGate() {
+    renderDots();
+    renderRecap();
   }
 
   // ── One-section-at-a-time flow ─────────────────────────────
@@ -693,15 +710,9 @@
     const isLast = currentIndex === SECTIONS.length - 1;
     if (!isLast) { goToSection(currentIndex + 1); return; }
 
-    const allComplete = SECTIONS.every(s => isSectionComplete(s.key));
-    const hasEvidence = evidenceItems.length > 0;
-    if (!allComplete || !hasEvidence) {
-      const hint = $('gateHint');
-      hint.textContent = `Complete all seven sections${!hasEvidence ? ' and add at least one piece of evidence in Strengths & Evidence' : ''} before this stage is ready for your mentor to review.`;
-      hint.style.display = 'block';
-      return;
-    }
-
+    // No hard requirement here — mentees should be free to mark this stage
+    // ready for their mentor with as much or as little answered as feels
+    // right to them, not made to feel stuck by a checklist.
     const btn = $('flowNextBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     const { error } = await markStageReadyForReview(dbClient, currentUser.id, 'discover');
@@ -737,6 +748,7 @@
 
       progressByStage = Object.fromEntries((progressRes.data || []).map(r => [r.stage, r]));
       reflections = Object.fromEntries((reflectionsRes.data || []).map(r => [r.section_key, r.payload]));
+      savedSectionKeys = new Set((reflectionsRes.data || []).map(r => r.section_key));
       evidenceItems = evidenceRes.data || [];
       nominees = nomineesRes.data || [];
 
@@ -745,8 +757,8 @@
       // Topbar progress readout — same "X% complete / Next up" pattern as
       // the vocation home page, computed from all seven stages' status.
       const stages = window.VOCATION_STAGES;
-      const nextStage = stages.find(s => ((progressByStage[s.key] || {}).status || 'not_started') !== 'complete') || stages[0];
-      const doneCount = stages.filter(s => ['complete', 'mentor_reviewed'].includes((progressByStage[s.key] || {}).status)).length;
+      const nextStage = stages.find(s => !['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status || 'not_started')) || stages[0];
+      const doneCount = stages.filter(s => ['ready_for_review', 'mentor_reviewed', 'complete'].includes((progressByStage[s.key] || {}).status)).length;
       $('topbarPct').textContent = Math.round((doneCount / stages.length) * 100);
       $('topbarProgressFill').style.width = `${Math.round((doneCount / stages.length) * 100)}%`;
       $('topbarNext').textContent = nextStage.label;
