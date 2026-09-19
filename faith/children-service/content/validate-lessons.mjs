@@ -22,6 +22,9 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
   if (lesson.postClass?.reflection?.freeText !== false) bad(file, 'postClass.reflection.freeText must be false (no free text from children)');
   if (lesson.live?.roles?.adultsRequired < 2) bad(file, 'live.roles.adultsRequired must be at least 2');
 
+  const STOPS = ['creation', 'abraham', 'exodus', 'judges', 'kings', 'exile', 'jesus', 'church'];
+  if (!STOPS.includes(lesson.character?.mapStop)) bad(file, `character.mapStop must be one of: ${STOPS.join(', ')}`);
+
   const mystery = lesson.preClass?.mystery;
   if (mystery && !mystery.options?.includes(mystery.answer)) bad(file, 'mystery.answer is not one of mystery.options');
 

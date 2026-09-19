@@ -1,0 +1,394 @@
+// Children's Service (Bible Explorers) — end-to-end behaviour of the parent
+// and play pages.
+//
+// Unlike the other specs here this one does NOT talk to the real Supabase
+// project: the module's tables aren't deployed there yet, and a test must
+// never create real accounts or children's records. Instead the Supabase SDK
+// import is intercepted and replaced with tests/helpers/fake-supabase.mjs, an
+// in-memory stand-in. The page code under test is unchanged.
+//
+// What this DOES prove: the pages' flows, gating and rendering, that the
+// Zoom link is not in the page before the server releases it, that a child
+// belonging to another parent can't be opened, and that practice mode writes
+// nothing. What it does NOT prove: row-level security, which lives in
+// supabase/children_service_schema*.sql and is tested against a real Postgres
+// (see the commit message / PR notes for how).
+const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
+const { trackConsoleErrors } = require('./helpers');
+
+const BASE = '/faith/children-service';
+const FAKE = fs.readFileSync(path.join(__dirname, 'helpers', 'fake-supabase.mjs'), 'utf8');
+const DAVID = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'faith', 'children-service', 'content', 'lessons', 'david-01.json'), 'utf8'));
+const SECRET = 'https://zoom.example/j/SECRET-LINK-123';
+
+const iso = (minFromNow) => new Date(Date.now() + minFromNow * 60000).toISOString();
+const BADGES = [
+  ['camp-fire-friend', 'Camp Fire Friend', 'system'], ['catch-up-champion', 'Catch-Up Champion', 'system'],
+  ['story-detective', 'Story Detective', 'system'], ['map-marker', 'Map Marker', 'system'],
+  ['verse-keeper', 'Verse Keeper', 'leader'], ['brave-like-david', 'Brave Like David', 'leader'],
+  ['helping-hands', 'Helping Hands', 'parent'], ['table-talkers', 'Table Talkers', 'parent']
+].map(([key, title, awarded_by]) => ({ key, title, description: title + ' description', awarded_by }));
+
+function seed({ signedIn = true, member = 'active', consent = true, kid = true } = {}) {
+  const user = { id: 'parent1', email: 'ama@example.com', password: 'password1', user_metadata: { full_name: 'Ama' } };
+  return {
+    auth: { users: [user], session: signedIn ? { user: { id: user.id, email: user.email, user_metadata: user.user_metadata } } : null },
+    t: {
+      churches: [{ id: 'church1', slug: 'inspire', name: 'Inspire (our own church)', open_enrolment: true }],
+      classes: [
+        { id: 'class-exp', church_id: 'church1', name: 'Explorers', age_band: 'explorer', active: true },
+        { id: 'class-trb', church_id: 'church1', name: 'Trailblazers', age_band: 'trailblazer', active: true }
+      ],
+      church_members: member ? [{ id: 'm1', church_id: 'church1', user_id: 'parent1', role: 'parent', status: member }] : [],
+      consents: consent ? ['data_processing', 'safeguarding_policy'].map((type) => ({ id: type, parent_id: 'parent1', child_id: null, type, given: true, created_at: iso(-1000) })) : [],
+      children: [
+        ...(kid ? [{ id: 'kid1', church_id: 'church1', parent_id: 'parent1', display_name: 'Kofi', age_band: 'explorer', avatar: { skin: 2, hair: 1 }, class_id: 'class-exp', created_at: iso(-500) }] : []),
+        { id: 'kid-other', church_id: 'church1', parent_id: 'parent2', display_name: 'Esi', age_band: 'explorer', avatar: {}, class_id: 'class-exp', created_at: iso(-400) }
+      ],
+      lessons: [{ id: 'lesson-david', slug: 'david-01', status: 'published', character_name: 'David', sequence: 1, content: DAVID }],
+      badges: BADGES,
+      sessions: [
+        { id: 'sess-open', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(10), duration_min: 28, status: 'scheduled', platform: 'zoom' },
+        { id: 'sess-early', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(300), duration_min: 28, status: 'scheduled', platform: 'zoom' }
+      ],
+      session_join_details: [
+        { session_id: 'sess-open', join_url: SECRET, meeting_id: '111 222 333', passcode: 'pw-open' },
+        { session_id: 'sess-early', join_url: SECRET + '-EARLY', meeting_id: '444', passcode: 'pw-early' }
+      ],
+      attendance: [], progress: [], awards: []
+    }
+  };
+}
+
+async function setup(page, s) {
+  const errs = await trackConsoleErrors(page);
+  await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm', (r) =>
+    r.fulfill({ status: 200, contentType: 'application/javascript', headers: { 'access-control-allow-origin': '*' }, body: FAKE }));
+  await page.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+  await page.route('https://fonts.gstatic.com/**', (r) => r.fulfill({ status: 200, body: '' }));
+  await page.addInitScript((data) => { if (!localStorage.getItem('fakedb')) localStorage.setItem('fakedb', JSON.stringify(data)); }, s);
+  return errs;
+}
+const db = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('fakedb')));
+
+test.describe('landing page', () => {
+  test('the mystery is driven by the lesson JSON and can be solved', async ({ page }) => {
+    const errs = await trackConsoleErrors(page);
+    await page.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+    await page.goto(`${BASE}/index.html`);
+    await expect(page.locator('#clues li')).toHaveCount(1);
+    await expect(page.locator('#clues li span')).toHaveText(DAVID.preClass.mystery.clues[0]);
+    await page.getByRole('button', { name: 'Moses' }).click();
+    await expect(page.locator('#msg')).toContainText('Not quite');
+    await page.getByRole('button', { name: 'David' }).click();
+    await expect(page.locator('#msg')).toContainText('It was David');
+    await expect(page.locator('#badge-pop')).toBeVisible();
+    errs.assertNoErrors();
+  });
+
+  test('"Give me another clue" disappears after the last clue', async ({ page }) => {
+    await page.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+    await page.goto(`${BASE}/index.html`);
+    const more = page.locator('#more');
+    for (let i = 1; i < DAVID.preClass.mystery.clues.length; i++) await more.click();
+    await expect(page.locator('#clues li')).toHaveCount(DAVID.preClass.mystery.clues.length);
+    await expect(more).toBeHidden();
+  });
+});
+
+test.describe('accounts and gating', () => {
+  test('a signed-out visitor is sent to sign in and back', async ({ page }) => {
+    await setup(page, seed({ signedIn: false }));
+    await page.goto(`${BASE}/parent/index.html`);
+    await expect(page).toHaveURL(/parent\/login\.html\?next=/);
+    await page.fill('#email', 'ama@example.com');
+    await page.fill('#pw', 'password1');
+    await page.click('#go');
+    await expect(page).toHaveURL(/parent\/index\.html$/);
+  });
+
+  test('sign-in ignores an off-site ?next= (no open redirect)', async ({ page }) => {
+    await setup(page, seed({ signedIn: false }));
+    await page.goto(`${BASE}/parent/login.html?next=${encodeURIComponent('https://evil.example/steal')}`);
+    await page.fill('#email', 'ama@example.com');
+    await page.fill('#pw', 'password1');
+    await page.click('#go');
+    await expect(page).toHaveURL(/faith\/children-service\/parent\/index\.html$/);
+  });
+
+  test('wrong password gives a friendly message', async ({ page }) => {
+    await setup(page, seed({ signedIn: false }));
+    await page.goto(`${BASE}/parent/login.html`);
+    await page.fill('#email', 'ama@example.com');
+    await page.fill('#pw', 'nope-nope');
+    await page.click('#go');
+    await expect(page.locator('#err')).toContainText('don’t match');
+  });
+
+  test('new parent: sign up, consent gate, ask to join, wait for approval', async ({ page }) => {
+    // Fresh database for a brand-new parent: the fake has no row-level security, so
+    // seeded rows belonging to other people must not be present or they'd be visible.
+    const fresh = seed().t;
+    fresh.consents = []; fresh.church_members = []; fresh.children = []; fresh.sessions = [];
+    const errs = await setup(page, { auth: { users: [], session: null }, t: fresh });
+    await page.goto(`${BASE}/parent/join.html`);
+    await page.fill('#name', 'Ama');
+    await page.fill('#email', 'new@example.com');
+    await page.fill('#pw', 'password1');
+    await page.click('#go');
+    await expect(page.locator('#err')).toContainText('18 or over');           // adult box not ticked
+    await page.check('#adult');
+    await page.click('#go');
+    await expect(page).toHaveURL(/parent\/index\.html$/);
+    await expect(page.getByRole('heading', { name: 'Before we start' })).toBeVisible();
+    await page.click('#cgo');
+    await expect(page.locator('#cerr')).toContainText('tick both');            // cannot skip consent
+    await page.check('#c1'); await page.check('#c2');
+    await page.click('#cgo');
+    await expect(page.getByRole('heading', { name: /Join Inspire/ })).toBeVisible();
+    await page.click('#ask');
+    await expect(page.getByRole('heading', { name: 'Waiting for a leader to approve you' })).toBeVisible();
+    const s = await db(page);
+    const mine = s.t.consents.filter((c) => c.type === 'data_processing' || c.type === 'safeguarding_policy');
+    expect(mine).toHaveLength(2);
+    expect(mine.every((c) => c.given === true && c.policy_version && c.child_id === null)).toBe(true);
+    expect(s.t.church_members.find((m) => m.status === 'pending' && m.role === 'parent')).toBeTruthy();
+    errs.assertNoErrors();
+  });
+
+  test('a pending parent cannot add children', async ({ page }) => {
+    await setup(page, seed({ member: 'pending', kid: false }));
+    await page.goto(`${BASE}/parent/child.html`);
+    await expect(page.getByRole('heading', { name: 'Not just yet' })).toBeVisible();
+    await expect(page.locator('#form')).toHaveCount(0);
+  });
+
+  test('a parent who has not consented is stopped at the consent screen', async ({ page }) => {
+    await setup(page, seed({ consent: false }));
+    await page.goto(`${BASE}/parent/index.html`);
+    await expect(page.getByRole('heading', { name: 'Before we start' })).toBeVisible();
+  });
+});
+
+test.describe('family, children and avatars', () => {
+  test('add a child: name rules, class assignment, avatar saved', async ({ page }) => {
+    const errs = await setup(page, seed({ kid: false }));
+    await page.goto(`${BASE}/parent/index.html`);
+    await expect(page.getByRole('heading', { name: 'Hello, Ama!' })).toBeVisible();
+    await page.getByRole('link', { name: /Add a child/ }).click();
+    await expect(page).toHaveURL(/child\.html$/);
+
+    await page.click('#save');
+    await expect(page.locator('#err')).toContainText('first name');
+    await page.fill('#dn', 'Kofi Mensah');
+    await page.click('#save');
+    await expect(page.locator('#err')).toContainText('no surname');
+    await page.fill('#dn', 'Kofi');
+    await page.click('#save');
+    await expect(page.locator('#err')).toContainText('age group');
+
+    await page.getByLabel(/Trailblazers/).check();
+    await page.getByRole('button', { name: 'Long' }).click();
+    await page.getByRole('button', { name: 'Scarf' }).click();
+    await page.click('#save');
+    await expect(page).toHaveURL(/parent\/index\.html$/);
+    await expect(page.getByRole('heading', { name: 'Kofi' })).toBeVisible();
+    await expect(page.getByText('Trailblazer (8–11)')).toBeVisible();
+
+    const kid = (await db(page)).t.children.find((c) => c.display_name === 'Kofi');
+    expect(kid.class_id).toBe('class-trb');                                    // matched to the right class
+    expect(kid.parent_id).toBe('parent1');
+    expect(kid.avatar).toMatchObject({ hair: 2, gear: 2 });
+    expect(Object.keys(kid).sort()).toEqual(['age_band', 'avatar', 'church_id', 'class_id', 'created_at', 'display_name', 'id', 'parent_id']); // nothing else collected
+    errs.assertNoErrors();
+  });
+
+  test("another parent's child cannot be opened, edited or played", async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/parent/child.html?id=kid-other`);
+    await expect(page.getByRole('heading', { name: /couldn’t find that child/ })).toBeVisible();
+    await page.goto(`${BASE}/play/home.html?child=kid-other`);
+    await expect(page.getByRole('heading', { name: /couldn’t find that explorer/ })).toBeVisible();
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid-other`);
+    await expect(page.getByRole('heading', { name: /couldn’t find that explorer/ })).toBeVisible();
+  });
+
+  test('editing a child keeps their age group; removing needs a second confirming tap', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/parent/child.html?id=kid1`);
+    await expect(page.locator('input[name=band]')).toHaveCount(0);            // age group is fixed
+    await page.fill('#dn', 'Kojo');
+    await page.click('#save');
+    await expect(page.getByRole('heading', { name: 'Kojo' })).toBeVisible();
+    expect((await db(page)).t.children.find((c) => c.id === 'kid1').age_band).toBe('explorer');
+
+    await page.goto(`${BASE}/parent/child.html?id=kid1`);
+    await page.click('#rm');
+    await expect(page.getByText('Really remove Kojo?')).toBeVisible();
+    await page.click('#rm-no');
+    expect((await db(page)).t.children.some((c) => c.id === 'kid1')).toBe(true);
+    await page.click('#rm');
+    await page.click('#rm-yes');
+    await expect(page).toHaveURL(/parent\/index\.html$/);
+    expect((await db(page)).t.children.some((c) => c.id === 'kid1')).toBe(false);
+  });
+});
+
+test.describe('joining class', () => {
+  test('the Zoom link is not in the page before its time', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/class/join.html?session=sess-early`);
+    await expect(page.getByText('Not open yet')).toBeVisible();
+    const html = await page.content();
+    expect(html).not.toContain('SECRET-LINK');
+    expect(html).not.toContain('pw-early');
+    await expect(page.getByRole('link', { name: /Open Zoom/ })).toHaveCount(0);
+  });
+
+  test('inside the window the link appears, and check-in earns Camp Fire Friend', async ({ page }) => {
+    const errs = await setup(page, seed());
+    await page.goto(`${BASE}/class/join.html?session=sess-open`);
+    const link = page.getByRole('link', { name: /Open Zoom/ });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', SECRET);
+    await expect(link).toHaveAttribute('rel', /noopener/);
+    await expect(page.getByText('pw-open')).toBeVisible();
+    await page.getByRole('button', { name: 'I’m here!' }).click();
+    await expect(page.getByText('✓ Checked in')).toBeVisible();
+    await expect(page.locator('#newbadge')).toContainText('Camp Fire Friend');
+    const s = await db(page);
+    expect(s.t.attendance).toEqual([expect.objectContaining({ session_id: 'sess-open', child_id: 'kid1', source: 'self_checkin' })]);
+    errs.assertNoErrors();
+  });
+
+  test('a non-https join link is never offered', async ({ page }) => {
+    const s = seed();
+    s.t.session_join_details[0].join_url = 'javascript:alert(1)';
+    await setup(page, s);
+    await page.goto(`${BASE}/class/join.html?session=sess-open`);
+    await expect(page.getByRole('link', { name: /Open Zoom/ })).toHaveCount(0);
+  });
+
+  test('a parent with no child in the class sees no link', async ({ page }) => {
+    await setup(page, seed({ kid: false }));
+    await page.goto(`${BASE}/class/join.html?session=sess-open`);
+    await expect(page.getByRole('heading', { name: /None of your children/ })).toBeVisible();
+    expect(await page.content()).not.toContain('SECRET-LINK');
+  });
+});
+
+test.describe('the David adventure', () => {
+  test('play all five steps as an Explorer: progress saved, badges earned, map unlocked', async ({ page }) => {
+    const errs = await setup(page, seed());
+    await page.goto(`${BASE}/play/home.html?child=kid1`);
+    await expect(page.getByRole('heading', { name: 'Hi, Kofi!' })).toBeVisible();
+    await page.getByRole('link', { name: 'Start the adventure' }).click();
+
+    // 1. mystery: a wrong guess first, then right
+    await page.locator('.choice', { hasText: 'Moses' }).click();
+    await expect(page.locator('#msg')).toContainText('Not quite');
+    await page.locator('.choice', { hasText: 'David' }).click();
+    await expect(page.locator('#msg')).toContainText('It was David');
+    await expect(page.locator('#toasts')).toContainText('Story Detective');
+    await page.click('#go');
+
+    // 2. story
+    for (;;) {
+      const label = await page.locator('#fwd').innerText();
+      await page.click('#fwd');
+      if (label.includes('finished')) break;
+    }
+    // 3. quiz (Explorer has 3 questions)
+    for (let i = 0; i < DAVID.live.quiz.explorer.length; i++) {
+      await page.locator('.choice').first().click();
+      await page.click('#nx');
+    }
+    // 4. memory verse: outward, then looks (a wrong word first)
+    await page.locator('.bank button', { hasText: 'looks' }).click();
+    await expect(page.locator('#msg')).toContainText('Not that one');
+    await page.locator('.bank button', { hasText: 'outward' }).click();
+    await page.locator('.bank button', { hasText: 'looks' }).click();
+    await expect(page.getByText('You did it! Now say it out loud')).toBeVisible();
+    await page.click('#nx');                                                   // saves the verse step, which completes the map-marker requirements
+    await expect(page.locator('#toasts')).toContainText('Map Marker');
+
+    // 5. mission / reflect, with a grown-up confirming one badge
+    await page.locator('.choice').first().click();
+    await page.getByRole('button', { name: 'We did the mission' }).click();
+    await expect(page.locator('#toasts')).toContainText('Helping Hands');
+    await page.click('#nx');
+    await expect(page.getByRole('heading', { name: 'You did it!' })).toBeVisible();
+    await expect(page.locator('.cardface .who')).toHaveText('David');
+
+    const s = await db(page);
+    expect(s.t.progress.map((p) => p.step_key).sort()).toEqual(['mystery', 'quiz', 'reflect', 'story', 'verse']);
+    expect(s.t.progress.find((p) => p.step_key === 'mystery').detail.solved).toBe(true);
+    expect(s.t.awards.map((a) => a.badge_key).sort()).toEqual(['helping-hands', 'map-marker', 'story-detective']);
+    // free-text is never collected: reflection is one of the fixed choices
+    expect(DAVID.postClass.reflection.choices).toContain(s.t.progress.find((p) => p.step_key === 'reflect').detail.choice);
+
+    await page.getByRole('link', { name: 'Back to my adventures' }).click();
+    await expect(page.locator('.stop.open')).toContainText('David');
+    await expect(page.locator('.stop.open')).toContainText('Kings');
+    await expect(page.locator('.shelf .bdg:not(.locked)')).toHaveCount(3);
+    await expect(page.locator('.shelf .bdg.locked')).toHaveCount(BADGES.length - 3);
+    await expect(page.getByRole('link', { name: 'Play again' })).toBeVisible();
+    errs.assertNoErrors();
+  });
+
+  test('a Trailblazer gets the longer story, the verse quotes and four quiz questions', async ({ page }) => {
+    const s = seed(); s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
+    await setup(page, s);
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
+    await page.locator('.choice', { hasText: 'David' }).click();
+    await page.click('#go');
+    let quotes = 0;
+    for (;;) {
+      if (await page.locator('blockquote.quote').count()) quotes++;
+      const label = await page.locator('#fwd').innerText();
+      await page.click('#fwd');
+      if (label.includes('finished')) break;
+    }
+    expect(quotes).toBe(3);                                                    // 16:7, 17:37, 17:45
+    for (let i = 0; i < DAVID.live.quiz.trailblazer.length; i++) { await page.locator('.choice').first().click(); await page.click('#nx'); }
+    await expect(page.locator('.bank button')).toHaveCount(3);                 // 3 gaps for the older band
+  });
+
+  test('the class warm-up plays only the mystery, then returns to the family page', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/class/join.html?session=sess-open`);
+    await page.getByRole('link', { name: /Kofi’s mystery/ }).click();
+    await page.locator('.choice', { hasText: 'David' }).click();
+    await page.click('#go');
+    await expect(page.getByRole('heading', { name: 'Great warm-up!' })).toBeVisible();
+    expect((await db(page)).t.progress.map((p) => p.step_key)).toEqual(['mystery']);
+  });
+
+  test('progress resumes at the first unfinished step', async ({ page }) => {
+    const s = seed();
+    s.t.progress = ['mystery', 'story'].map((k) => ({ id: k, child_id: 'kid1', lesson_id: 'lesson-david', step_key: k, detail: {} }));
+    await setup(page, s);
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
+    await expect(page.locator('.q-count')).toContainText('Question 1');
+  });
+
+  test('practice mode (no account) works and saves nothing', async ({ page }) => {
+    const errs = await setup(page, seed({ signedIn: false }));
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01`);
+    await expect(page.getByText('Practice mode: nothing is saved.')).toBeVisible();
+    await page.locator('.choice', { hasText: 'David' }).click();
+    await expect(page.locator('#msg')).toContainText('It was David');
+    const s = await db(page);
+    expect(s.t.progress).toHaveLength(0);
+    expect(s.t.awards).toHaveLength(0);
+    errs.assertNoErrors();
+  });
+
+  test('an unsafe lesson slug is rejected', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/play/lesson.html?lesson=${encodeURIComponent('../../etc/passwd')}&child=kid1`);
+    await expect(page.getByRole('heading', { name: 'Which adventure?' })).toBeVisible();
+  });
+});

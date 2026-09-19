@@ -26,7 +26,7 @@ When the database is live, the same JSON goes into
 | Field | Purpose |
 |---|---|
 | `id`, `schemaVersion`, `status` | `status`: `sample` (placeholder), `draft`, or `published` |
-| `character` | name, era, `places` (map markers), `trait`, `cardTagline` for the collectible card |
+| `character` | name, era, `places`, `trait`, `cardTagline` for the collectible card, and `mapStop`: which stop on the Bible map this lesson unlocks (`creation`, `abraham`, `exodus`, `judges`, `kings`, `exile`, `jesus`, `church`) |
 | `translation` | id, name, licence, notes |
 | `scripture` | `passages` and per-band `ageNotes` |
 | `bigIdea` | One sentence. The thing a child should be able to say afterwards |
