@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffc93c">
+<meta name="robots" content="noindex">
+<title>Create a grown-up account — Bible Explorers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/faith/children-service/css/kids.css">
+<link rel="stylesheet" href="/faith/children-service/css/app.css">
+</head>
+<body class="app">
+<div id="chrome-top"></div>
+<main class="wrap"><div class="narrow" id="app">
+  <h1>Create a grown-up account</h1>
+  <p class="lede">You sign in, and you choose who plays. Children never get their own login.</p>
+  <form class="card" id="form" novalidate>
+    <div class="field"><label for="name">Your first name</label><input id="name" type="text" autocomplete="given-name" maxlength="40" required></div>
+    <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="new-password" minlength="8" required><p class="hint">At least 8 characters.</p></div>
+    <label class="check"><input type="checkbox" id="adult" required><span>I am a parent or carer, aged 18 or over.</span></label>
+    <p class="err" id="err" role="alert"></p>
+    <button class="btn btn-sun" type="submit" id="go">Create account</button>
+    <p class="small muted spaced">Already have an account? <a href="/faith/children-service/parent/login.html">Sign in</a></p>
+  </form>
+</div></main>
+<div id="chrome-bottom"></div>
+<script src="/assets/supabase.js"></script>
+<script src="/faith/children-service/js/kids-config.js"></script>
+<script src="/faith/children-service/js/kids-core.js"></script>
+<script src="/faith/children-service/js/pages/parent-join.js"></script>
+</body>
+</html>
