@@ -147,7 +147,17 @@ export function createClient() {
         save(db);
         return { data: { session: db.auth.session }, error: null };
       },
-      async signOut() { const db = load(); db.auth.session = null; save(db); return { error: null }; }
+      async signOut() { const db = load(); db.auth.session = null; save(db); return { error: null }; },
+      // Like real Supabase, never reveals whether the address has an account.
+      async resetPasswordForEmail(email) { const db = load(); (db.auth.resetRequests = db.auth.resetRequests || []).push(email); save(db); return { data: {}, error: null }; },
+      async updateUser({ password }) {
+        const db = load();
+        if (!db.auth.session) return { data: {}, error: { message: 'Auth session missing!' } };
+        const u = db.auth.users.find((x) => x.id === db.auth.session.user.id);
+        if (password) u.password = password;
+        save(db);
+        return { data: { user: u }, error: null };
+      }
     },
     schema(name) {
       if (name !== 'children_service') throw new Error('fake supabase: unexpected schema ' + name);

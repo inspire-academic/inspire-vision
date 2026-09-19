@@ -128,6 +128,9 @@
     });
     html += rows || '<p class="muted">No classes are scheduled for your children yet. When a leader adds one it will appear here.</p>';
     html += '</div>';
+    // Church admins get a shortcut to the leader tools. (Just a link: the tools themselves are protected by the database.)
+    var ar = await cs.from('church_members').select('id').eq('user_id', me).eq('role', 'church_admin').eq('status', 'active').eq('church_id', church.id);
+    if (!ar.error && (ar.data || []).length) html += '<p class="spaced"><a class="btn btn-line btn-small" href="' + C.base + '/church-admin/index.html">Leader tools</a></p>';
     app.innerHTML = html;
   }
 })();

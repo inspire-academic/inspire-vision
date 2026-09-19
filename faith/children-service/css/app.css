@@ -20,7 +20,9 @@ body.app{background:linear-gradient(180deg,#eaf6fb 0,#fffaf0 320px)}
 .field label,.field legend{display:block;font-weight:600;margin-bottom:6px}
 .field .hint{font-size:15px;color:var(--ink-soft);margin-top:4px}
 .field input[type=text],.field input[type=email],.field input[type=password]{width:100%;min-height:54px;padding:12px 16px;border:3px solid #d9cfb4;border-radius:16px;font:inherit;background:#fff}
-.field input:focus{border-color:var(--sky-deep);outline:none}
+.field select,.field input[type=datetime-local],.field input[type=number],.row select,.row input[type=date]{min-height:48px;padding:8px 12px;border:3px solid #d9cfb4;border-radius:14px;font:inherit;background:#fff;max-width:100%}
+.field select,.field input[type=datetime-local],.field input[type=number]{width:100%}
+.field input:focus,.field select:focus{border-color:var(--sky-deep);outline:none}
 .check{display:flex;gap:12px;align-items:flex-start;margin:0 0 14px}
 .check input{width:26px;height:26px;flex:0 0 auto;margin-top:3px;accent-color:var(--teal)}
 .check span{font-size:17px}

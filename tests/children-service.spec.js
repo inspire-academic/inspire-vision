@@ -279,6 +279,136 @@ test.describe('joining class', () => {
   });
 });
 
+test.describe('password reset', () => {
+  test('asking for a reset gives the same answer for any address', async ({ page }) => {
+    const errs = await setup(page, seed({ signedIn: false }));
+    await page.goto(`${BASE}/parent/login.html`);
+    await page.click('#forgot');
+    await expect(page.locator('#err')).toContainText('email address');       // needs an address first
+    for (const email of ['ama@example.com', 'nobody@example.com']) {
+      await page.fill('#email', email);
+      await page.click('#forgot');
+      await expect(page.locator('#info')).toContainText('If that email has an account');
+    }
+    expect((await db(page)).auth.resetRequests).toEqual(['ama@example.com', 'nobody@example.com']);
+    errs.assertNoErrors();
+  });
+
+  test('a valid reset link lets the parent choose a new password', async ({ page }) => {
+    await setup(page, seed());                                                // session present = recovery session established
+    await page.goto(`${BASE}/parent/reset.html`);
+    await page.fill('#pw', 'short');
+    await page.click('#go');
+    await expect(page.locator('#err')).toContainText('at least 8');
+    await page.fill('#pw', 'brand-new-pass');
+    await page.fill('#pw2', 'different-pass');
+    await page.click('#go');
+    await expect(page.locator('#err')).toContainText('don’t match');
+    await page.fill('#pw2', 'brand-new-pass');
+    await page.click('#go');
+    await expect(page.getByRole('heading', { name: 'Password changed' })).toBeVisible();
+    expect((await db(page)).auth.users[0].password).toBe('brand-new-pass');
+  });
+
+  test('an expired or reused link asks for a fresh one', async ({ page }) => {
+    await setup(page, seed({ signedIn: false }));
+    await page.goto(`${BASE}/parent/reset.html`);
+    await expect(page.getByRole('heading', { name: 'This link has expired' })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#form')).toHaveCount(0);
+  });
+});
+
+test.describe('leader tools', () => {
+  function adminSeed() {
+    const s = seed();
+    s.t.church_members.push(
+      { id: 'adm', church_id: 'church1', user_id: 'parent1', role: 'church_admin', status: 'active', display_name: 'Ama', created_at: iso(-900) },
+      { id: 'pend1', church_id: 'church1', user_id: 'u-efua', role: 'parent', status: 'pending', display_name: 'Efua', created_at: iso(-30) },
+      { id: 'pend2', church_id: 'church1', user_id: 'u-stranger', role: 'parent', status: 'pending', display_name: 'Stranger', created_at: iso(-20) }
+    );
+    return s;
+  }
+
+  test('a parent who is not an admin is turned away', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/church-admin/index.html`);
+    await expect(page.getByRole('heading', { name: 'Leaders only' })).toBeVisible();
+    await expect(page.locator('#sess-form')).toHaveCount(0);
+  });
+
+  test('the family page shows the leader-tools link only to admins', async ({ page }) => {
+    await setup(page, adminSeed());
+    await page.goto(`${BASE}/parent/index.html`);
+    await expect(page.getByRole('link', { name: 'Leader tools' })).toBeVisible();
+  });
+
+  test('approve and decline families; give a leader role; vetting unlocks children', async ({ page }) => {
+    const errs = await setup(page, adminSeed());
+    await page.goto(`${BASE}/church-admin/index.html`);
+    await expect(page.getByRole('heading', { name: 'Families waiting for approval' })).toBeVisible();
+    await expect(page.getByText('Efua')).toBeVisible();
+    await page.locator('[data-approve="pend1"]').click();
+    await expect(page.getByText('Family approved')).toBeVisible();
+    await page.locator('[data-decline="pend2"]').click();
+    await expect(page.getByText('Request declined')).toBeVisible();
+    let s = await db(page);
+    expect(s.t.church_members.find((m) => m.id === 'pend1').status).toBe('active');
+    expect(s.t.church_members.some((m) => m.id === 'pend2')).toBe(false);
+
+    // Efua becomes a leader; she cannot see children until BOTH dates are recorded
+    await page.selectOption('#role-who', 'u-efua');
+    await page.selectOption('#role-what', 'facilitator');
+    await page.click('#role-add');
+    await expect(page.getByText('Role added')).toBeVisible();
+    const row = page.locator('[data-staff]', { hasText: 'Efua' });
+    await expect(row).toContainText('Cannot see children yet');
+    await row.locator('[data-f=dbs]').fill('2026-01-15');
+    await row.locator('[data-savestaff]').click();
+    await expect(page.locator('[data-staff]', { hasText: 'Efua' })).toContainText('Cannot see children yet');   // one date is not enough
+    await page.locator('[data-staff]', { hasText: 'Efua' }).locator('[data-f=train]').fill('2026-02-01');
+    await page.locator('[data-staff]', { hasText: 'Efua' }).locator('[data-savestaff]').click();
+    await expect(page.locator('[data-staff]', { hasText: 'Efua' })).toContainText('Can see children');
+    s = await db(page);
+    expect(s.t.church_members.find((m) => m.user_id === 'u-efua' && m.role === 'facilitator')).toMatchObject({ dbs_checked_on: '2026-01-15', safeguarding_trained_on: '2026-02-01', status: 'active' });
+
+    // the same role cannot be added twice
+    await page.selectOption('#role-who', 'u-efua');
+    await page.selectOption('#role-what', 'facilitator');
+    await page.click('#role-add');
+    await expect(page.locator('#role-err')).toContainText('already have that role');
+    errs.assertNoErrors();
+  });
+
+  test('schedule a class (link must be https), see it listed, cancel it', async ({ page }) => {
+    const errs = await setup(page, adminSeed());
+    await page.goto(`${BASE}/church-admin/index.html`);
+    await page.selectOption('#s-class', 'class-trb');
+    await expect(page.locator('#s-dur')).toHaveValue('42');                    // Trailblazers default to 42 minutes
+    await page.click('#s-go');
+    await expect(page.locator('#s-err')).toContainText('start time');
+    await page.fill('#s-when', '2030-10-03T10:00');
+    await page.fill('#s-url', 'http://zoom.example/j/999');
+    await page.click('#s-go');
+    await expect(page.locator('#s-err')).toContainText('https://');
+    await page.fill('#s-url', 'https://zoom.example/j/999?pwd=abc');
+    await page.fill('#s-mid', '999 000');
+    await page.fill('#s-pw', 'letmein');
+    await page.selectOption('#s-lesson', 'lesson-david');
+    await page.click('#s-go');
+    await expect(page.getByText('Class scheduled')).toBeVisible();
+
+    const s = await db(page);
+    const created = s.t.sessions.find((x) => x.class_id === 'class-trb');
+    expect(created).toMatchObject({ church_id: 'church1', lesson_id: 'lesson-david', duration_min: 42, platform: 'zoom', status: 'scheduled' });
+    expect(s.t.session_join_details.find((d) => d.session_id === created.id)).toMatchObject({ join_url: 'https://zoom.example/j/999?pwd=abc', meeting_id: '999 000', passcode: 'letmein' });
+
+    await page.locator(`[data-cancel="${created.id}"]`).click();
+    await expect(page.getByText('Class cancelled')).toBeVisible();
+    expect((await db(page)).t.sessions.find((x) => x.id === created.id).status).toBe('cancelled');
+    errs.assertNoErrors();
+  });
+});
+
 test.describe('the David adventure', () => {
   test('play all five steps as an Explorer: progress saved, badges earned, map unlocked', async ({ page }) => {
     const errs = await setup(page, seed());
