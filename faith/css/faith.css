@@ -139,6 +139,30 @@ button,input{font:inherit}
 .community-card p{font-size:12.5px;line-height:1.4;margin:10px 0 14px}
 
 /* Pathways */
+/* Bible Explorers door (Children's Service). Lives on the Faith landing page, between the
+   feature row and Featured Pathways. The module itself has its own bright skin under
+   /faith/children-service/; this band is the only place it appears in Faith's own styling. */
+.explorers-door{margin-top:16px}
+.explorers-card{
+  display:flex;align-items:center;gap:22px;padding:22px 26px;border-radius:8px;
+  border:1px solid #efdca6;background:linear-gradient(135deg,#fff8e1 0%,#ffeaad 100%);
+  box-shadow:0 3px 12px rgba(16,45,56,.06)
+}
+.explorers-mark{flex:0 0 auto;width:74px;height:74px}
+.explorers-mark svg{width:100%;height:100%;display:block}
+.explorers-copy{flex:1}
+.explorers-kicker{margin:0;font:italic 400 12px/1 var(--serif);color:#7a5a10}
+.explorers-copy h2{font:400 30px/1.05 var(--serif);margin:4px 0 6px;color:var(--ink)}
+.explorers-copy p{margin:0;font-size:14px;line-height:1.45;color:#3c4f56;max-width:560px}
+.explorers-actions{display:flex;flex-direction:column;gap:9px;align-items:stretch;flex:0 0 auto}
+.explorers-actions .btn{white-space:nowrap}
+@media(max-width:850px){
+  .explorers-card{flex-wrap:wrap;gap:16px;padding:18px}
+  .explorers-actions{flex-direction:row;flex-wrap:wrap;width:100%}
+}
+.initiatives li a.initiative-link{display:contents;text-decoration:none;color:inherit}
+.initiatives li a.initiative-link strong{text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:2px}
+
 .pathways{padding:18px 0 30px}
 .section-heading{display:flex;justify-content:space-between;align-items:end}
 .section-heading p{font-size:12px;color:#687b82;margin:5px 0 0}
