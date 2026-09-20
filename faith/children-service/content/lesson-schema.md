@@ -21,11 +21,37 @@ When the database is live, the same JSON goes into
 - **No leaderboards, scores or speed.** Quiz answers are for the child's own
   feedback and are not ranked or displayed to others.
 
+- **Every lesson is more than history.** It must include life-application
+  `apply.moments` (a live one for each age band) and a `belonging` spotlight
+  ("who else is in this story?"). The validator enforces both.
+- **Nothing reaches children unreviewed.** `contentReview.status` starts as
+  `draft`. Only Pastor Eric or the designated lead teacher can move it to
+  `approved` (filling in `reviewer` and `reviewedOn`). The seed generator
+  writes an unapproved lesson to the database as `draft`, which children
+  cannot see. Review by opening the play page **without** a child selected
+  (practice mode reads the file directly), and use the Explorer / Trailblazer
+  toggle to read both versions.
+- **Names are used sparingly and never point at a real child.** Scenarios use
+  placeholders such as `{boy1}` and `{girl2}`, filled from the lesson's own
+  `names` pool. The app never uses the child's own name for a character, and
+  picks the same names for the same child each time. A given name may appear
+  at most 3 times in a lesson.
+- **Scripture quotes are checked, not trusted.** Run
+  `node faith/children-service/content/verify-quotes.mjs` (needs internet) to
+  confirm every quoted verse is in the World English Bible.
+- **Africa and every nation are in the story, not added on.** Do not claim a
+  modern country (such as Ghana) is in the Bible. Say "Africa", or name the
+  ancient places that are (Egypt, Cush, Cyrene, Ethiopia).
+
 ## Top-level fields
 
 | Field | Purpose |
 |---|---|
 | `id`, `schemaVersion`, `status` | `status`: `sample` (placeholder), `draft`, or `published` |
+| `contentReview` | `status` (`draft` / `approved`), `note`, `reviewer`, `reviewedOn`. An approved lesson must name its reviewer and date |
+| `names` | The pool of `boy` and `girl` names scenarios draw from, plus a note. Edit it to fit your congregation |
+| `apply` | Life-application moments; see below |
+| `belonging` | The "who else is in this story?" spotlight; see below |
 | `character` | name, era, `places`, `trait`, `cardTagline` for the collectible card, and `mapStop`: which stop on the Bible map this lesson unlocks (`creation`, `abraham`, `exodus`, `judges`, `kings`, `exile`, `jesus`, `church`) |
 | `translation` | id, name, licence, notes |
 | `scripture` | `passages` and per-band `ageNotes` |
@@ -52,9 +78,37 @@ When the database is live, the same JSON goes into
 - `quiz.explorer` / `quiz.trailblazer`: multiple choice only.
 - `memoryVerse`: reference, text (public domain), and actions.
 
+## `apply` (life application)
+
+`apply.moments[]`, each with:
+
+- `key`, `after` (where it sits: `story.part1`, `story.part2`, `quiz` or
+  `verse`), `bands`, `liveUse` (`yes` = run it in the live class; `home` =
+  app / home only, e.g. anything that could single out a child in a group).
+- `title`, `scenario`, `question`, and `choices[]` where **every** choice has
+  a `text` and a kind `response`. No choice is "wrong".
+- `grownUpTalk`: how it hands over to a grown-up. This is where the real
+  conversation happens, because children never type in the app.
+- `leaderPrompt` (required when `liveUse` is `yes`): what the leader asks
+  aloud. Live discussion is the main way these are taught; the app is
+  reinforcement. Never ask a child to speak for their culture or family.
+
+Nothing a child taps on a moment is stored.
+
+## `belonging`
+
+- `spotlight`: `who`, `from`, `why`, `ref`. Vary it lesson to lesson (for
+  example Ruth, Joseph in Egypt, the Ethiopian official, Simon of Cyrene).
+- `cards[]`: `key`, `bands`, `title`, `text`, optional `quote` (`ref`, `text`).
+  At least two cards per band.
+- `leaderPrompt`, and a `belonging` block in each run-sheet.
+
 ## Validation
 
 `content/validate-lessons.mjs` checks each lesson: parses, run-sheet minutes
-add up, every `activities.<key>` reference exists, every quiz `answer` is a
-valid option index, and no free-text reflection is enabled.
+add up, every `activities.<key>` and `apply.<key>` reference exists, live
+blocks only use `liveUse: "yes"` moments for the right band, every quiz
+`answer` is a valid option index, no free-text reflection is enabled, moments
+are complete (a reply for every choice, a grown-up hand-over), `belonging` is
+present, the review gate is well-formed, and names are used sparingly.
 Run: `node faith/children-service/content/validate-lessons.mjs`

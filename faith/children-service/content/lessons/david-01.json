@@ -4,6 +4,19 @@
   "status": "sample",
   "_note": "PLACEHOLDER lesson written to prove the lesson format end to end. The story is an original retelling; verse text is World English Bible (public domain), quoted only where fetched verbatim. Replace with the real character-study material when it is supplied.",
 
+  "contentReview": {
+    "status": "draft",
+    "note": "Life-application and belonging content drafted by Claude after a planning discussion with Pastor Eric. It must be approved by Pastor Eric or the designated lead teacher before children see it. Read the whole lesson in preview mode (the play page without a child selected) and check: (1) the names and situations ring true for our children, (2) nothing could single out a real child, (3) the Bible is used faithfully.",
+    "reviewer": null,
+    "reviewedOn": null
+  },
+
+  "names": {
+    "note": "Names used in the life-application scenarios. The app picks from these but never uses a child's own name for a character. Day-names are Ghanaian (Akan); Tunde and Emeka are Nigerian (Yoruba and Igbo). Edit freely to match your congregation; list only names you are happy to see in any role.",
+    "boy": ["Kweku", "Kojo", "Kwame", "Tunde", "Emeka"],
+    "girl": ["Adjoa", "Ama", "Abena"]
+  },
+
   "character": {
     "name": "David",
     "era": "united-kingdom",
@@ -150,12 +163,12 @@
           { "minutes": 3, "block": "Welcome ritual", "detail": "Hook chant, then an emoji check-in: show me a face for how your week was. Say each child's first name." },
           { "minutes": 2, "block": "Verse of the month", "detail": "Actions plus a rhyme. Thirty seconds of review, no test." },
           { "minutes": 5, "block": "Story part 1: the shepherd boy", "detail": "Use the staff. Call and response: God looks at the ... heart!" },
-          { "minutes": 3, "block": "Move: sheep and shepherd", "detail": "activities.sheep-and-shepherd" },
-          { "minutes": 6, "block": "Story part 2: the giant", "detail": "Use the Explorer version. Sling and stone prop." },
-          { "minutes": 3, "block": "I wonder", "detail": "activities.i-wonder" },
-          { "minutes": 3, "block": "Draw a sling", "detail": "activities.draw-a-sling" },
-          { "minutes": 2, "block": "Prayer", "detail": "Short, led by the leader. Children may join in; nobody has to." },
-          { "minutes": 1, "block": "Send-off", "detail": "Big idea, then announce the home card. Sign-off chant." }
+          { "minutes": 3, "block": "Think about it: left out at break", "detail": "apply.heart-explorer" },
+          { "minutes": 2, "block": "Move: sheep and shepherd", "detail": "activities.sheep-and-shepherd" },
+          { "minutes": 5, "block": "Story part 2: the giant", "detail": "Use the Explorer version. Sling and stone prop." },
+          { "minutes": 3, "block": "Think about it: a wobbly tummy", "detail": "apply.giant-explorer" },
+          { "minutes": 2, "block": "You belong in this story", "detail": "belonging" },
+          { "minutes": 3, "block": "Prayer and send-off", "detail": "Short prayer led by the leader; children may join in, nobody has to. Big idea, announce the home card, sign-off chant." }
         ]
       },
       "trailblazer": {
@@ -164,15 +177,16 @@
           { "minutes": 3, "block": "Welcome ritual", "detail": "Hook chant and emoji check-in. Say each child's first name." },
           { "minutes": 2, "block": "Verse of the month", "detail": "Review with actions; one quick recall round." },
           { "minutes": 6, "block": "Story part 1: the shepherd boy", "detail": "Use the staff. Call and response: God looks at the ... heart!" },
-          { "minutes": 3, "block": "Move: sheep and shepherd", "detail": "activities.sheep-and-shepherd" },
+          { "minutes": 3, "block": "Think about it: a name that's hard to say", "detail": "apply.heart-trailblazer" },
+          { "minutes": 2, "block": "Move: sheep and shepherd", "detail": "activities.sheep-and-shepherd" },
           { "minutes": 5, "block": "Story part 2a: the challenge", "detail": "Goliath's challenge, David's answer, the lion and the bear (17:37)." },
-          { "minutes": 3, "block": "Poll: would you go?", "detail": "activities.would-you-go" },
+          { "minutes": 2, "block": "Poll: would you go?", "detail": "activities.would-you-go" },
           { "minutes": 5, "block": "Story part 2b: armour, stones, the sling", "detail": "Saul's armour, five stones, David's words (17:45). Freeze-frame before the stone." },
-          { "minutes": 5, "block": "Hot seat", "detail": "activities.hot-seat" },
-          { "minutes": 3, "block": "I wonder", "detail": "activities.i-wonder" },
-          { "minutes": 3, "block": "Find it", "detail": "activities.find-it" },
-          { "minutes": 2, "block": "Prayer", "detail": "Short, led by the leader. Children may join in; nobody has to." },
-          { "minutes": 2, "block": "Send-off", "detail": "Big idea recap, announce the home card, sign-off chant." }
+          { "minutes": 4, "block": "Hot seat", "detail": "activities.hot-seat" },
+          { "minutes": 3, "block": "Think about it: the pressure to join in", "detail": "apply.giant-trailblazer" },
+          { "minutes": 3, "block": "You belong in this story", "detail": "belonging" },
+          { "minutes": 2, "block": "Find it", "detail": "activities.find-it" },
+          { "minutes": 2, "block": "Prayer and send-off", "detail": "Short prayer led by the leader; children may join in, nobody has to. Big idea recap, announce the home card, sign-off chant." }
         ]
       }
     },
@@ -229,18 +243,199 @@
     }
   },
 
+  "apply": {
+    "intro": "Life questions placed where the story meets a child's week. LIVE: the leader asks them aloud and lets children answer in their own words. APP: the same moment is a tap on a choice that ends by handing the conversation to a grown-up. Nothing a child taps is stored, and no choice is 'wrong'. Every choice gets a kind, honest reply.",
+    "howToUse": "Leaders: read the scenario, ask the question, let two or three children answer, then give the Bible's answer. Never ask a child to speak for their culture or family. If a child says something that worries you, follow the leaders' safeguarding checklist. Names come from the pool in \"names\"; swap in names that are not in your group, especially for the child who is left out or laughed at.",
+    "moments": [
+      {
+        "key": "heart-explorer",
+        "after": "story.part1",
+        "bands": ["explorer"],
+        "liveUse": "yes",
+        "title": "Left out at break",
+        "scenario": "{boy1} is the smallest boy in his class. When teams are picked for football at break, {boy1} is picked last. Again.",
+        "question": "When God looks at {boy1}, what does God see?",
+        "choices": [
+          { "text": "A boy who is too small", "response": "That is what eyes see on the outside. But God looks at the heart, and God sees a boy he made and loves." },
+          { "text": "A boy God made and loves", "response": "Yes! God saw David's heart, not how big he was. God sees {boy1}'s heart too." },
+          { "text": "I'm not sure", "response": "That's okay. Let's wonder together: God looked at David's heart instead of his size. What might God see when he looks at {boy1}?" }
+        ],
+        "grownUpTalk": "Ask a grown-up: Was there ever a time you felt left out? What helped?",
+        "leaderPrompt": "Ask everyone: \"Have you ever seen someone picked last? How do you think they felt?\" Let two or three children answer, then ask: \"What does God see when he looks at him?\" Don't push for a 'right' answer; come back to 1 Samuel 16:7."
+      },
+      {
+        "key": "giant-explorer",
+        "after": "story.part2",
+        "bands": ["explorer"],
+        "liveUse": "yes",
+        "title": "A wobbly tummy",
+        "scenario": "{girl1} has to read out loud in front of her whole class. Her tummy feels wobbly, and she thinks she might get it wrong. It feels like a giant.",
+        "question": "David remembered how God had helped him before. What could {girl1} do?",
+        "choices": [
+          { "text": "Take a deep breath and tell God she feels scared", "response": "Yes! David trusted God, and we can tell God about our wobbly feelings. He is always listening." },
+          { "text": "Remember a time God helped her before", "response": "Great idea! David remembered the lion and the bear. What could {girl1} remember?" },
+          { "text": "Tell a friend or her teacher she feels nervous", "response": "That is brave too! God gives us people to help us, like a smooth stone in David's bag." }
+        ],
+        "grownUpTalk": "Ask a grown-up: What is a wobbly-tummy giant you have faced? How did God help you?",
+        "leaderPrompt": "Ask: \"Who has ever felt wobbly before doing something scary?\" Then: \"What did David remember?\" (the lion and the bear, 17:37). \"What could you remember about how God has helped you?\" Let children answer; nobody has to."
+      },
+      {
+        "key": "newkid-explorer",
+        "after": "quiz",
+        "bands": ["explorer"],
+        "liveUse": "home",
+        "title": "The new girl at lunch",
+        "scenario": "{girl2}'s family has just moved to a new town. On her first day at school, nobody knows her, and she sits all on her own at lunch.",
+        "question": "God sees {girl2}'s heart. What could you do if you saw someone new sitting alone?",
+        "choices": [
+          { "text": "Sit with her and say hello", "response": "Yes! That is what God's love looks like when it has hands and feet. Now she is not alone." },
+          { "text": "Ask her to play with us", "response": "A great way to help someone feel like they belong!" },
+          { "text": "Tell a grown-up she might need a friend", "response": "Also kind! A grown-up can help, and you can still say hello too." }
+        ],
+        "grownUpTalk": "Ask a grown-up: Do you remember being new somewhere? What did someone do that helped?"
+      },
+      {
+        "key": "verse-explorer",
+        "after": "verse",
+        "bands": ["explorer"],
+        "liveUse": "home",
+        "title": "When could I use this verse?",
+        "scenario": "You have learned: \"God looks at the heart.\" A verse is for using, not just for remembering.",
+        "question": "When could you say it quietly to yourself?",
+        "choices": [
+          { "text": "When I feel left out", "response": "Good choice. Say it, take a breath, and remember: God sees your heart. Then maybe ask someone to play." },
+          { "text": "When I feel small", "response": "Good choice. God looked at David's heart when he was the smallest in his family. He sees yours too." },
+          { "text": "When someone says something unkind", "response": "Good choice. What they say is not the whole story of you. God looks at the heart. If it keeps happening, tell a grown-up." }
+        ],
+        "grownUpTalk": "Try saying the verse together at bedtime this week."
+      },
+      {
+        "key": "heart-trailblazer",
+        "after": "story.part1",
+        "bands": ["trailblazer"],
+        "liveUse": "yes",
+        "title": "A name that's hard to say",
+        "scenario": "{girl1} has just started at a new school. Some kids laugh at how her name sounds, and one of them says, \"Can I just call you something easier?\" {girl1} wonders whether she should change who she is to fit in.",
+        "question": "People looked at David's outside and missed his heart. What does it mean that God looks at {girl1}'s heart?",
+        "choices": [
+          { "text": "God knows her real name and who she is, even when others get it wrong", "response": "Yes. Her name is not a problem to fix. Later in this study we will see what God says about names." },
+          { "text": "She should quietly change her name so the laughing stops", "response": "A lot of people have felt that pressure, and it is understandable. But God is not embarrassed by her name, and she does not have to hide it. There are braver, kinder ways. And if others keep being unkind, a teacher should know." },
+          { "text": "She could kindly teach them to say it right, and ask a teacher for help if it doesn't stop", "response": "That takes courage. Nobody should have to handle unkindness alone. Telling a teacher is not weak. It is wise." }
+        ],
+        "grownUpTalk": "Ask a grown-up: Do you know how your name was chosen? Has anyone ever got your name wrong?",
+        "leaderPrompt": "Ask: \"Has anyone ever had their name said wrong, or been teased about it? You don't have to share.\" Then: \"What does God see when he looks at her?\" Never ask a child to explain their name, culture or family to the group. Move on gently if nobody wants to answer."
+      },
+      {
+        "key": "giant-trailblazer",
+        "after": "story.part2",
+        "bands": ["trailblazer"],
+        "liveUse": "yes",
+        "title": "The pressure to join in",
+        "scenario": "{boy1} is in a class group chat. Some older kids start sending mean jokes about {boy2}, who is new, and everyone is replying with laughing emojis. {boy1}'s stomach twists. Joining in would be easy.",
+        "question": "Some giants are not big men with spears. They are the pressure to go along with the crowd. What could a David-heart do?",
+        "choices": [
+          { "text": "Not join in, and stay quiet", "response": "Not joining in matters. But staying quiet can feel lonely, and {boy2} may still be hurting. There is more he could do." },
+          { "text": "Send {boy2} a kind message on his own", "response": "Kindness costs something, and it can change someone's whole day." },
+          { "text": "Tell a grown-up he trusts about the chat", "response": "That is brave, not telling tales. Mean messages online are something grown-ups need to know about." }
+        ],
+        "grownUpTalk": "Ask a grown-up: What would you want a friend to do if people were being unkind about you online? What should we do as a family if something like this happens?",
+        "leaderPrompt": "Ask: \"What makes it hard to go against the group?\" Then: \"What is one small stone you have?\" (prayer, a friend, a trusted adult, remembering what God has done). Affirm telling a trusted adult as courage. If a child says they are being bullied, follow the leaders' safeguarding checklist."
+      },
+      {
+        "key": "marks-trailblazer",
+        "after": "quiz",
+        "bands": ["trailblazer"],
+        "liveUse": "home",
+        "title": "More than a mark",
+        "scenario": "{boy3} got a low mark in a maths test. A friend says, \"Guess you're just not clever.\" {boy3} is starting to believe it.",
+        "question": "Is one test mark the same as who {boy3} is? What does God look at?",
+        "choices": [
+          { "text": "God looks at his heart, and one mark doesn't say who he is", "response": "Yes. A mark tells you what to practise. It does not tell you who you are." },
+          { "text": "The mark shows he should try again, and ask for help", "response": "Wise. Asking for help is what brave people do. David did not face the giant alone in his own strength." },
+          { "text": "Maybe he should give up on maths", "response": "Lots of people feel like that after a bad mark. Take a rest, then ask someone who can help. God cares about {boy3}'s heart and his effort, not just the mark." }
+        ],
+        "grownUpTalk": "Ask a grown-up: Was there ever something you were told you weren't good at? What happened?"
+      },
+      {
+        "key": "verse-trailblazer",
+        "after": "verse",
+        "bands": ["trailblazer"],
+        "liveUse": "home",
+        "title": "When could I use this verse?",
+        "scenario": "A memory verse is a tool, not a trophy. \"Man looks at the outward appearance, but Yahweh looks at the heart.\"",
+        "question": "When might you need it this week?",
+        "choices": [
+          { "text": "When someone laughs at how I look or sound", "response": "Say it in your head. What they see is not the whole of you. If it keeps happening, tell a grown-up you trust." },
+          { "text": "When I feel too small or too different", "response": "David was the youngest and the one nobody thought of. God chose him because he looked at his heart." },
+          { "text": "When I'm tempted to join in being unkind", "response": "That is a giant-sized moment. Say the verse, remember whose heart you want to have, and take one brave step the other way." },
+          { "text": "When I have made a mistake and feel not good enough", "response": "One mistake is not who you are. God looks at the heart, and he is kind to people who come to him." }
+        ],
+        "grownUpTalk": "Pick one moment this week when you will say the verse, and tell a grown-up which one."
+      }
+    ]
+  },
+
+  "belonging": {
+    "spotlight": {
+      "who": "Ruth",
+      "from": "Moab",
+      "why": "A woman from a different land who chose to follow the God of Israel, and became David's great-grandmother.",
+      "ref": "Ruth 4:17"
+    },
+    "intro": "Every lesson in this series asks one question: who else is in this story? The Bible is not one family's history. It is God's invitation to every family, and this is how it begins to show in David's own family line.",
+    "leaderPrompt": "Tell it simply: Ruth was not born in Israel, and she chose God's people. Ask: \"Did you know David's great-grandmother came from a different country?\" Then read the promise and the name verse together. Do not ask individual children to say where their family is from; let anyone share if they want to.",
+    "cards": [
+      {
+        "key": "ruth",
+        "bands": ["explorer", "trailblazer"],
+        "title": "Ruth: from far away, in God's family",
+        "text": "David's great-grandmother was called Ruth. She was not born in Israel. She came from a different land, called Moab, and she chose to follow the God of Israel. Ruth's family became David's family.",
+        "quote": { "ref": "Ruth 4:17", "text": "They named him Obed. He is the father of Jesse, the father of David." }
+      },
+      {
+        "key": "promise",
+        "bands": ["explorer", "trailblazer"],
+        "title": "God's promise for every family",
+        "text": "Long before David, God made a promise. It was for people from every family on earth. That blessing came through Jesus, who was born in David's family line. So families from Ghana, Nigeria, Jamaica, England, India and everywhere else are invited in.",
+        "quote": { "ref": "Genesis 12:3", "text": "All the families of the earth will be blessed through you." }
+      },
+      {
+        "key": "name",
+        "bands": ["explorer", "trailblazer"],
+        "title": "God knows your name",
+        "text": "God does not mix up names. Whether you are called Kweku or Adjoa, Kojo or Ama, Kwame or Abena, Tunde or Emeka, or any other name, God says this to his people:",
+        "quote": { "ref": "Isaiah 43:1", "text": "I have called you by your name. You are mine." }
+      },
+      {
+        "key": "africa",
+        "bands": ["trailblazer"],
+        "title": "Africa is in the story too",
+        "text": "People from Africa are all through the Bible. Egypt, and Cush to the south of Egypt, are named again and again. Simon, from Cyrene in North Africa, was made to carry Jesus' cross (Luke 23:26). And a royal official from Ethiopia travelled to Jerusalem to worship God, then learned about Jesus and believed (Acts 8:26-39)."
+      },
+      {
+        "key": "nations",
+        "bands": ["trailblazer"],
+        "title": "Every nation, tribe and language",
+        "text": "The Bible ends with a picture of people from everywhere, standing together to worship God.",
+        "quote": { "ref": "Revelation 7:9", "text": "a great multitude, which no man could count, out of every nation and of all tribes, peoples, and languages" }
+      }
+    ]
+  },
+
   "postClass": {
     "estimatedMinutes": 10,
     "mission": {
       "title": "Brave for a day",
-      "description": "Do one brave or kind thing this week that you find a bit hard. Tell a grown-up, and they can confirm it on the hub.",
+      "description": "Do one brave or kind thing this week that you find a bit hard. You could learn how to say a classmate's name properly, or sit with someone who is on their own. Tell a grown-up, and they can confirm it in the app.",
       "confirmedBy": "parent"
     },
     "familyQuestions": [
       "Who do people sometimes pick last? How could we show them that God sees their heart?",
       "Tell about a time you felt like a small person facing a big problem. What helped?",
-      "David remembered how God had helped him before. What is one time you remember God helping us?"
+      "David remembered how God had helped him before. What is one time you remember God helping our family, perhaps in another country or a long time ago? Grandparents and older relatives often have the best stories.",
+      "Do you know how your name was chosen? In Ghana many children are named after the day they were born: Kweku for a boy born on a Wednesday, Adjoa for a girl born on a Monday, Kwame for a boy born on a Saturday, Abena for a girl born on a Tuesday. Names from Nigeria and from every other place carry stories too. Ask a grown-up your name's story, and remember that God knows it."
     ],
+    "homeActivities": ["draw-a-sling"],
     "reflection": {
       "prompt": "One thing I noticed:",
       "choices": [
@@ -258,7 +453,8 @@
     "cards": [
       { "front": "Who was the youngest son that God chose?", "back": "David" },
       { "front": "What does God look at?", "back": "The heart (1 Samuel 16:7)" },
-      { "front": "What did David use against the giant?", "back": "A sling and a smooth stone" }
+      { "front": "What did David use against the giant?", "back": "A sling and a smooth stone" },
+      { "front": "Who was David's great-grandmother, and where did she come from?", "back": "Ruth, who came from Moab and chose to follow God (Ruth 4:17)" }
     ],
     "intervalsDays": [1, 3, 7, 30]
   },
@@ -276,7 +472,7 @@
   },
 
   "doctrine": {
-    "themes": ["God's choosing", "trust", "courage"],
+    "themes": ["God's choosing", "trust", "courage", "belonging for every nation"],
     "flags": []
   }
 }

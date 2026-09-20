@@ -42,11 +42,21 @@ for (const file of lessons) {
   const raw = fs.readFileSync(path.join(lessonsDir, file), 'utf8');
   const lesson = JSON.parse(raw);
   if (raw.includes(`$${tag}$`)) throw new Error(`${file} contains the dollar-quote tag`);
+  // Children only ever see 'published' lessons. A lesson is published ONLY once
+  // its contentReview is approved by Pastor Eric or the designated lead teacher;
+  // until then the generated SQL marks it 'draft'. So do not run this SQL against
+  // the live database until the review is approved — the app would hide the lesson.
+  const approved = lesson.contentReview?.status === 'approved';
+  const dbStatus = approved ? 'published' : 'draft';
+  if (!approved) console.warn(`  NOTE ${file}: contentReview is "${lesson.contentReview?.status}", so the SQL marks it DRAFT. Do not run it until approved.`);
   sql += `
--- ${file}
+-- ${file}  [status written: ${dbStatus}]${approved ? '' : `
+-- !! NOT APPROVED. contentReview is "${lesson.contentReview?.status}", so this lesson is written as 'draft' and children
+-- !! will NOT see it. Do not run this against the live database until Pastor Eric or the designated lead teacher approves
+-- !! the lesson (set contentReview to approved with a reviewer and date in the JSON, then regenerate this file).`}
 INSERT INTO children_service.lessons (church_id, slug, character_name, series_key, sequence, translation, content, status)
 VALUES (NULL, ${sqlText(lesson.id)}, ${sqlText(lesson.character.name)}, 'bible-characters', ${lessons.indexOf(file) + 1},${sqlText(lesson.translation.id)},
-$${tag}$${JSON.stringify(lesson)}$${tag}$::jsonb, 'published')
+$${tag}$${JSON.stringify(lesson)}$${tag}$::jsonb, '${dbStatus}')
 ON CONFLICT (COALESCE(church_id, '00000000-0000-0000-0000-000000000000'::uuid), slug)
 DO UPDATE SET content = EXCLUDED.content, character_name = EXCLUDED.character_name,
               translation = EXCLUDED.translation, status = EXCLUDED.status, updated_at = now();
