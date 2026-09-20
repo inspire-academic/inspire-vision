@@ -124,7 +124,7 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
     if (!pe.synopsis || pe.synopsis.length < 40 || pe.synopsis.length > 600) bad(file, 'parentEmail.synopsis should be a short paragraph (40 to 600 characters)');
     for (const band of BANDS) {
       const qs = pe.questions?.[band];
-      if (!Array.isArray(qs) || qs.length < 2 || qs.length > 4) bad(file, `parentEmail.questions.${band} needs 2 to 4 questions`);
+      if (!Array.isArray(qs) || qs.length !== 2) bad(file, `parentEmail.questions.${band} needs exactly 2 questions (the email asks two)`);
       else qs.forEach((q, i) => { if (typeof q !== 'string' || q.length < 15) bad(file, `parentEmail.questions.${band}[${i}] is too short`); });
     }
     if (/\{(boy|girl)\d+\}/.test(JSON.stringify(pe))) bad(file, 'parentEmail must not use {boy1}/{girl1} name tokens (use {child} for the child)');

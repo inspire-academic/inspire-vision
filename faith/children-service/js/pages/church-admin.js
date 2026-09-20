@@ -14,7 +14,7 @@
   var app = document.getElementById('app');
   var cs = await K.cs();
   var me = session.user.id;
-  var church, members = [], classes = [], lessons = [], sessions = [];
+  var church, members = [], classes = [], lessons = [], sessions = [], kids = [];
   var STAFF = ['church_admin', 'safeguarding_lead', 'facilitator', 'assistant'];
   var ROLE_LABEL = { church_admin: 'Church admin', safeguarding_lead: 'Safeguarding lead', facilitator: 'Teacher', assistant: 'Co-teacher' };
 
@@ -39,6 +39,18 @@
     ]);
     r.forEach(function (x) { if (x.error) throw x.error; });
     members = r[0].data || []; classes = r[1].data || []; lessons = r[2].data || []; sessions = r[3].data || [];
+    // Children, only to let the email preview use a REAL child's first name. Not needed for anything else,
+    // so a refusal (a leader who is not cleared to see children yet) just means the preview uses a sample.
+    var kr = await cs.from('children').select('id,display_name,class_id').eq('church_id', church.id).is('archived_at', null).order('created_at');
+    kids = kr.error ? [] : (kr.data || []);
+  }
+  function kidsInClass(classId) { return kids.filter(function (k) { return k.class_id === classId; }); }
+  // Which child a preview / test email is built for: the one chosen in the open preview, else the first
+  // real child in that class, else '' (a made-up sample child called Johnny).
+  function childFor(sess) {
+    if (previewing && previewing.id === sess.id) return previewing.childId || '';
+    var k = kidsInClass(sess.class_id)[0];
+    return k ? k.id : '';
   }
 
   function nameOf(m) { return m.display_name || 'Unnamed'; }
@@ -56,14 +68,16 @@
     if (current && names.indexOf(current) < 0) names.push(current);           // keep an existing name even if they have since left
     return opt('', 'Not set yet', !current) + names.map(function (n) { return opt(n, n, n === current); }).join('');
   }
-  var previewing = null;                                                       // { id, subject, html, sample } while the email preview is open
-  async function callSummary(action, sessionId) {
+  var previewing = null;                                                       // { id, childId, subject, html, sample, hasLesson, childName } while the email preview is open
+  async function callSummary(action, sessionId, childId) {
     var s = await K.session(), res, body;
+    var payload = { action: action, session_id: sessionId };
+    if (childId) payload.child_id = childId;
     try {
       res = await fetch('/.netlify/functions/cs-class-summary', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: 'Bearer ' + (s ? s.access_token : '') },
-        body: JSON.stringify({ action: action, session_id: sessionId })
+        body: JSON.stringify(payload)
       });
       body = await res.json();
     } catch (e) { throw new Error('We could not reach the server. Please try again in a moment.'); }
@@ -122,8 +136,20 @@
       (classes.length ? '' : '<p class="small muted">There are no classes yet. Run the seed file first.</p>') + '</form></div>';
 
     html += '<div class="card"><h2>All classes</h2><p class="small muted">After a class, parents whose child attended get a short email: what was studied, who taught, and questions to talk about. Use <b>Preview parent email</b> to see exactly what they will receive, or <b>Send me a test</b> to get it in your own inbox. Neither ever emails a parent.</p>';
-    if (previewing) html += '<div class="card notice good" id="preview-card"><strong>Subject:</strong> ' + K.esc(previewing.subject) + (previewing.sample ? ' <span class="small muted">(shown for a sample child called Johnny)</span>' : '') +
-      '<div id="preview-frame" style="margin-top:10px"></div><p class="row spaced"><button type="button" class="btn btn-line btn-small" id="preview-close">Close preview</button></p></div>';
+    if (previewing) {
+      var pcls = sessions.filter(function (x) { return x.id === previewing.id; })[0];
+      var pkids = pcls ? kidsInClass(pcls.class_id) : [];
+      html += '<div class="card notice ' + (previewing.hasLesson ? 'good' : 'bad') + '" id="preview-card">' +
+        (previewing.hasLesson ? '' : '<p><strong>This class has no lesson attached, so parents will not be emailed for it.</strong> The email needs a lesson to say what was studied and to give questions. Choose a lesson for this class in the list below.</p>') +
+        '<div class="row"><label class="small">Show the email for <select id="preview-child" aria-label="Which child to show the email for">' +
+        pkids.map(function (k) { return opt(k.id, k.display_name, k.id === previewing.childId); }).join('') +
+        opt('', 'A sample child (Johnny)', !previewing.childId) + '</select></label></div>' +
+        '<p class="small muted">' + (previewing.sample
+          ? 'Johnny is only a stand-in name for this preview. In the email a parent receives, this is their own child’s first name' + (pkids.length ? ' (pick a real child above to see it)' : ', and this class has no children in it yet') + '.'
+          : 'This is how the email reads for ' + K.esc(previewing.childName) + '’s parent. Nothing has been sent.') + '</p>' +
+        '<strong>Subject:</strong> ' + K.esc(previewing.subject) +
+        '<div id="preview-frame" style="margin-top:10px"></div><p class="row spaced"><button type="button" class="btn btn-line btn-small" id="preview-close">Close preview</button></p></div>';
+    }
     if (!sessions.length) html += '<p class="muted">No classes scheduled yet.</p>';
     sessions.slice().reverse().forEach(function (s) {
       var cl = classes.filter(function (c) { return c.id === s.class_id; })[0];
@@ -131,7 +157,9 @@
       html += '<div class="session" style="flex-direction:column;align-items:stretch"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><strong>' + K.esc(K.fmtWhen(s.starts_at)) + '</strong><br><span class="small muted">' + K.esc(cl ? cl.name : 'Class') +
         (le ? ' &middot; ' + K.esc(le.character_name) : '') + ' &middot; ' + s.duration_min + ' min &middot; ' + K.esc(s.status) + '</span></div>' +
         (s.status === 'scheduled' ? '<button type="button" class="btn btn-danger btn-small" data-cancel="' + K.esc(s.id) + '">Cancel class</button>' : '') + '</div>' +
-        '<div class="row" style="margin-top:8px"><label class="small">Teacher <select data-teacher-for="' + K.esc(s.id) + '" aria-label="Teacher for this class">' + teacherOptions(s.teacher_name) + '</select></label>' +
+        (le ? '' : '<p class="small err" style="margin:6px 0 0">No lesson attached. Parents will not be emailed for this class until you choose one.</p>') +
+        '<div class="row" style="margin-top:8px"><label class="small">Lesson <select data-lesson-for="' + K.esc(s.id) + '" aria-label="Lesson for this class">' + opt('', 'No lesson yet', !s.lesson_id) + lessons.map(function (l) { return opt(l.id, l.character_name, l.id === s.lesson_id); }).join('') + '</select></label>' +
+        '<label class="small">Teacher <select data-teacher-for="' + K.esc(s.id) + '" aria-label="Teacher for this class">' + teacherOptions(s.teacher_name) + '</select></label>' +
         '<button type="button" class="btn btn-line btn-small" data-preview="' + K.esc(s.id) + '">Preview parent email</button>' +
         '<button type="button" class="btn btn-line btn-small" data-sendtest="' + K.esc(s.id) + '">Send me a test</button></div></div>';
     });
@@ -142,7 +170,7 @@
       if (host) {
         var f = document.createElement('iframe');
         f.setAttribute('sandbox', ''); f.setAttribute('title', 'Parent email preview');
-        f.style.cssText = 'width:100%;height:560px;border:1px solid #efe3c8;border-radius:12px;background:#fff';
+        f.style.cssText = 'width:100%;height:820px;border:1px solid #efe3c8;border-radius:12px;background:#fff';
         f.srcdoc = previewing.html;
         host.appendChild(f);
       }
@@ -188,19 +216,37 @@
         act(function () { return cs.from('sessions').update({ teacher_name: v }).eq('id', sel.dataset.teacherFor); }, v ? 'Teacher saved: ' + v + '.' : 'Teacher cleared. The email will not name a teacher.');
       });
     });
+    Array.prototype.forEach.call(app.querySelectorAll('[data-lesson-for]'), function (sel) {
+      sel.addEventListener('change', function () {
+        var v = sel.value || null; sel.disabled = true; previewing = null;
+        act(function () { return cs.from('sessions').update({ lesson_id: v }).eq('id', sel.dataset.lessonFor); }, v ? 'Lesson saved for this class.' : 'Lesson cleared. Parents will not be emailed for this class until you choose one.');
+      });
+    });
+    async function openPreview(sessionId, childId) {
+      var r = await callSummary('preview', sessionId, childId);
+      previewing = { id: sessionId, childId: childId || '', subject: r.subject, html: r.html, sample: r.sample, hasLesson: r.hasLesson !== false, childName: r.childName };
+      render(); var pc = document.getElementById('preview-card'); if (pc && pc.scrollIntoView) pc.scrollIntoView({ block: 'start' });
+    }
     Array.prototype.forEach.call(app.querySelectorAll('[data-preview]'), function (b) {
       b.addEventListener('click', async function () {
         b.disabled = true;
-        try { var r = await callSummary('preview', b.dataset.preview); previewing = { id: b.dataset.preview, subject: r.subject, html: r.html, sample: r.sample }; render(); var pc = document.getElementById('preview-card'); if (pc && pc.scrollIntoView) pc.scrollIntoView({ block: 'start' }); }
+        var sess = sessions.filter(function (x) { return x.id === b.dataset.preview; })[0];
+        try { await openPreview(b.dataset.preview, sess ? childFor({ id: sess.id, class_id: sess.class_id }) : ''); }
         catch (e) { render(e.message, 'bad'); }
       });
+    });
+    var pchild = document.getElementById('preview-child');
+    if (pchild) pchild.addEventListener('change', async function () {
+      var id = previewing.id; pchild.disabled = true;
+      try { await openPreview(id, pchild.value); } catch (e) { render(e.message, 'bad'); }
     });
     var pclose = document.getElementById('preview-close');
     if (pclose) pclose.addEventListener('click', function () { previewing = null; render(); });
     Array.prototype.forEach.call(app.querySelectorAll('[data-sendtest]'), function (b) {
       b.addEventListener('click', async function () {
         b.disabled = true;
-        try { var r = await callSummary('send_test', b.dataset.sendtest); render('Test sent to ' + r.to + '. Check your inbox (and spam). No parent was emailed.'); }
+        var sess = sessions.filter(function (x) { return x.id === b.dataset.sendtest; })[0];
+        try { var r = await callSummary('send_test', b.dataset.sendtest, sess ? childFor(sess) : ''); render('Test sent to ' + r.to + '. Check your inbox (and spam). No parent was emailed.' + (r.hasLesson === false ? ' Note: this class has no lesson attached, so the real emails would not be sent for it.' : '')); }
         catch (e) { render(e.message, 'bad'); }
       });
     });

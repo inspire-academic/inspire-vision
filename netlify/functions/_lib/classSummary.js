@@ -40,13 +40,21 @@ function studiedLine(lesson, childName) {
   return { name: c.name, detail: '' };
 }
 
-// Discussion questions for THIS age group. Prefer the lesson's parentEmail questions; older
-// lessons fall back to their family questions (first three).
+// The email asks TWO questions (as specified). Prefer the lesson's parentEmail questions for
+// this age group; older lessons fall back to their first two family questions.
+const QUESTION_COUNT = 2;
 function questionsFor(lesson, band, childName) {
   const pe = (lesson && lesson.parentEmail && lesson.parentEmail.questions) || {};
   let qs = pe[band] || pe.all;
-  if (!Array.isArray(qs) || !qs.length) qs = ((lesson && lesson.postClass && lesson.postClass.familyQuestions) || []).slice(0, 3);
-  return qs.map((q) => fillChild(q, childName)).filter(Boolean).slice(0, 4);
+  if (!Array.isArray(qs) || !qs.length) qs = (lesson && lesson.postClass && lesson.postClass.familyQuestions) || [];
+  return qs.map((q) => fillChild(q, childName)).filter(Boolean).slice(0, QUESTION_COUNT);
+}
+
+// An email is only worth sending when there is a lesson to talk about: "They studied David"
+// plus something to discuss. A class with no lesson attached would produce a hollow email
+// ("attended ... thank you"), so the sender skips it and the admin preview warns about it.
+function lessonReady(lesson) {
+  return !!(lesson && lesson.character && lesson.character.name);
 }
 
 function buildEmail(input) {
@@ -127,4 +135,4 @@ function sessionIsDue(session, nowMs, opts) {
 // Only a real live attendance counts (not someone who merely watched the recap).
 const COUNTS_AS_ATTENDED = ['self_checkin', 'leader'];
 
-module.exports = { esc, churchDisplayName, formatWhen, studiedLine, questionsFor, buildEmail, sessionIsDue, COUNTS_AS_ATTENDED };
+module.exports = { esc, churchDisplayName, formatWhen, studiedLine, questionsFor, lessonReady, buildEmail, sessionIsDue, COUNTS_AS_ATTENDED, QUESTION_COUNT };
