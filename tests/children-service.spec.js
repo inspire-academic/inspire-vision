@@ -42,6 +42,34 @@ test.describe('landing page', () => {
   });
 });
 
+test.describe('the door on the Faith page', () => {
+  test('a clear "Bible Explorers" band on /faith/ leads to the module, on desktop and on a phone', async ({ page, browser }) => {
+    const errs = await setup(page, seed({ signedIn: false }));
+    await page.goto('/faith/index.html');
+    const door = page.locator('.explorers-door');
+    await expect(door.getByRole('heading', { name: 'Bible Explorers' })).toBeVisible();
+    await expect(door).toContainText('Ages 5 to 11');
+    await expect(door.getByRole('link', { name: /Meet Bible Explorers/ })).toHaveAttribute('href', '/faith/children-service/index.html');
+    await expect(door.getByRole('link', { name: /sign in/ })).toHaveAttribute('href', '/faith/children-service/parent/login.html');
+    await expect(page.locator('.initiatives a.initiative-link')).toHaveAttribute('href', '/faith/children-service/index.html');   // the existing "Next Gen Faith" item is now a link
+    await expect(page.locator('.gateway-card')).toHaveCount(8);                      // the rest of the page is untouched
+    errs.assertNoErrors();
+
+    await door.getByRole('link', { name: /Meet Bible Explorers/ }).click();
+    await expect(page).toHaveURL(/faith\/children-service\/index\.html$/);
+    await expect(page.getByRole('heading', { name: /Bible Explorers/ }).first()).toBeVisible();
+
+    const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const p2 = await phone.newPage();
+    await setup(p2, seed({ signedIn: false }));
+    await p2.goto('/faith/index.html');
+    await expect(p2.locator('.explorers-door')).toBeVisible();
+    expect(await p2.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);   // no sideways scrolling
+    await p2.locator('.explorers-door').getByRole('link', { name: /sign in/ }).click();
+    await expect(p2).toHaveURL(/parent\/login\.html$/);
+  });
+});
+
 test.describe('accounts and gating', () => {
   test('a signed-out visitor is sent to sign in and back', async ({ page }) => {
     await setup(page, seed({ signedIn: false }));
