@@ -8,6 +8,12 @@ functions = "netlify/functions"
 [functions."notify-mentor-staleness"]
   schedule = "0 8 * * 1"
 
+# Children's Service: after-class summary email to parents. Runs every 10 minutes on the
+# PUBLISHED deploy only, and does NOTHING unless the env var CS_CLASS_SUMMARIES is set to
+# "on" — see the function's own header comment for every safeguard.
+[functions."notify-class-summaries"]
+  schedule = "*/10 * * * *"
+
 [context.production]
   branch = "main"
 

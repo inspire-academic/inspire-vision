@@ -107,9 +107,22 @@ Nothing a child taps on a moment is stored.
   At least two cards per band.
 - `leaderPrompt`, and a `belonging` block in each run-sheet.
 
+## `parentEmail` (the after-class email)
+
+Used by `netlify/functions/_lib/classSummary.js`, the same builder the leader
+preview uses. Never contains a child's name; the email fills it in.
+
+- `synopsis`: two to four short sentences, plain words, no names of children.
+  Shown after "They studied <character>."
+- `questions.explorer` / `questions.trailblazer`: three questions each, for a
+  parent to ask at home. Write `{child}` where the child's name should go.
+  If `parentEmail` is missing, the email falls back to the first three
+  `postClass.familyQuestions` and a one-line synopsis from the tagline.
+
 ## Validation
 
-`content/validate-lessons.mjs` checks each lesson: parses, run-sheet minutes
+`content/validate-lessons.mjs` checks each lesson: `parentEmail` has a synopsis
+and questions for both bands, parses, run-sheet minutes
 add up, every `activities.<key>` and `apply.<key>` reference exists, live
 blocks only use `liveUse: "yes"` moments for the right band, every quiz
 `answer` is a valid option index, no free-text reflection is enabled, moments

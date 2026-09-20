@@ -35,13 +35,41 @@
       cs.from('church_members').select('id,user_id,role,status,display_name,dbs_checked_on,safeguarding_trained_on,created_at').eq('church_id', church.id).order('created_at'),
       cs.from('classes').select('id,name,age_band').eq('church_id', church.id).eq('active', true).order('age_band'),
       cs.from('lessons').select('id,slug,character_name').eq('status', 'published').order('sequence'),
-      cs.from('sessions').select('id,class_id,lesson_id,starts_at,duration_min,platform,status').eq('church_id', church.id).order('starts_at')
+      cs.from('sessions').select('id,class_id,lesson_id,starts_at,duration_min,platform,status,teacher_name').eq('church_id', church.id).order('starts_at')
     ]);
     r.forEach(function (x) { if (x.error) throw x.error; });
     members = r[0].data || []; classes = r[1].data || []; lessons = r[2].data || []; sessions = r[3].data || [];
   }
 
   function nameOf(m) { return m.display_name || 'Unnamed'; }
+  // First names of everyone who can teach (active staff), for the "Teacher" choice on a class.
+  // The chosen name is what parents see in the after-class email.
+  function teacherNames() {
+    var seen = {}, out = [];
+    members.forEach(function (m) {
+      if (STAFF.indexOf(m.role) >= 0 && m.status === 'active' && m.display_name && !seen[m.display_name]) { seen[m.display_name] = 1; out.push(m.display_name); }
+    });
+    return out;
+  }
+  function teacherOptions(current) {
+    var names = teacherNames();
+    if (current && names.indexOf(current) < 0) names.push(current);           // keep an existing name even if they have since left
+    return opt('', 'Not set yet', !current) + names.map(function (n) { return opt(n, n, n === current); }).join('');
+  }
+  var previewing = null;                                                       // { id, subject, html, sample } while the email preview is open
+  async function callSummary(action, sessionId) {
+    var s = await K.session(), res, body;
+    try {
+      res = await fetch('/.netlify/functions/cs-class-summary', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: 'Bearer ' + (s ? s.access_token : '') },
+        body: JSON.stringify({ action: action, session_id: sessionId })
+      });
+      body = await res.json();
+    } catch (e) { throw new Error('We could not reach the server. Please try again in a moment.'); }
+    if (!res.ok) throw new Error(body && body.error ? body.error : 'Something went wrong.');
+    return body;
+  }
   function opt(v, t, sel) { return '<option value="' + K.esc(v) + '"' + (sel ? ' selected' : '') + '>' + K.esc(t) + '</option>'; }
 
   function render(flash, kind) {
@@ -83,6 +111,7 @@
     html += '<div class="card"><h2>Schedule a class</h2><form id="sess-form" novalidate>' +
       '<div class="field"><label for="s-class">Class</label><select id="s-class">' + classes.map(function (c) { return opt(c.id, c.name); }).join('') + '</select></div>' +
       '<div class="field"><label for="s-lesson">Lesson</label><select id="s-lesson">' + opt('', 'No lesson yet') + lessons.map(function (l) { return opt(l.id, l.character_name); }).join('') + '</select></div>' +
+      '<div class="field"><label for="s-teacher">Teacher</label><select id="s-teacher">' + teacherOptions('') + '</select><p class="hint">Named in the short email parents receive after class. You can change it later.</p></div>' +
       '<div class="field"><label for="s-when">Starts</label><input id="s-when" type="datetime-local"><p class="hint">In your device’s time zone.</p></div>' +
       '<div class="field"><label for="s-dur">Length (minutes)</label><input id="s-dur" type="number" min="10" max="120" value="28"></div>' +
       '<div class="field"><label for="s-plat">Meeting app</label><select id="s-plat">' + opt('zoom', 'Zoom', true) + opt('teams', 'Teams') + '</select></div>' +
@@ -92,17 +121,32 @@
       '<p class="err" id="s-err" role="alert"></p><button class="btn btn-sun" type="submit" id="s-go"' + (classes.length ? '' : ' disabled') + '>Schedule class</button>' +
       (classes.length ? '' : '<p class="small muted">There are no classes yet. Run the seed file first.</p>') + '</form></div>';
 
-    html += '<div class="card"><h2>All classes</h2>';
+    html += '<div class="card"><h2>All classes</h2><p class="small muted">After a class, parents whose child attended get a short email: what was studied, who taught, and questions to talk about. Use <b>Preview parent email</b> to see exactly what they will receive, or <b>Send me a test</b> to get it in your own inbox. Neither ever emails a parent.</p>';
+    if (previewing) html += '<div class="card notice good" id="preview-card"><strong>Subject:</strong> ' + K.esc(previewing.subject) + (previewing.sample ? ' <span class="small muted">(shown for a sample child called Johnny)</span>' : '') +
+      '<div id="preview-frame" style="margin-top:10px"></div><p class="row spaced"><button type="button" class="btn btn-line btn-small" id="preview-close">Close preview</button></p></div>';
     if (!sessions.length) html += '<p class="muted">No classes scheduled yet.</p>';
     sessions.slice().reverse().forEach(function (s) {
       var cl = classes.filter(function (c) { return c.id === s.class_id; })[0];
       var le = lessons.filter(function (l) { return l.id === s.lesson_id; })[0];
-      html += '<div class="session"><div><strong>' + K.esc(K.fmtWhen(s.starts_at)) + '</strong><br><span class="small muted">' + K.esc(cl ? cl.name : 'Class') +
+      html += '<div class="session" style="flex-direction:column;align-items:stretch"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><strong>' + K.esc(K.fmtWhen(s.starts_at)) + '</strong><br><span class="small muted">' + K.esc(cl ? cl.name : 'Class') +
         (le ? ' &middot; ' + K.esc(le.character_name) : '') + ' &middot; ' + s.duration_min + ' min &middot; ' + K.esc(s.status) + '</span></div>' +
-        (s.status === 'scheduled' ? '<button type="button" class="btn btn-danger btn-small" data-cancel="' + K.esc(s.id) + '">Cancel class</button>' : '') + '</div>';
+        (s.status === 'scheduled' ? '<button type="button" class="btn btn-danger btn-small" data-cancel="' + K.esc(s.id) + '">Cancel class</button>' : '') + '</div>' +
+        '<div class="row" style="margin-top:8px"><label class="small">Teacher <select data-teacher-for="' + K.esc(s.id) + '" aria-label="Teacher for this class">' + teacherOptions(s.teacher_name) + '</select></label>' +
+        '<button type="button" class="btn btn-line btn-small" data-preview="' + K.esc(s.id) + '">Preview parent email</button>' +
+        '<button type="button" class="btn btn-line btn-small" data-sendtest="' + K.esc(s.id) + '">Send me a test</button></div></div>';
     });
     html += '</div>';
     app.innerHTML = html;
+    if (previewing) {                                                          // the email itself, in a locked-down frame (scripts can't run in it)
+      var host = document.getElementById('preview-frame');
+      if (host) {
+        var f = document.createElement('iframe');
+        f.setAttribute('sandbox', ''); f.setAttribute('title', 'Parent email preview');
+        f.style.cssText = 'width:100%;height:560px;border:1px solid #efe3c8;border-radius:12px;background:#fff';
+        f.srcdoc = previewing.html;
+        host.appendChild(f);
+      }
+    }
     wire();
   }
 
@@ -138,6 +182,28 @@
       if (r.error) { document.getElementById('role-err').textContent = r.error.code === '23505' ? 'They already have that role.' : K.explain(r.error); return; }
       await load(); render('Role added. They still need both dates recorded before they can see children.');
     });
+    Array.prototype.forEach.call(app.querySelectorAll('[data-teacher-for]'), function (sel) {
+      sel.addEventListener('change', function () {
+        var v = sel.value || null; sel.disabled = true;
+        act(function () { return cs.from('sessions').update({ teacher_name: v }).eq('id', sel.dataset.teacherFor); }, v ? 'Teacher saved: ' + v + '.' : 'Teacher cleared. The email will not name a teacher.');
+      });
+    });
+    Array.prototype.forEach.call(app.querySelectorAll('[data-preview]'), function (b) {
+      b.addEventListener('click', async function () {
+        b.disabled = true;
+        try { var r = await callSummary('preview', b.dataset.preview); previewing = { id: b.dataset.preview, subject: r.subject, html: r.html, sample: r.sample }; render(); var pc = document.getElementById('preview-card'); if (pc && pc.scrollIntoView) pc.scrollIntoView({ block: 'start' }); }
+        catch (e) { render(e.message, 'bad'); }
+      });
+    });
+    var pclose = document.getElementById('preview-close');
+    if (pclose) pclose.addEventListener('click', function () { previewing = null; render(); });
+    Array.prototype.forEach.call(app.querySelectorAll('[data-sendtest]'), function (b) {
+      b.addEventListener('click', async function () {
+        b.disabled = true;
+        try { var r = await callSummary('send_test', b.dataset.sendtest); render('Test sent to ' + r.to + '. Check your inbox (and spam). No parent was emailed.'); }
+        catch (e) { render(e.message, 'bad'); }
+      });
+    });
     Array.prototype.forEach.call(app.querySelectorAll('[data-cancel]'), function (b) {
       b.addEventListener('click', function () { b.disabled = true; act(function () { return cs.from('sessions').update({ status: 'cancelled' }).eq('id', b.dataset.cancel); }, 'Class cancelled. Families will see that it is cancelled.'); });
     });
@@ -166,6 +232,7 @@
     var r1 = await cs.from('sessions').insert({
       id: id, church_id: church.id, class_id: document.getElementById('s-class').value,
       lesson_id: document.getElementById('s-lesson').value || null,
+      teacher_name: document.getElementById('s-teacher').value || null,
       starts_at: new Date(when).toISOString(), duration_min: dur, platform: plat, status: 'scheduled'
     });
     if (r1.error) { err.textContent = K.explain(r1.error); btn.disabled = false; return; }
