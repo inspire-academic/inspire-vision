@@ -83,8 +83,21 @@ test.describe('teacher sign-in, teacher home, and the same lessons with notes', 
 
   test('a draft lesson is clearly marked in the teacher view', async ({ page }) => {
     await setup(page, teacherSeed());
+    const draft = JSON.parse(JSON.stringify(DAVID));                                   // serve a draft copy, whatever state the real file is in
+    draft.contentReview = { status: 'draft', reviewer: null, reviewedOn: null };
+    await page.route('**/content/lessons/david-01.json', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(draft) }));
     await page.goto(`${BASE}/play/lesson.html?lesson=david-01&teacher=1`);
     await expect(page.locator('.preview-banner')).toContainText('DRAFT');
+  });
+
+  test('an approved lesson is not marked as a draft, and the real file names its reviewer and date', async ({ page }) => {
+    await setup(page, teacherSeed());
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&teacher=1`);
+    await expect(page.locator('.preview-banner')).toBeVisible();
+    await expect(page.locator('.preview-banner')).not.toContainText('DRAFT');
+    expect(DAVID.contentReview.status).toBe('approved');
+    expect(DAVID.contentReview.reviewer).toBeTruthy();
+    expect(DAVID.contentReview.reviewedOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   test('?teacher=1 does nothing for someone who is not a teacher', async ({ page }) => {
