@@ -4,10 +4,11 @@
 //   { action: "preview",   session_id, child_id? }   -> { subject, text, html, sample }
 //   { action: "send_test", session_id, child_id? }   -> emails ONLY the signed-in admin
 // Without child_id the email is built for a sample child called "Johnny" in the class's age group.
+// With child_id it is built for that real child (their first name, age group and parent's greeting).
 // Needs RESEND_API_KEY for send_test (preview needs nothing).
 'use strict';
 const { getAdminClient, requireChurchAdmin, DEFAULT_CHURCH_SLUG } = require('./_lib/csAuth');
-const { buildEmail } = require('./_lib/classSummary');
+const { buildEmail, lessonReady } = require('./_lib/classSummary');
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const FROM = 'Inspire Children’s Service <noreply@inspireacademic.org>';
@@ -41,20 +42,25 @@ async function handle(event, deps) {
       s.lesson_id ? cs.from('lessons').select('content').eq('id', s.lesson_id).maybeSingle() : Promise.resolve({ data: null }),
       cs.from('classes').select('age_band').eq('id', s.class_id).maybeSingle()
     ]);
-    let childName = 'Johnny', band = (cl.data && cl.data.age_band) || 'explorer', sample = true;
+    let childName = 'Johnny', band = (cl.data && cl.data.age_band) || 'explorer', sample = true, parentName = null;
     if (body.child_id) {
-      const kr = await cs.from('children').select('display_name,age_band').eq('id', body.child_id).eq('church_id', church.id).maybeSingle();
+      const kr = await cs.from('children').select('display_name,age_band,parent_id').eq('id', body.child_id).eq('church_id', church.id).maybeSingle();
       if (kr.error) throw kr.error;
       if (!kr.data) return fail(404, 'Child not found.');
       childName = kr.data.display_name; band = kr.data.age_band; sample = false;
+      const pm = await cs.from('church_members').select('display_name').eq('user_id', kr.data.parent_id).eq('church_id', church.id).eq('role', 'parent').maybeSingle();
+      parentName = (pm.data && pm.data.display_name) || null;                  // the same greeting the real email would have
     }
+    const lesson = lr.data && lr.data.content;
+    const hasLesson = lessonReady(lesson);
     const mail = buildEmail({
-      childName, band, parentName: null, startsAt: s.starts_at,
+      childName, band, parentName, startsAt: s.starts_at,
       timezone: ch.data && ch.data.timezone, churchName: (ch.data && ch.data.name) || church.name,
-      lesson: lr.data && lr.data.content, teacherName: s.teacher_name
+      lesson, teacherName: s.teacher_name
     });
 
-    if (body.action === 'preview') return json(200, { ok: true, sample, subject: mail.subject, text: mail.text, html: mail.html });
+    // hasLesson=false means the real sender would NOT email anyone for this class (see notify-class-summaries.js)
+    if (body.action === 'preview') return json(200, { ok: true, sample, hasLesson, childName, subject: mail.subject, text: mail.text, html: mail.html });
 
     // send_test: to the signed-in admin's own address, and nobody else
     if (!me.email) return fail(400, 'Your account has no email address.');
@@ -66,7 +72,7 @@ async function handle(event, deps) {
       html: mail.html.replace('<div class="wrap">', `<div class="wrap"><p style="background:#fde8e6;border-radius:8px;padding:8px 12px;font-weight:700">${banner}</p>`)
     });
     if (r.error) return fail(502, 'We could not send the test email. Please try again.');
-    return json(200, { ok: true, sample, to: me.email });
+    return json(200, { ok: true, sample, hasLesson, to: me.email });
   } catch (e) {
     console.error('cs-class-summary error:', e && e.message);
     return fail(500, 'Something went wrong. Please try again.');

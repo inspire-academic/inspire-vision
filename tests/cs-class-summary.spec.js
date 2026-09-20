@@ -48,10 +48,30 @@ test.describe('the email', () => {
   test('uses the age group\'s own questions, and puts the child\'s name in them', () => {
     const ex = buildEmail(base).text, tr = buildEmail({ ...base, band: 'trailblazer' }).text;
     expect(ex).toContain("What do you think God sees when God looks at Johnny's heart?");
-    expect(ex).not.toContain('pressure to go along with the crowd');
-    expect(tr).toContain('pressure to go along with the crowd');
-    expect(tr).not.toContain('memory verse');
+    expect(ex).not.toContain('feels like a giant');
+    expect(tr).toContain('feels like a giant');
+    expect(tr).toContain('David\'s great-grandmother Ruth');                  // the belonging question
     expect(ex + tr).not.toMatch(/\{child\}/);                                // never a raw placeholder
+  });
+
+  test('asks exactly TWO questions, for every age group', () => {
+    for (const band of ['explorer', 'trailblazer']) {
+      const e = buildEmail({ ...base, band });
+      expect(e.text.match(/^\d\. /gm), band).toHaveLength(2);
+      expect(e.text).not.toContain('3. ');
+      expect((e.html.match(/<li>/g) || []), band).toHaveLength(2);
+    }
+    const many = JSON.parse(JSON.stringify(DAVID)); many.parentEmail.questions.explorer.push('A third question here?', 'A fourth question here?');
+    expect(buildEmail({ ...base, lesson: many }).text.match(/^\d\. /gm)).toHaveLength(2);            // never more, even if a lesson supplies more
+  });
+
+  test('every child\'s own name appears wherever the email names the child, and the stand-in name never leaks', () => {
+    const e = buildEmail({ ...base, childName: 'Nene', band: 'explorer' });
+    expect(e.subject).toBe('Nene joined Bible Explorers');
+    expect(e.text).toContain('Nene attended the virtual Bible class');
+    expect(e.text).toContain('Thank you for supporting Nene to become a great Bible explorer.');
+    expect(e.text).toContain("God looks at Nene's heart");
+    expect(e.text + e.html).not.toContain('Johnny');
   });
 
   test('leaves the teacher line out when nobody is set, rather than saying "unknown"', () => {
@@ -67,10 +87,10 @@ test.describe('the email', () => {
     const e = buildEmail({ ...base, lesson: old });
     expect(e.text).toContain('They studied David: The shepherd boy God chose.');           // tagline fallback, with its full stop
     expect(e.text).toContain('1. Who do people sometimes pick last?');                      // family questions fallback
-    expect(e.text.match(/^\d\. /gm).length).toBe(3);
+    expect(e.text.match(/^\d\. /gm).length).toBe(2);
   });
 
-  test('a class with no lesson still produces an email (no study line, no questions)', () => {
+  test('the wording alone, given no lesson, has no study line and no questions (the sender and preview treat that as "do not send")', () => {
     const e = buildEmail({ ...base, lesson: null });
     expect(e.text).toContain('Johnny attended the virtual Bible class');
     expect(e.text).not.toContain('They studied');
@@ -215,7 +235,7 @@ test.describe('the scheduled sender', () => {
     expect(kofi.text).toContain('Their teacher for today was Tina.');
     expect(kofi.text).toContain('What do you think God sees when God looks at Kofi');            // explorer questions
     const abena = w.sent.find((m) => m.subject === 'Abena joined Bible Explorers');
-    expect(abena.text).toContain('pressure to go along with the crowd');                         // trailblazer questions
+    expect(abena.text).toContain('feels like a giant');                                          // trailblazer questions
     expect(abena.text).toContain('Hello Kwame,');
     expect(w.sent.every((m) => /noreply@inspireacademic\.org/.test(m.from) && m.html && m.text)).toBe(true);
     expect(w.sent.map((m) => m.subject).join()).not.toMatch(/Esi|Old|Noemail|Recap/);          // opted out, archived, no email, recap-only
@@ -283,6 +303,24 @@ test.describe('the scheduled sender', () => {
     expect(w.sent.length).toBe(3 + 45);
   });
 
+  test('a class with NO lesson sends nothing, marks nobody as emailed, and sends once a lesson is attached', async () => {
+    for (const noLesson of [null, undefined]) {
+      const w = world();
+      w.t.sessions.find((s) => s.id === U(11)).lesson_id = noLesson;
+      const r = await go(w);
+      expect(r.sent).toBe(0);
+      expect(r.noLesson).toBeGreaterThan(0);
+      expect(w.sent).toHaveLength(0);
+      expect(w.t.attendance.every((a) => a.summary_sent_at === null), 'nobody was claimed, so nothing is lost').toBe(true);
+      w.t.sessions.find((s) => s.id === U(11)).lesson_id = L1;                         // a leader attaches the lesson within the 24 hours
+      expect((await go(w)).sent).toBe(3);                                               // ...and the parents are emailed after all
+    }
+    const w2 = world();                                                                 // a lesson row that exists but is empty is treated the same
+    w2.t.lessons.find((l) => l.id === L1).content = {};
+    expect((await go(w2)).sent).toBe(0);
+    expect(w2.sent).toHaveLength(0);
+  });
+
   test('a late check-in (teacher marks a child present afterwards) is still emailed', async () => {
     const w = world();
     await go(w);
@@ -347,8 +385,11 @@ test.describe('admin preview and test send', () => {
     const r = await w.call('tok-admin', { action: 'preview', session_id: U(11), child_id: U(22) });
     expect(r.body.sample).toBe(false);
     expect(r.body.subject).toBe('Abena joined Bible Explorers');
-    expect(r.body.text).toContain('pressure to go along with the crowd');
-    expect((await w.call('tok-admin', { action: 'preview', session_id: U(16) })).status).toBe(404);                      // another church's class
+    expect(r.body.text).toContain('feels like a giant');
+    expect(r.body.childName).toBe('Abena');
+    expect(r.body.text).toContain('Hello Kwame,');                                                                       // the parent's own greeting, as in the real email
+    expect(r.body.text).not.toContain('Johnny');
+    expect((await w.call('tok-admin', { action: 'preview', session_id: U(16) })).status).toBe(404);                     // another church's class
     expect((await w.call('tok-admin', { action: 'preview', session_id: U(11), child_id: U(28) })).status).toBe(404);    // another church's child
     expect((await w.call('tok-admin', { action: 'preview', session_id: 'nope' })).status).toBe(400);
     expect((await w.call('tok-admin', { action: 'preview', session_id: U(11), child_id: 'nope' })).status).toBe(400);
@@ -366,6 +407,16 @@ test.describe('admin preview and test send', () => {
     expect(w.sent[0].text).toMatch(/^THIS IS A TEST/);
     expect(w.sent[0].html).toContain('THIS IS A TEST');
     expect(w.t.attendance.every((a) => a.summary_sent_at === null)).toBe(true);      // a test never marks anything as sent
+  });
+
+  test('preview and test say whether the class has a lesson (without one, parents would not be emailed)', async () => {
+    const w = adminWorld();
+    expect((await w.call('tok-admin', { action: 'preview', session_id: U(11) })).body.hasLesson).toBe(true);
+    w.t.sessions.find((s) => s.id === U(11)).lesson_id = null;
+    const p = await w.call('tok-admin', { action: 'preview', session_id: U(11) });
+    expect(p.body.hasLesson).toBe(false);
+    expect(p.body.text).not.toContain('They studied');
+    expect((await w.call('tok-admin', { action: 'send_test', session_id: U(11) })).body.hasLesson).toBe(false);
   });
 
   test('send_test says so plainly when email is not set up', async () => {
