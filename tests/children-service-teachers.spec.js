@@ -202,6 +202,7 @@ async function mockPeople(page, opts = {}) {
       case 'set_status': role(body.member_id).status = body.status; return send(200, { ok: true });
       case 'remove_role': state.people.forEach((p) => { p.roles = p.roles.filter((r) => r.id !== body.member_id); }); state.people = state.people.filter((p) => p.roles.length); return send(200, { ok: true });
       case 'assign_role': state.people.find((p) => p.user_id === body.user_id).roles.push({ id: 'rx', role: body.role, status: 'active' }); return send(200, { ok: true });
+      case 'set_checks': { const r = role(body.member_id); r.dbs_checked_on = body.dbs_checked_on; r.safeguarding_trained_on = body.safeguarding_trained_on; return send(200, { ok: true }); }
       case 'send_reset': return send(200, { ok: true, email: state.people.find((p) => p.user_id === body.user_id).email });
       default: return send(400, { error: 'Unknown action.' });
     }
@@ -281,6 +282,55 @@ test.describe('people and roles page', () => {
     expect(st.calls.find((c) => c.action === 'assign_role')).toEqual({ action: 'assign_role', user_id: 'u-ama', role: 'facilitator' });
     await page.locator('[data-person="u-tina"]').getByRole('button', { name: 'Send password reset' }).click();
     await expect(page.getByText('A password-reset email has been sent to tina@church.org')).toBeVisible();
+  });
+
+  test('DBS and training date boxes are on every teacher and leader card, and not on families', async ({ page }) => {
+    await setup(page, adminSeed());
+    await mockPeople(page);
+    await page.goto(`${BASE}/church-admin/people.html`);
+    const tina = page.locator('[data-person="u-tina"]'), eric = page.locator('[data-person="parent1"]'), ama = page.locator('[data-person="u-ama"]');
+    await expect(tina.locator('[data-f=dbs]')).toHaveValue('2026-01-01');
+    await expect(tina.locator('[data-f=train]')).toHaveValue('2026-01-02');
+    await expect(tina).toContainText('✓ Can see class lists');
+    await expect(eric.locator('[data-f=dbs]')).toHaveValue('');
+    await expect(eric).toContainText('Needs both dates');
+    await expect(ama.locator('[data-f=dbs]')).toHaveCount(0);                              // families have no checks
+    await expect(ama.locator('[data-savechecks]')).toHaveCount(0);
+    const today = await page.evaluate(() => { const d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); });
+    await expect(tina.locator('[data-f=dbs]')).toHaveAttribute('max', today);            // the picker itself refuses future dates
+  });
+
+  test('both dates unlock class lists; one alone does not; a date can be cleared', async ({ page }) => {
+    await setup(page, adminSeed());
+    const st = await mockPeople(page);
+    await page.goto(`${BASE}/church-admin/people.html`);
+    const eric = () => page.locator('[data-person="parent1"]');
+    await eric().locator('[data-f=dbs]').fill('2026-03-04');
+    await eric().getByRole('button', { name: 'Save dates' }).click();
+    await expect(page.getByText('once BOTH dates are recorded')).toBeVisible();
+    expect(st.calls.find((c) => c.action === 'set_checks')).toEqual({ action: 'set_checks', member_id: 'r1', dbs_checked_on: '2026-03-04', safeguarding_trained_on: null });
+    await expect(eric()).toContainText('Needs both dates');                                // still locked with one date
+
+    await eric().locator('[data-f=train]').fill('2026-03-10');
+    await eric().getByRole('button', { name: 'Save dates' }).click();
+    await expect(page.getByText('can now see class lists and the meeting link')).toBeVisible();
+    await expect(eric()).toContainText('✓ Can see class lists');
+
+    const tina = () => page.locator('[data-person="u-tina"]');                            // clearing a date takes access away again
+    await tina().locator('[data-f=dbs]').fill('');
+    await tina().getByRole('button', { name: 'Save dates' }).click();
+    await expect(tina()).toContainText('Needs both dates');
+    expect(st.calls.filter((c) => c.action === 'set_checks').pop()).toMatchObject({ member_id: 'r2', dbs_checked_on: null, safeguarding_trained_on: '2026-01-02' });
+  });
+
+  test("a refused date is shown plainly and nothing looks saved", async ({ page }) => {
+    await setup(page, adminSeed());
+    await mockPeople(page, { fail: { set_checks: { status: 400, error: 'Please enter real dates that are not in the future.' } } });
+    await page.goto(`${BASE}/church-admin/people.html`);
+    await page.locator('[data-person="parent1"]').locator('[data-f=dbs]').fill('2026-03-04');
+    await page.locator('[data-person="parent1"]').getByRole('button', { name: 'Save dates' }).click();
+    await expect(page.getByText('Please enter real dates that are not in the future.')).toBeVisible();
+    await expect(page.locator('[data-person="parent1"]')).toContainText('Needs both dates');
   });
 
   test("the server's refusal is shown plainly, and a non-admin is turned away", async ({ page, browser }) => {

@@ -41,6 +41,7 @@
   }
 
   function when(iso) { return iso ? K.fmtWhen(iso) : null; }
+  function todayLocal() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function canSeeChildren(p) {
     return p.roles.some(function (r) { return r.role !== 'parent' && r.status === 'active' && r.dbs_checked_on && r.safeguarding_trained_on; });
   }
@@ -55,7 +56,7 @@
       '<form id="invite" novalidate><div class="field"><label for="i-email">Email</label><input id="i-email" type="email" autocomplete="off"></div>' +
       '<div class="field"><label for="i-name">First name (optional)</label><input id="i-name" type="text" maxlength="40" autocomplete="off"></div>' +
       '<div class="field"><label for="i-role">Role</label><select id="i-role">' + ADD_ROLES.map(function (r) { return '<option value="' + r + '"' + (r === 'facilitator' ? ' selected' : '') + '>' + ROLE_LABEL[r] + '</option>'; }).join('') + '</select>' +
-      '<p class="hint">A teacher sees the lessons as children do, with teacher notes. They only see the class list once their DBS check and safeguarding training are recorded in <a href="' + C.base + '/church-admin/index.html">Leader tools</a>.</p></div>' +
+      '<p class="hint">A teacher sees the lessons as children do, with teacher notes. They only see class lists and the meeting link once their DBS check and safeguarding training dates are recorded on their card below. Only record a date once the check or training has really happened.</p></div>' +
       '<p class="err" id="i-err" role="alert"></p><button class="btn btn-sun" type="submit" id="i-go">Add teacher</button></form></div>';
 
     var staff = people.filter(isStaff), families = people.filter(function (p) { return !isStaff(p); });
@@ -89,6 +90,15 @@
         if (r.role !== 'parent') h += '<button type="button" class="btn btn-danger btn-small" data-remove="' + K.esc(r.id) + '">Remove</button>';
       }
       h += '</div></div>';
+      if (r.role !== 'parent') {
+        // The two checks that unlock class lists and the meeting link. Both are needed.
+        var both = r.status === 'active' && r.dbs_checked_on && r.safeguarding_trained_on;
+        h += '<div class="row" data-checks="' + K.esc(r.id) + '" style="margin:6px 0 4px 6px;align-items:flex-end">' +
+          '<label class="small">DBS check (or local equivalent)<br><input type="date" data-f="dbs" max="' + todayLocal() + '" value="' + K.esc(r.dbs_checked_on || '') + '"></label>' +
+          '<label class="small">Safeguarding training<br><input type="date" data-f="train" max="' + todayLocal() + '" value="' + K.esc(r.safeguarding_trained_on || '') + '"></label>' +
+          '<button type="button" class="btn btn-line btn-small" data-savechecks="' + K.esc(r.id) + '">Save dates</button>' +
+          '<span class="small ' + (both ? 'tick' : 'muted') + '">' + (both ? '✓ Can see class lists' : 'Needs both dates') + '</span></div>';
+      }
     });
     if (addable.length) {
       h += '<div class="row spaced"><select data-addrole-for="' + K.esc(p.user_id) + '" aria-label="Add a role for ' + K.esc(p.name || 'this person') + '"><option value="">Give another role…</option>' +
@@ -130,6 +140,15 @@
     });
     Array.prototype.forEach.call(app.querySelectorAll('[data-remove-yes]'), function (b) {
       b.addEventListener('click', function () { b.disabled = true; act(function () { return api('remove_role', { member_id: b.dataset.removeYes }); }, 'Role removed.'); });
+    });
+    Array.prototype.forEach.call(app.querySelectorAll('[data-savechecks]'), function (b) {
+      b.addEventListener('click', function () {
+        var box = app.querySelector('[data-checks="' + b.dataset.savechecks + '"]');
+        var dbs = box.querySelector('[data-f=dbs]').value || null, trn = box.querySelector('[data-f=train]').value || null;
+        b.disabled = true;
+        act(function () { return api('set_checks', { member_id: b.dataset.savechecks, dbs_checked_on: dbs, safeguarding_trained_on: trn }); },
+          dbs && trn ? 'Dates saved. This person can now see class lists and the meeting link.' : 'Saved. They will see class lists once BOTH dates are recorded.');
+      });
     });
     Array.prototype.forEach.call(app.querySelectorAll('[data-reset]'), function (b) {
       b.addEventListener('click', async function () {

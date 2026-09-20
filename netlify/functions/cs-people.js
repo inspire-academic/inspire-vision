@@ -8,6 +8,7 @@
 //   assign_role   give an existing member another role
 //   set_status    suspend / reactivate one role
 //   remove_role   take one non-parent role away
+//   set_checks    record / clear the DBS and safeguarding-training dates for a teacher or leader
 //   send_reset    email a member a password-reset link
 //
 // What it deliberately does NOT do: show or set anyone's password; list anyone who is
@@ -33,6 +34,19 @@ function redirectFor(event, env) {
   const allowed = BUILT_IN_ORIGINS.concat((env.CS_ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean));
   const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || '';
   return (allowed.includes(origin) ? origin : BUILT_IN_ORIGINS[0]) + RESET_PATH;   // never an origin we don't own
+}
+
+// A calendar date "YYYY-MM-DD" (or null / "" to clear it): must really exist, be from 2000 onwards,
+// and not be in the future. (Tomorrow UTC is allowed so a UK evening date is never wrongly refused.)
+function parseCheckDate(v, now = new Date()) {
+  if (v === null || v === undefined || v === '') return { ok: true, value: null };
+  if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return { ok: false };
+  const d = new Date(v + 'T00:00:00Z');
+  if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v) return { ok: false };   // e.g. 2026-02-30
+  if (d.getUTCFullYear() < 2000) return { ok: false };
+  const tomorrow = new Date(now.getTime() + 86400000).toISOString().slice(0, 10);
+  if (v > tomorrow) return { ok: false };
+  return { ok: true, value: v };
 }
 
 async function findUserByEmail(admin, email) {
@@ -155,6 +169,24 @@ async function handle(event, deps) {
         }
         const del = await cs.from('church_members').delete().eq('id', row.id).eq('church_id', church.id);
         if (del.error) throw del.error;
+        return json(200, { ok: true });
+      }
+
+      case 'set_checks': {
+        // Record (or clear) the dates of a teacher's DBS check (or local equivalent) and safeguarding
+        // training. A teacher sees class lists and the meeting link only when BOTH are set, so these
+        // are validated strictly: real calendar dates, in the past or today, and only for staff roles.
+        if (!UUID.test(body.member_id || '')) return fail(400, 'Invalid request.');
+        const dbs = parseCheckDate(body.dbs_checked_on), trn = parseCheckDate(body.safeguarding_trained_on);
+        if (!dbs.ok || !trn.ok) return fail(400, 'Please enter real dates that are not in the future.');
+        const all = await rows();
+        const row = all.find((m) => m.id === body.member_id);
+        if (!row) return fail(404, 'Not found.');
+        if (row.role === 'parent') return fail(400, 'Checks apply to teachers and leaders, not families.');
+        const up = await cs.from('church_members')
+          .update({ dbs_checked_on: dbs.value, safeguarding_trained_on: trn.value })
+          .eq('id', row.id).eq('church_id', church.id);
+        if (up.error) throw up.error;
         return json(200, { ok: true });
       }
 
