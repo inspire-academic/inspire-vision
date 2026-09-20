@@ -140,6 +140,16 @@
     });
     html += rows || '<p class="muted">No classes are scheduled for your children yet. When a leader adds one it will appear here.</p>';
     html += '</div>';
+
+    // After-class summary emails: on unless the parent has switched them off. The latest
+    // "communications" consent wins; every change is a NEW row, so the choice keeps its history.
+    var pr = await cs.from('consents').select('given,created_at').eq('parent_id', me).eq('type', 'communications').is('child_id', null).order('created_at', { ascending: false }).limit(1);
+    var emailsOn = !(!pr.error && pr.data && pr.data[0] && pr.data[0].given === false);
+    if (kids.length) {
+      html += '<div class="card" id="emails"><h2>Class summary emails</h2><p>After each live class your child attends, we send you a short email: what they studied, who taught, and a few questions to talk about together.</p>' +
+        '<div class="row"><span id="emails-state" class="' + (emailsOn ? 'tick' : 'muted') + '"><b>' + (emailsOn ? '✓ On' : 'Off') + '</b></span>' +
+        '<button type="button" class="btn btn-line btn-small" id="emails-toggle">' + (emailsOn ? 'Turn off' : 'Turn on') + '</button></div><p class="err" id="emails-err" role="alert"></p></div>';
+    }
     // Church admins get a shortcut to the leader tools. (Just a link: the tools themselves are protected by the database.)
     var ar = await cs.from('church_members').select('id').eq('user_id', me).eq('role', 'church_admin').eq('status', 'active').eq('church_id', church.id);
     var tools = '';
@@ -148,5 +158,16 @@
       '<a class="btn btn-line btn-small" href="' + C.base + '/church-admin/people.html">People and roles</a>';
     if (tools) html += '<p class="spaced row">' + tools + '</p>';
     app.innerHTML = html;
+
+    var tog = document.getElementById('emails-toggle');
+    if (tog) tog.addEventListener('click', async function () {
+      tog.disabled = true;
+      var res = await cs.from('consents').insert({ parent_id: me, child_id: null, type: 'communications', policy_version: C.policyVersion, given: !emailsOn });
+      if (res.error) { document.getElementById('emails-err').textContent = K.explain(res.error); tog.disabled = false; return; }
+      emailsOn = !emailsOn;
+      var st = document.getElementById('emails-state');
+      st.className = emailsOn ? 'tick' : 'muted'; st.innerHTML = '<b>' + (emailsOn ? '✓ On' : 'Off') + '</b>';
+      tog.textContent = emailsOn ? 'Turn off' : 'Turn on'; tog.disabled = false;
+    });
   }
 })();
