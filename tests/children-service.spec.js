@@ -51,11 +51,16 @@ function seed({ signedIn = true, member = 'active', consent = true, kid = true }
       badges: BADGES,
       sessions: [
         { id: 'sess-open', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(10), duration_min: 28, status: 'scheduled', platform: 'zoom' },
-        { id: 'sess-early', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(300), duration_min: 28, status: 'scheduled', platform: 'zoom' }
+        { id: 'sess-early', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(300), duration_min: 28, status: 'scheduled', platform: 'zoom' },
+        // scheduled end was 5 minutes ago (inside the 10-minute grace) / 22 minutes ago (outside it)
+        { id: 'sess-just-ended', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(-33), duration_min: 28, status: 'scheduled', platform: 'zoom' },
+        { id: 'sess-long-over', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(-50), duration_min: 28, status: 'scheduled', platform: 'zoom' }
       ],
       session_join_details: [
         { session_id: 'sess-open', join_url: SECRET, meeting_id: '111 222 333', passcode: 'pw-open' },
-        { session_id: 'sess-early', join_url: SECRET + '-EARLY', meeting_id: '444', passcode: 'pw-early' }
+        { session_id: 'sess-early', join_url: SECRET + '-EARLY', meeting_id: '444', passcode: 'pw-early' },
+        { session_id: 'sess-just-ended', join_url: SECRET + '-JUSTENDED', meeting_id: '555', passcode: 'pw-just' },
+        { session_id: 'sess-long-over', join_url: SECRET + '-OVER', meeting_id: '666', passcode: 'pw-over' }
       ],
       attendance: [], progress: [], awards: []
     }
@@ -261,6 +266,31 @@ test.describe('joining class', () => {
     const s = await db(page);
     expect(s.t.attendance).toEqual([expect.objectContaining({ session_id: 'sess-open', child_id: 'kid1', source: 'self_checkin' })]);
     errs.assertNoErrors();
+  });
+
+  test('just after the scheduled end the link still works but the page no longer says "open"', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/class/join.html?session=sess-just-ended`);
+    await expect(page.getByText('The class time is over')).toBeVisible();
+    await expect(page.getByText('The class is open')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Open Zoom/ })).toHaveAttribute('href', SECRET + '-JUSTENDED');
+  });
+
+  test('more than 10 minutes after the end the link is gone', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/class/join.html?session=sess-long-over`);
+    await expect(page.getByRole('heading', { name: 'This class has finished' })).toBeVisible();
+    const html = await page.content();
+    expect(html).not.toContain('SECRET-LINK');
+    expect(html).not.toContain('pw-over');
+  });
+
+  test('the family page lists a class only until its grace period ends', async ({ page }) => {
+    await setup(page, seed());
+    await page.goto(`${BASE}/parent/index.html`);
+    await expect(page.locator('.session')).toHaveCount(3);                     // open, early, just-ended (long-over is hidden)
+    await expect(page.locator(`a[href*="sess-long-over"]`)).toHaveCount(0);
+    await expect(page.locator(`a[href*="sess-just-ended"]`)).toHaveCount(1);
   });
 
   test('a non-https join link is never offered', async ({ page }) => {

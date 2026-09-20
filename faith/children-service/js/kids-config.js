@@ -10,5 +10,8 @@ window.KIDS_CONFIG = {
   policyVersion: 'interim-2026-09-19',
   // How many minutes before a class the join link becomes available
   // (mirrors get_join_info() in children_service_schema.sql).
-  joinOpensMinutesBefore: 30
+  joinOpensMinutesBefore: 30,
+  // ...and how long after a class is due to end it stays reachable (overruns,
+  // late families). Mirrors schema v3; 30 minutes was too long.
+  joinStaysOpenMinutesAfter: 10
 };

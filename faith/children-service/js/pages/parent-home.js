@@ -101,7 +101,7 @@
     var sr = await cs.from('sessions').select('id,class_id,starts_at,duration_min,status,platform,lesson_id')
       .in('status', ['scheduled', 'live']).order('starts_at').limit(10);
     if (sr.error) throw sr.error;
-    var now = Date.now(), slack = C.joinOpensMinutesBefore * 60000;
+    var now = Date.now(), slack = C.joinStaysOpenMinutesAfter * 60000;
     var sessions = (sr.data || []).filter(function (s) { return new Date(s.starts_at).getTime() + s.duration_min * 60000 + slack > now; });
 
     var html = '<h1>' + (firstName ? 'Hello, ' + K.esc(firstName) + '!' : 'My family') + '</h1>' +
