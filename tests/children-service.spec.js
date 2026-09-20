@@ -46,6 +46,7 @@ test.describe('landing page', () => {
     await page.goto(`${BASE}/index.html`);
     await expect(page.locator('header.top nav').getByRole('link', { name: 'Sign in' })).toBeVisible();
     await expect(page.locator('#grownups').getByRole('link', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByText('Sign-up opens soon')).toHaveCount(0);                                     // sign-up is open: no greyed-out "opens soon" button
     await page.locator('header.top nav').getByRole('link', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/parent\/login\.html$/);
 
