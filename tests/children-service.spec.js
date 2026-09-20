@@ -14,69 +14,8 @@
 // supabase/children_service_schema*.sql and is tested against a real Postgres
 // (see the commit message / PR notes for how).
 const { test, expect } = require('@playwright/test');
-const fs = require('fs');
-const path = require('path');
+const { BASE, DAVID, SECRET, iso, BADGES, seed, setup, db, passMoments } = require('./helpers/cs-fixtures');
 const { trackConsoleErrors } = require('./helpers');
-
-const BASE = '/faith/children-service';
-const FAKE = fs.readFileSync(path.join(__dirname, 'helpers', 'fake-supabase.mjs'), 'utf8');
-const DAVID = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'faith', 'children-service', 'content', 'lessons', 'david-01.json'), 'utf8'));
-const SECRET = 'https://zoom.example/j/SECRET-LINK-123';
-
-const iso = (minFromNow) => new Date(Date.now() + minFromNow * 60000).toISOString();
-const BADGES = [
-  ['camp-fire-friend', 'Camp Fire Friend', 'system'], ['catch-up-champion', 'Catch-Up Champion', 'system'],
-  ['story-detective', 'Story Detective', 'system'], ['map-marker', 'Map Marker', 'system'],
-  ['verse-keeper', 'Verse Keeper', 'leader'], ['brave-like-david', 'Brave Like David', 'leader'],
-  ['helping-hands', 'Helping Hands', 'parent'], ['table-talkers', 'Table Talkers', 'parent']
-].map(([key, title, awarded_by]) => ({ key, title, description: title + ' description', awarded_by }));
-
-function seed({ signedIn = true, member = 'active', consent = true, kid = true } = {}) {
-  const user = { id: 'parent1', email: 'ama@example.com', password: 'password1', user_metadata: { full_name: 'Ama' } };
-  return {
-    auth: { users: [user], session: signedIn ? { user: { id: user.id, email: user.email, user_metadata: user.user_metadata } } : null },
-    t: {
-      churches: [{ id: 'church1', slug: 'inspire', name: 'Inspire (our own church)', open_enrolment: true }],
-      classes: [
-        { id: 'class-exp', church_id: 'church1', name: 'Explorers', age_band: 'explorer', active: true },
-        { id: 'class-trb', church_id: 'church1', name: 'Trailblazers', age_band: 'trailblazer', active: true }
-      ],
-      church_members: member ? [{ id: 'm1', church_id: 'church1', user_id: 'parent1', role: 'parent', status: member }] : [],
-      consents: consent ? ['data_processing', 'safeguarding_policy'].map((type) => ({ id: type, parent_id: 'parent1', child_id: null, type, given: true, created_at: iso(-1000) })) : [],
-      children: [
-        ...(kid ? [{ id: 'kid1', church_id: 'church1', parent_id: 'parent1', display_name: 'Kofi', age_band: 'explorer', avatar: { skin: 2, hair: 1 }, class_id: 'class-exp', created_at: iso(-500) }] : []),
-        { id: 'kid-other', church_id: 'church1', parent_id: 'parent2', display_name: 'Esi', age_band: 'explorer', avatar: {}, class_id: 'class-exp', created_at: iso(-400) }
-      ],
-      lessons: [{ id: 'lesson-david', slug: 'david-01', status: 'published', character_name: 'David', sequence: 1, content: DAVID }],
-      badges: BADGES,
-      sessions: [
-        { id: 'sess-open', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(10), duration_min: 28, status: 'scheduled', platform: 'zoom' },
-        { id: 'sess-early', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(300), duration_min: 28, status: 'scheduled', platform: 'zoom' },
-        // scheduled end was 5 minutes ago (inside the 10-minute grace) / 22 minutes ago (outside it)
-        { id: 'sess-just-ended', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(-33), duration_min: 28, status: 'scheduled', platform: 'zoom' },
-        { id: 'sess-long-over', church_id: 'church1', class_id: 'class-exp', lesson_id: 'lesson-david', starts_at: iso(-50), duration_min: 28, status: 'scheduled', platform: 'zoom' }
-      ],
-      session_join_details: [
-        { session_id: 'sess-open', join_url: SECRET, meeting_id: '111 222 333', passcode: 'pw-open' },
-        { session_id: 'sess-early', join_url: SECRET + '-EARLY', meeting_id: '444', passcode: 'pw-early' },
-        { session_id: 'sess-just-ended', join_url: SECRET + '-JUSTENDED', meeting_id: '555', passcode: 'pw-just' },
-        { session_id: 'sess-long-over', join_url: SECRET + '-OVER', meeting_id: '666', passcode: 'pw-over' }
-      ],
-      attendance: [], progress: [], awards: []
-    }
-  };
-}
-
-async function setup(page, s) {
-  const errs = await trackConsoleErrors(page);
-  await page.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm', (r) =>
-    r.fulfill({ status: 200, contentType: 'application/javascript', headers: { 'access-control-allow-origin': '*' }, body: FAKE }));
-  await page.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
-  await page.route('https://fonts.gstatic.com/**', (r) => r.fulfill({ status: 200, body: '' }));
-  await page.addInitScript((data) => { if (!localStorage.getItem('fakedb')) localStorage.setItem('fakedb', JSON.stringify(data)); }, s);
-  return errs;
-}
-const db = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('fakedb')));
 
 test.describe('landing page', () => {
   test('the mystery is driven by the lesson JSON and can be solved', async ({ page }) => {
@@ -439,15 +378,6 @@ test.describe('leader tools', () => {
   });
 });
 
-// Click through any "Think about it" moment cards that follow the quiz / verse steps,
-// tapping a choice on each (which must reveal a reply) before carrying on.
-async function passMoments(page) {
-  while (await page.locator('.q-count .moment-tag:not(.belong)').count()) {
-    await page.locator('#stage .choice').first().click();
-    await expect(page.locator('#mresp')).not.toBeEmpty();
-    await page.click('#nx');
-  }
-}
 // Solve the mystery and page through the story until the first moment card; return its scenario text.
 async function toFirstMoment(page) {
   await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
@@ -459,6 +389,28 @@ async function toFirstMoment(page) {
   }
   for (let n = 0; n < 40 && !(await page.locator('.moment-tag').count()); n++) await page.click('#fwd');
   return page.locator('#stage .story').first().innerText();
+}
+
+// Walk the flow (mystery, story, quiz) and collect the scenario text of every "Think about it"
+// moment in the order a child meets them, stopping after the quiz moment. Nothing is saved that matters here.
+async function scenarios(page) {
+  await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
+  await page.locator('#stage').waitFor();
+  if (await page.locator('.choice', { hasText: 'David' }).count()) { await page.locator('.choice', { hasText: 'David' }).click(); await page.click('#go'); }
+  const out = [];
+  for (let n = 0; n < 60; n++) {                                                // story
+    if (await page.locator('.q-count .moment-tag').count()) out.push(await page.locator('#stage .story').first().innerText());
+    const label = await page.locator('#fwd').innerText();
+    await page.click('#fwd');
+    if (label.includes('finished')) break;
+  }
+  const qs = await page.evaluate(() => 0);
+  while (!(await page.locator('.q-count .moment-tag:not(.belong)').count())) {   // quiz until its moment appears
+    await page.locator('#stage .choice').first().click();
+    await page.click('#nx');
+  }
+  out.push(await page.locator('#stage .story').first().innerText());
+  return out;
 }
 
 test.describe('life application and belonging', () => {
@@ -477,19 +429,47 @@ test.describe('life application and belonging', () => {
   });
 
   test("a scenario never uses the child's own name, and the names are stable across visits", async ({ page, browser }) => {
-    const s = seed(); s.t.children[0].display_name = 'Adjoa'; s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
+    // The first Trailblazer character is a non-African girl, so a real Sophie must not meet herself in it.
+    const s = seed(); s.t.children[0].display_name = 'Sophie'; s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
     await setup(page, s);
     const first = await toFirstMoment(page);
-    expect(first).not.toContain('Adjoa');                                      // a real Adjoa must not meet herself as the one laughed at
-    expect(first).toMatch(/Ama|Abena/);                                        // it used the other girls' names in the pool
+    expect(first).not.toContain('Sophie');
+    expect(first).toMatch(new RegExp(DAVID.names.girl.other.filter((n) => n !== 'Sophie').join('|')));
     expect(first).not.toMatch(/\{(boy|girl)\d\}/);                             // no unresolved placeholder
-    const again = await toFirstMoment(page);
-    expect(again).toBe(first);                                                 // same names next time, not random
+    expect(await toFirstMoment(page)).toBe(first);                             // same names next time, not random
 
-    const s2 = seed(); s2.t.children[0].display_name = 'Kojo';
+    // The same rule for a boy, and for an African name: Explorer boy1 is non-African (Jason may not appear for a Jason)
+    const s2 = seed(); s2.t.children[0].display_name = 'Jason';
     const p2 = await (await browser.newContext()).newPage();
     await setup(p2, s2);
-    expect(await toFirstMoment(p2)).not.toContain('Kojo');                     // same rule for boys' names (Explorer moment)
+    expect(await toFirstMoment(p2)).not.toContain('Jason');
+
+    // Trailblazer Kweku: boy1 is the African slot in the second moment, and must not be Kweku.
+    const s3 = seed(); s3.t.children[0].display_name = 'Kweku'; s3.t.children[0].age_band = 'trailblazer'; s3.t.children[0].class_id = 'class-trb';
+    const p3 = await (await browser.newContext()).newPage();
+    await setup(p3, s3);
+    expect((await scenarios(p3)).join(' ')).not.toContain('Kweku');
+  });
+
+  test('characters alternate between non-African and African names, starting non-African', async ({ page, browser }) => {
+    const origin = (name) => (['boy', 'girl'].flatMap((g) => DAVID.names[g].african).includes(name) ? 'african' : 'other');
+    const allNames = ['boy', 'girl'].flatMap((g) => ['african', 'other'].flatMap((o) => DAVID.names[g][o]));
+    const namesInOrder = (texts) => {
+      const found = [];
+      for (const t of texts) for (const m of t.matchAll(new RegExp(`\\b(${allNames.join('|')})\\b`, 'g'))) if (!found.includes(m[1])) found.push(m[1]);
+      return found;
+    };
+    // Explorer: three characters
+    await setup(page, seed());
+    const ex = namesInOrder(await scenarios(page)).map(origin);
+    expect(ex).toEqual(['other', 'african', 'other']);
+    // Trailblazer: four characters (a boy appears twice in one chat scenario)
+    const s = seed(); s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
+    const p2 = await (await browser.newContext()).newPage();
+    await setup(p2, s);
+    const tr = namesInOrder(await scenarios(p2)).map(origin);
+    expect(tr).toEqual(['other', 'african', 'other', 'african']);
+    for (let i = 1; i < tr.length; i++) expect(tr[i]).not.toBe(tr[i - 1]);       // never two of the same heritage in a row
   });
 
   test('tapping a choice gives a kind reply and a grown-up prompt, and saves nothing', async ({ page }) => {
@@ -531,7 +511,7 @@ test.describe('life application and belonging', () => {
     expect((await db(page)).t.progress.map((p) => p.step_key)).toContain('belong');
   });
 
-  test('a Trailblazer gets the two extra Belong cards (Africa, and every nation)', async ({ page }) => {
+  test('a Trailblazer gets the extra Belong card (every nation), and there is no Africa-only card', async ({ page }) => {
     const s = seed(); s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
     s.t.progress = ['mystery', 'story', 'quiz', 'verse'].map((k) => ({ id: k, child_id: 'kid1', lesson_id: 'lesson-david', step_key: k, detail: {} }));
     await setup(page, s);
@@ -543,8 +523,10 @@ test.describe('life application and belonging', () => {
       await page.click('#fwd');
       if (label.includes('mission')) break;
     }
-    expect(titles).toEqual(DAVID.belonging.cards.map((c) => c.title));           // all five, in order
-    expect(titles).toContain('Africa is in the story too');
+    expect(titles).toEqual(DAVID.belonging.cards.map((c) => c.title));           // all of them, in order
+    expect(titles).toHaveLength(4);
+    expect(titles).toContain('Every nation, tribe and language');
+    expect(titles.join(' ')).not.toMatch(/Africa is in the story/);               // removed: Pastor Eric did not want that framing
   });
 
   test('an older lesson without moments or belonging still plays, and does not record a Belong step it never showed', async ({ page }) => {

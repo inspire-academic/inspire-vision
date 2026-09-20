@@ -16,7 +16,7 @@
   var me = session.user.id;
   var church, members = [], classes = [], lessons = [], sessions = [];
   var STAFF = ['church_admin', 'safeguarding_lead', 'facilitator', 'assistant'];
-  var ROLE_LABEL = { church_admin: 'Church admin', safeguarding_lead: 'Safeguarding lead', facilitator: 'Leader', assistant: 'Co-leader' };
+  var ROLE_LABEL = { church_admin: 'Church admin', safeguarding_lead: 'Safeguarding lead', facilitator: 'Teacher', assistant: 'Co-teacher' };
 
   try {
     var ch = await cs.rpc('church_by_slug', { p_slug: C.churchSlug });
@@ -48,7 +48,9 @@
     var pending = members.filter(function (m) { return m.role === 'parent' && m.status === 'pending'; });
     var activeParents = members.filter(function (m) { return m.role === 'parent' && m.status === 'active'; });
     var staff = members.filter(function (m) { return STAFF.indexOf(m.role) >= 0; });
-    var html = '<h1>Leader tools</h1><p class="lede">' + K.esc(church.name) + '</p>';
+    var html = '<h1>Leader tools</h1><p class="lede">' + K.esc(church.name) + '</p>' +
+      '<p><a class="btn btn-sun btn-small" href="' + C.base + '/church-admin/people.html">People and roles</a> ' +
+      '<span class="small muted">Add a teacher, see emails and last sign-in, send password resets.</span></p>';
     if (flash) html += '<div class="card notice ' + (kind || 'good') + '" role="status">' + K.esc(flash) + '</div>';
 
     // ---- families waiting
@@ -71,7 +73,7 @@
         '<label class="small">Safeguarding training<br><input type="date" data-f="train" value="' + K.esc(m.safeguarding_trained_on || '') + '"></label>' +
         '<button type="button" class="btn btn-line btn-small" data-savestaff="' + K.esc(m.id) + '">Save</button></div></div>';
     });
-    html += '<h3 class="spaced" style="font-size:22px">Give an approved family member a leader role</h3>' +
+    html += '<h3 class="spaced" style="font-size:22px">Give an approved family member a teacher role</h3>' +
       '<p class="small muted">They need to have signed up and been approved first.</p>' +
       '<div class="row"><select id="role-who" aria-label="Person">' + activeParents.map(function (m) { return opt(m.user_id, nameOf(m)); }).join('') + '</select>' +
       '<select id="role-what" aria-label="Role">' + STAFF.map(function (r) { return opt(r, ROLE_LABEL[r], r === 'facilitator'); }).join('') + '</select>' +

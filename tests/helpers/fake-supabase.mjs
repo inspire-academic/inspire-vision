@@ -98,7 +98,9 @@ function rpc(name, a) {
     if (!s || !d || !['scheduled', 'live'].includes(s.status)) return { data: [], error: null };
     const start = new Date(s.starts_at).getTime(), now = Date.now();
     const inWindow = now >= start - 30 * 60000 && now <= start + s.duration_min * 60000 + 10 * 60000;
-    const mine = T('children').some((c) => c.class_id === s.class_id && c.parent_id === me);
+    const vettedStaff = T('church_members').some((m) => m.user_id === me && m.status === 'active' && m.church_id === s.church_id
+      && ['facilitator', 'assistant', 'church_admin', 'safeguarding_lead'].includes(m.role) && m.dbs_checked_on && m.safeguarding_trained_on);
+    const mine = vettedStaff || T('children').some((c) => c.class_id === s.class_id && c.parent_id === me);
     return { data: inWindow && mine ? [{ join_url: d.join_url, meeting_id: d.meeting_id, passcode: d.passcode, platform: s.platform }] : [], error: null };
   }
   if (name === 'evaluate_badges') {
@@ -115,6 +117,16 @@ function rpc(name, a) {
     fresh.forEach((k) => T('awards').push({ id: uuid(), child_id: a.p_child, badge_key: k }));
     save(db);
     return { data: fresh.map((k) => ({ new_badge: k })), error: null };
+  }
+  if (name === 'award_badge_by_leader') {
+    const child = T('children').find((c) => c.id === a.p_child);
+    const b = T('badges').find((x) => x.key === a.p_badge && x.awarded_by === 'leader');
+    const vetted = child && T('church_members').some((m) => m.user_id === me && m.status === 'active' && m.church_id === child.church_id
+      && ['facilitator', 'assistant', 'church_admin', 'safeguarding_lead'].includes(m.role) && m.dbs_checked_on && m.safeguarding_trained_on);
+    if (!vetted || !b) return { data: null, error: err('42501', 'not permitted') };
+    if (!T('awards').some((x) => x.child_id === a.p_child && x.badge_key === a.p_badge)) T('awards').push({ id: uuid(), child_id: a.p_child, badge_key: a.p_badge });
+    save(db);
+    return { data: null, error: null };
   }
   if (name === 'award_badge_by_parent') {
     const b = T('badges').find((x) => x.key === a.p_badge && x.awarded_by === 'parent');

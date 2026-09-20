@@ -79,10 +79,16 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
     // name tokens like {boy1}, {girl2} must be resolvable from the pool
     const blob = JSON.stringify(m);
     for (const t of blob.matchAll(/\{(boy|girl)(\d+)\}/g)) {
-      if (!Array.isArray(pool[t[1]]) || Number(t[2]) > pool[t[1]].length) bad(file, `${where}: token ${t[0]} needs at least ${t[2]} ${t[1]} names in "names"`);
+      const total = (pool[t[1]]?.african?.length || 0) + (pool[t[1]]?.other?.length || 0);
+      if (Number(t[2]) > total) bad(file, `${where}: token ${t[0]} needs at least ${t[2]} ${t[1]} names in "names"`);
     }
   }
-  if (moments.length && !(pool.boy?.length >= 3 && pool.girl?.length >= 2)) bad(file, 'names pool is too small (need at least 3 boy and 2 girl names)');
+  // Characters alternate between non-African and African names, so each list needs enough names.
+  if (moments.length) {
+    for (const g of ['boy', 'girl']) for (const o of ['african', 'other']) {
+      if (!Array.isArray(pool[g]?.[o]) || pool[g][o].length < 2) bad(file, `names.${g}.${o} needs at least 2 names (characters alternate between African and non-African names)`);
+    }
+  }
 
   // run-sheet blocks may only point at moments that exist and are safe to run live
   for (const band of BANDS) {
@@ -113,7 +119,7 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
 
   // ---- names are used SPARINGLY -------------------------------------------
   // Outside the pool itself, any one name should appear in at most 3 places in a lesson.
-  const allNames = [...(pool.boy || []), ...(pool.girl || [])];
+  const allNames = ['boy', 'girl'].flatMap((g) => ['african', 'other'].flatMap((o) => pool[g]?.[o] || []));
   const textNoPool = JSON.stringify({ ...lesson, names: undefined });
   for (const n of allNames) {
     const count = (textNoPool.match(new RegExp(`\\b${n}\\b`, 'g')) || []).length;

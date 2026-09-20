@@ -111,6 +111,15 @@ body.app{background:linear-gradient(180deg,#eaf6fb 0,#fffaf0 320px)}
 .moment-tag{display:inline-block;background:#e0d5f3;color:#3d2a73;border-radius:999px;padding:4px 14px;font-weight:600;font-size:15px}
 .moment-tag.belong{background:#cdeed4;color:#1f5c2c}
 #mresp{margin-top:16px}
+.chip{display:inline-block;background:#e0d5f3;color:#3d2a73;border-radius:999px;padding:2px 12px;font-weight:600;font-size:14px}
+/* Teacher view: the same screens, plus a small lavender note. Kept deliberately quiet. */
+.teacher-note{background:#f1ecfb;border-left:6px solid var(--plum);border-radius:14px;padding:10px 16px;margin:16px 0;font-size:16px}
+.teacher-note strong{display:block;color:#3d2a73;font-size:14px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.teacher-note p{margin:4px 0}
+details.teacher-note summary{cursor:pointer;min-height:32px}
+details.teacher-note summary strong{display:inline;text-transform:none;letter-spacing:0;font-size:17px}
+details.teacher-note ol{margin:8px 0 2px;padding-left:22px}
+details.teacher-note li{margin:6px 0}
 .choice.wrong{background:#f7e3df;border-color:#d99b91;opacity:.8}
 .choice[disabled]{cursor:default}
 .nav-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:22px}
