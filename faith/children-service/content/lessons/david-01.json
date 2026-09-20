@@ -5,10 +5,10 @@
   "_note": "PLACEHOLDER lesson written to prove the lesson format end to end. The story is an original retelling; verse text is World English Bible (public domain), quoted only where fetched verbatim. Replace with the real character-study material when it is supplied.",
 
   "contentReview": {
-    "status": "draft",
+    "status": "approved",
     "note": "Life-application and belonging content drafted by Claude after a planning discussion with Pastor Eric. It must be approved by Pastor Eric or the designated lead teacher before children see it. Read the whole lesson in preview mode (the play page without a child selected) and check: (1) the names and situations ring true for our children, (2) nothing could single out a real child, (3) the Bible is used faithfully.",
-    "reviewer": null,
-    "reviewedOn": null
+    "reviewer": "Eric Appiah",
+    "reviewedOn": "2026-09-20"
   },
 
   "names": {
