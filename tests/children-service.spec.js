@@ -40,6 +40,21 @@ test.describe('landing page', () => {
     await expect(page.locator('#clues li')).toHaveCount(DAVID.preClass.mystery.clues.length);
     await expect(more).toBeHidden();
   });
+
+  test('a parent or teacher can find "Sign in" from the top of the page and from the grown-ups section, on desktop and on a phone', async ({ page, browser }) => {
+    await page.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+    await page.goto(`${BASE}/index.html`);
+    await expect(page.locator('header.top nav').getByRole('link', { name: 'Sign in' })).toBeVisible();
+    await expect(page.locator('#grownups').getByRole('link', { name: /sign in/i })).toBeVisible();
+    await page.locator('header.top nav').getByRole('link', { name: 'Sign in' }).click();
+    await expect(page).toHaveURL(/\/parent\/login\.html$/);
+
+    const phone = await (await browser.newContext({ viewport: { width: 375, height: 700 } })).newPage();     // small screens hide most of the nav
+    await phone.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+    await phone.goto(`${BASE}/index.html`);
+    await expect(phone.locator('header.top nav').getByRole('link', { name: 'Sign in' })).toBeVisible();
+    expect(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);   // and nothing spills sideways
+  });
 });
 
 test.describe('the door on the Faith page', () => {
