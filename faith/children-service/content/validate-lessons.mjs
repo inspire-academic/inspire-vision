@@ -117,6 +117,19 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.json'))) {
     }
   }
 
+  // ---- the after-class parent email ---------------------------------------
+  const pe = lesson.parentEmail;
+  if (!pe) bad(file, 'missing "parentEmail" (the synopsis and discussion questions for the after-class email to parents)');
+  else {
+    if (!pe.synopsis || pe.synopsis.length < 40 || pe.synopsis.length > 600) bad(file, 'parentEmail.synopsis should be a short paragraph (40 to 600 characters)');
+    for (const band of BANDS) {
+      const qs = pe.questions?.[band];
+      if (!Array.isArray(qs) || qs.length < 2 || qs.length > 4) bad(file, `parentEmail.questions.${band} needs 2 to 4 questions`);
+      else qs.forEach((q, i) => { if (typeof q !== 'string' || q.length < 15) bad(file, `parentEmail.questions.${band}[${i}] is too short`); });
+    }
+    if (/\{(boy|girl)\d+\}/.test(JSON.stringify(pe))) bad(file, 'parentEmail must not use {boy1}/{girl1} name tokens (use {child} for the child)');
+  }
+
   // ---- names are used SPARINGLY -------------------------------------------
   // Outside the pool itself, any one name should appear in at most 3 places in a lesson.
   const allNames = ['boy', 'girl'].flatMap((g) => ['african', 'other'].flatMap((o) => pool[g]?.[o] || []));
