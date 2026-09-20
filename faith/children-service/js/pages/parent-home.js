@@ -13,10 +13,22 @@
   var me = session.user.id;
   var firstName = (session.user.user_metadata && session.user.user_metadata.full_name) || '';
 
+  var TEACHER_ROLES = ['facilitator', 'assistant', 'safeguarding_lead'];
+  var staffRoles = [];
+
   try { await route(); }
   catch (e) { K.notice('<h2>Something went wrong</h2><p>' + K.esc(K.explain(e)) + '</p>', 'bad'); }
 
   async function route() {
+    // A teacher signs in and lands on the teacher home. (Church admins keep this page, with
+    // shortcuts. Anyone can still open this page from teacher home with ?stay=1.)
+    var sr0 = await cs.from('church_members').select('role').eq('user_id', me).eq('status', 'active')
+      .in('role', TEACHER_ROLES.concat(['church_admin']));
+    if (!sr0.error) staffRoles = (sr0.data || []).map(function (r) { return r.role; });
+    var isTeacher = staffRoles.some(function (r) { return TEACHER_ROLES.indexOf(r) >= 0; });
+    var isAdminHere = staffRoles.indexOf('church_admin') >= 0;
+    if (isTeacher && !isAdminHere && K.qs('stay') !== '1') { location.replace(C.base + '/teacher/index.html'); return; }
+
     var cr = await cs.from('consents').select('type,given,created_at')
       .is('child_id', null).in('type', ['data_processing', 'safeguarding_policy'])
       .order('created_at', { ascending: false });
@@ -130,7 +142,11 @@
     html += '</div>';
     // Church admins get a shortcut to the leader tools. (Just a link: the tools themselves are protected by the database.)
     var ar = await cs.from('church_members').select('id').eq('user_id', me).eq('role', 'church_admin').eq('status', 'active').eq('church_id', church.id);
-    if (!ar.error && (ar.data || []).length) html += '<p class="spaced"><a class="btn btn-line btn-small" href="' + C.base + '/church-admin/index.html">Leader tools</a></p>';
+    var tools = '';
+    if (staffRoles.length) tools += '<a class="btn btn-line btn-small" href="' + C.base + '/teacher/index.html">Teacher tools</a>';
+    if (!ar.error && (ar.data || []).length) tools += '<a class="btn btn-line btn-small" href="' + C.base + '/church-admin/index.html">Leader tools</a>' +
+      '<a class="btn btn-line btn-small" href="' + C.base + '/church-admin/people.html">People and roles</a>';
+    if (tools) html += '<p class="spaced row">' + tools + '</p>';
     app.innerHTML = html;
   }
 })();

@@ -12,9 +12,15 @@
   },
 
   "names": {
-    "note": "Names used in the life-application scenarios. The app picks from these but never uses a child's own name for a character. Day-names are Ghanaian (Akan); Tunde and Emeka are Nigerian (Yoruba and Igbo). Edit freely to match your congregation; list only names you are happy to see in any role.",
-    "boy": ["Kweku", "Kojo", "Kwame", "Tunde", "Emeka"],
-    "girl": ["Adjoa", "Ama", "Abena"]
+    "note": "Names used in the life-application scenarios. Characters ALTERNATE between the two lists (a non-African name, then an African one, then a non-African one...), in the order they appear in the lesson, so no lesson reads as all one heritage. The app never uses a child's own name for a character. African day-names are Ghanaian (Akan); Tunde and Emeka are Nigerian (Yoruba and Igbo). Edit freely to match your congregation; list only names you are happy to see in any role.",
+    "boy": {
+      "african": ["Kweku", "Kojo", "Kwame", "Tunde", "Emeka"],
+      "other": ["Jason", "Alfie", "Joe", "Sam", "Ben"]
+    },
+    "girl": {
+      "african": ["Adjoa", "Ama", "Abena"],
+      "other": ["Sophie", "Chloe", "Molly", "Grace"]
+    }
   },
 
   "character": {
@@ -403,14 +409,8 @@
         "key": "name",
         "bands": ["explorer", "trailblazer"],
         "title": "God knows your name",
-        "text": "God does not mix up names. Whether you are called Kweku or Adjoa, Kojo or Ama, Kwame or Abena, Tunde or Emeka, or any other name, God says this to his people:",
+        "text": "God does not mix up names. Whether you are called Jason or Kweku, Sophie or Adjoa, Alfie or Kojo, Chloe or Ama, Joe or Emeka, Molly or Tunde, or any other name from anywhere in the world, God says this to his people:",
         "quote": { "ref": "Isaiah 43:1", "text": "I have called you by your name. You are mine." }
-      },
-      {
-        "key": "africa",
-        "bands": ["trailblazer"],
-        "title": "Africa is in the story too",
-        "text": "People from Africa are all through the Bible. Egypt, and Cush to the south of Egypt, are named again and again. Simon, from Cyrene in North Africa, was made to carry Jesus' cross (Luke 23:26). And a royal official from Ethiopia travelled to Jerusalem to worship God, then learned about Jesus and believed (Acts 8:26-39)."
       },
       {
         "key": "nations",

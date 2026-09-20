@@ -17,7 +17,11 @@
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) return K.notice('<h2>Which adventure?</h2><p><a href="' + home + '">Choose one from your family page</a></p>');
 
   var cs = null, child = null, lesson = null, lessonId = null, practice = !childId;
-  var band = 'explorer', doneSteps = {}, badgeInfo = {}, cur = 0;
+  var band = K.qs('band') === 'trailblazer' ? 'trailblazer' : 'explorer', doneSteps = {}, badgeInfo = {}, cur = 0;
+  // Teacher view: the SAME player a child sees (same look, same steps), with small "For the
+  // teacher" notes and a run-sheet added. Only honoured for a signed-in active teacher / leader,
+  // it never saves anything, and it reads the latest lesson file (so a draft can be reviewed).
+  var teacher = false;
   var steps = only === 'mystery' ? ['mystery'] : ['mystery', 'story', 'quiz', 'verse', 'belong', 'reflect'];
 
   try {
@@ -40,7 +44,14 @@
         (br.data || []).forEach(function (b) { badgeInfo[b.key] = b; });
       }
     } else {
-      K.mountChrome({ signedIn: !!(await K.session()) });
+      var sess = await K.session();
+      if (K.qs('teacher') === '1' && sess) {
+        var tcs = await K.cs();
+        var tr = await tcs.from('church_members').select('role').eq('user_id', sess.user.id).eq('status', 'active')
+          .in('role', ['facilitator', 'assistant', 'church_admin', 'safeguarding_lead']);
+        teacher = !tr.error && (tr.data || []).length > 0;
+      }
+      K.mountChrome({ signedIn: !!sess, teacher: teacher });
     }
     if (!lesson) {
       var f = await fetch(C.base + '/content/lessons/' + slug + '.json');
@@ -73,24 +84,44 @@
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
-  var nameCache = null;
-  function nameFor(kind, n) {
-    if (!nameCache) {
-      var pool = lesson.names || {}, own = child ? String(child.display_name).toLowerCase() : '';
-      var seed = hashSeed((childId || 'practice') + ':' + slug);
-      nameCache = {};
-      ['boy', 'girl'].forEach(function (g) {
-        var all = pool[g] || [];
-        var list = all.filter(function (x) { return x.toLowerCase() !== own; });
-        if (!list.length) list = all.length ? all : ['a friend'];
-        nameCache[g] = seededOrder(list, seed + (g === 'girl' ? 7 : 0));
+  // Characters ALTERNATE between non-African and African names, in the order they first
+  // appear in the lesson (e.g. Jason, then Kweku, then Alfie, then Adjoa...), so a lesson
+  // never reads as all one heritage. The pool lists both origins for each gender.
+  function tokenOrder() {
+    var seen = [];
+    ['story.part1', 'story.part2', 'quiz', 'verse'].forEach(function (a) {
+      momentsFor(a).forEach(function (m) {
+        var blob = [m.title, m.scenario, m.question].concat(m.choices.map(function (c) { return c.text + ' ' + c.response; }), [m.grownUpTalk]).join(' ');
+        (blob.match(/\{(?:boy|girl)\d+\}/g) || []).forEach(function (t) { if (seen.indexOf(t) < 0) seen.push(t); });
       });
+    });
+    return seen;
+  }
+  var nameMap = null;
+  function buildNames() {
+    var pool = lesson.names || {}, own = child ? String(child.display_name).toLowerCase() : '';
+    var seed = hashSeed((childId || 'practice') + ':' + slug + ':' + band);
+    var used = {}, map = {};
+    function origins(g) {                                   // tolerate an older flat list
+      var p = pool[g];
+      return Array.isArray(p) ? { other: p, african: [] } : { other: (p && p.other) || [], african: (p && p.african) || [] };
     }
-    var l = nameCache[kind];
-    return l[(n - 1) % l.length];
+    tokenOrder().forEach(function (tok, k) {
+      var g = tok.indexOf('{girl') === 0 ? 'girl' : 'boy', o = origins(g);
+      var want = k % 2 === 0 ? 'other' : 'african', alt = want === 'other' ? 'african' : 'other';
+      function free(list) { return list.filter(function (x) { return x.toLowerCase() !== own && !used[x]; }); }
+      var candidates = free(o[want]);
+      if (!candidates.length) candidates = free(o[alt]);                       // pool too small for strict alternation
+      if (!candidates.length) candidates = o[want].concat(o[alt]).filter(function (x) { return x.toLowerCase() !== own; });
+      if (!candidates.length) candidates = ['a friend'];
+      var pick = seededOrder(candidates, seed + k * 31)[0];
+      used[pick] = true; map[tok] = pick;
+    });
+    return map;
   }
   function fill(text) {
-    return String(text == null ? '' : text).replace(/\{(boy|girl)(\d+)\}/g, function (_, g, n) { return nameFor(g, parseInt(n, 10)); });
+    if (!nameMap) nameMap = buildNames();
+    return String(text == null ? '' : text).replace(/\{(?:boy|girl)\d+\}/g, function (tok) { return nameMap[tok] || 'a friend'; });
   }
 
   // ---------- "Think about it" life-application moments ----------
@@ -104,7 +135,7 @@
       '<p class="story">' + K.esc(fill(m.scenario)) + '</p><p class="story"><b>' + K.esc(fill(m.question)) + '</b></p>' +
       '<div class="choices">' + m.choices.map(function (c, i) {
         return '<button type="button" class="choice" data-mi="' + i + '">' + K.esc(fill(c.text)) + '</button>';
-      }).join('') + '</div><div id="mresp" aria-live="polite"></div>';
+      }).join('') + '</div><div id="mresp" aria-live="polite"></div>' + momentNote(m);
   }
   function wireMoment(stage, m) {
     Array.prototype.forEach.call(stage.querySelectorAll('[data-mi]'), function (b) {
@@ -183,16 +214,48 @@
   }
   window.addEventListener('pagehide', stopSpeech);
 
+  // ---------- teacher view additions (only when `teacher` is true) ----------
+  function tnote(parts) {
+    if (!teacher) return '';
+    var body = parts.filter(Boolean).map(function (p) { return '<p>' + p + '</p>'; }).join('');
+    return body ? '<aside class="teacher-note"><strong>For the teacher</strong>' + body + '</aside>' : '';
+  }
+  function momentNote(m) {
+    if (!teacher) return '';
+    return tnote([
+      // (prompts are written "Ask everyone: ..." / "Ask: ..."; drop that lead-in, the label already says it)
+      m.liveUse === 'yes' ? '<b>Ask aloud:</b> ' + K.esc(fill(m.leaderPrompt || '').replace(/^Ask[^:]{0,20}:\s*/, '')) : '<b>This one is for the app and home,</b> not for the live class.',
+      'Let children answer in their own words. Never ask a child to speak for their family or culture. Swap in names that are not in your group if you like.'
+    ]);
+  }
+  function runSheetHtml() {
+    var sheet = lesson.live && lesson.live.runSheet && lesson.live.runSheet[band];
+    if (!teacher || !sheet) return '';
+    var acts = {}; ((lesson.live && lesson.live.activities) || []).forEach(function (a) { acts[a.key] = a; });
+    var moments = {}; ((lesson.apply && lesson.apply.moments) || []).forEach(function (m) { moments[m.key] = m; });
+    var items = sheet.blocks.map(function (b) {
+      var d = b.detail || '', m, extra = '';
+      if ((m = /^apply\.(.+)$/.exec(d)) && moments[m[1]]) extra = 'Think about it: ' + K.esc(fill(moments[m[1]].scenario));
+      else if (d === 'belonging') extra = 'You belong in this story. ' + K.esc((lesson.belonging && lesson.belonging.leaderPrompt) || '');
+      else if ((m = /^activities\.(.+)$/.exec(d)) && acts[m[1]]) extra = K.esc(acts[m[1]].prompt);
+      else extra = K.esc(d);
+      return '<li><b>' + b.minutes + ' min</b> · ' + K.esc(b.block) + '<br><span class="small muted">' + extra + '</span></li>';
+    }).join('');
+    return '<details class="teacher-note"><summary><strong>Run sheet</strong> · ' + sheet.totalMinutes + ' minutes · ' + (band === 'explorer' ? 'Explorers (5–7)' : 'Trailblazers (8–11)') + '</summary><ol>' + items + '</ol></details>';
+  }
+
   function drawShell() {
     var banner = '';
     if (practice) {
-      banner = '<div class="preview-banner">Practice mode: nothing is saved. ' +
-        (childId ? '' : 'Playing as: <button type="button" class="linkbtn" data-band="explorer" aria-pressed="' + (band === 'explorer') + '">Explorer</button> ' +
-          '<button type="button" class="linkbtn" data-band="trailblazer" aria-pressed="' + (band === 'trailblazer') + '">Trailblazer</button>') + '</div>';
+      var draft = teacher && lesson.contentReview && lesson.contentReview.status !== 'approved';
+      banner = '<div class="preview-banner">' + (teacher ? 'Teacher view: nothing is saved. ' : 'Practice mode: nothing is saved. ') +
+        (childId ? '' : (teacher ? 'Showing: ' : 'Playing as: ') + '<button type="button" class="linkbtn" data-band="explorer" aria-pressed="' + (band === 'explorer') + '">Explorer</button> ' +
+          '<button type="button" class="linkbtn" data-band="trailblazer" aria-pressed="' + (band === 'trailblazer') + '">Trailblazer</button>') +
+        (draft ? '<br><b>DRAFT:</b> this version has not been approved yet, so children do not see it.' : '') + '</div>';
     }
-    app.innerHTML = banner + '<div class="progress" id="progress" aria-hidden="true"></div><div class="stage" id="stage" tabindex="-1"></div>';
+    app.innerHTML = banner + runSheetHtml() + '<div class="progress" id="progress" aria-hidden="true"></div><div class="stage" id="stage" tabindex="-1"></div>';
     Array.prototype.forEach.call(app.querySelectorAll('[data-band]'), function (b) {
-      b.addEventListener('click', function () { band = b.dataset.band; cur = 0; drawShell(); runStep(); });
+      b.addEventListener('click', function () { band = b.dataset.band; nameMap = null; cur = 0; drawShell(); runStep(); });
     });
   }
 
@@ -247,11 +310,16 @@
   // ---------- 2. story ----------
   function storyCards() {
     var st = lesson.live.story, cards = [];
-    chunk(st.part1.retelling).forEach(function (t) { cards.push({ title: st.part1.title, text: t }); });
+    // (the `note` on the first card of each part is shown only in the teacher view)
+    chunk(st.part1.retelling).forEach(function (t, k) {
+      cards.push({ title: st.part1.title, text: t, note: k === 0 ? [st.part1.prop && '<b>Prop:</b> ' + K.esc(st.part1.prop), st.part1.callAndResponse && '<b>Call and response:</b> ' + K.esc(st.part1.callAndResponse)] : null });
+    });
     if (st.part1.quoted) cards.push({ title: 'The Bible says', quote: st.part1.quoted });
     momentsFor('story.part1').forEach(function (m) { cards.push({ moment: m }); });
     var t2 = band === 'explorer' && st.part2.explorerVersion ? st.part2.explorerVersion : st.part2.retelling;
-    chunk(t2).forEach(function (t) { cards.push({ title: st.part2.title, text: t }); });
+    chunk(t2).forEach(function (t, k) {
+      cards.push({ title: st.part2.title, text: t, note: k === 0 ? [st.part2.prop && '<b>Prop:</b> ' + K.esc(st.part2.prop), (st.part2.soundCues || []).length && '<b>Sound cues:</b> ' + K.esc(st.part2.soundCues.join('; '))] : null });
+    });
     if (band === 'trailblazer') (st.part2.quoted || []).forEach(function (q) { cards.push({ title: 'The Bible says', quote: q }); });
     momentsFor('story.part2').forEach(function (m) { cards.push({ moment: m }); });
     return cards;
@@ -272,7 +340,7 @@
           : '<p class="story">' + K.esc(c.text) + '</p>';
         var storyOnly = cards.filter(function (x) { return !x.moment; });
         var storyNum = cards.slice(0, i + 1).filter(function (x) { return !x.moment; }).length;
-        stage.innerHTML = '<div class="q-count">Story ' + storyNum + ' of ' + storyOnly.length + '</div><h2>' + K.esc(c.title) + '</h2>' + body + nav;
+        stage.innerHTML = '<div class="q-count">Story ' + storyNum + ' of ' + storyOnly.length + '</div><h2>' + K.esc(c.title) + '</h2>' + body + tnote(c.note || []) + nav;
         wireRead(c.quote ? c.quote.text : c.text);
       }
       var b = document.getElementById('back');
@@ -342,6 +410,7 @@
       stage.innerHTML = '<div class="q-count">Memory verse</div><h2>' + K.esc(mv.ref) + '</h2><p class="gap-line">' + line + '</p>' +
         (finished ? '<p class="msg good">You did it! Now say it out loud, with actions:</p><ul class="rules-list">' + (mv.actions || []).map(function (a) { return '<li>' + K.esc(a) + '</li>'; }).join('') + '</ul>'
           : '<p>Tap the missing words, in order:</p><div class="bank">' + bank.map(function (b, i) { return '<button type="button" data-i="' + i + '"' + (b.used ? ' disabled' : '') + '>' + K.esc(b.w) + '</button>'; }).join('') + '</div><p class="msg" id="msg">' + K.esc(msg) + '</p>') +
+        tnote(['<b>Actions:</b> ' + (mv.actions || []).map(K.esc).join('; '), 'Say it with the actions, then once more from memory. Keep it light: this is not a test.']) +
         '<div class="nav-row"><div class="row">' + readBtn() + '</div>' + (finished ? '<button type="button" class="btn btn-sun" id="nx">Keep going</button>' : '<span></span>') + '</div>';
       wireRead(mv.text);
       Array.prototype.forEach.call(stage.querySelectorAll('.bank button'), function (b) {
@@ -370,7 +439,9 @@
       var c = cards[i], last = i === cards.length - 1;
       var body = '<p class="story">' + K.esc(c.text) + '</p>' +
         (c.quote ? '<blockquote class="quote">' + K.esc(c.quote.text) + '<small>' + K.esc(c.quote.ref) + ' (' + K.esc(lesson.translation.id) + ')</small></blockquote>' : '');
+      var sp = bel.spotlight || {};
       stage.innerHTML = '<div class="q-count"><span class="moment-tag belong">You belong in this story</span> ' + (i + 1) + ' of ' + cards.length + '</div><h2>' + K.esc(c.title) + '</h2>' + body +
+        (i === 0 ? tnote([bel.leaderPrompt && '<b>Ask aloud:</b> ' + K.esc(bel.leaderPrompt), sp.who && '<b>Who else is in this story:</b> ' + K.esc(sp.who + ' (from ' + sp.from + '). ' + (sp.why || ''))]) : '') +
         '<div class="nav-row"><div class="row">' + (i > 0 ? '<button type="button" class="btn btn-line btn-small" id="back">Back</button>' : '') + readBtn() + '</div>' +
         '<button type="button" class="btn btn-sun" id="fwd">' + (last ? 'On to my mission' : 'Next') + '</button></div>';
       wireRead(c.text + (c.quote ? ' ' + c.quote.text : ''));
@@ -421,7 +492,9 @@
         : '<p class="story">You’ve added <b>' + K.esc(c.name) + '</b> to your Bible map.</p>' +
           '<div class="cardface" style="margin:18px 0"><div class="who">' + K.esc(c.name) + '</div><div class="tag">' + K.esc(c.cardTagline || '') + '</div>' +
           (mv.ref ? '<div class="verse">' + K.esc(mv.ref) + '</div>' : '') + '</div>') +
-      '<div class="nav-row"><span></span>' + (practice
+      '<div class="nav-row"><span></span>' + (teacher
+        ? '<a class="btn btn-sun" href="' + C.base + '/teacher/index.html">Back to teacher home</a>'
+        : practice
         ? '<a class="btn btn-sun" href="' + C.base + '/parent/join.html">Grown-ups: create an account to save badges</a>'
         : '<a class="btn btn-sun" href="' + (isWarmup ? home : childHome) + '">' + (isWarmup ? 'Back to my family' : 'Back to my adventures') + '</a>') + '</div>';
   }

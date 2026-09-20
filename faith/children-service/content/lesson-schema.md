@@ -31,17 +31,21 @@ When the database is live, the same JSON goes into
   cannot see. Review by opening the play page **without** a child selected
   (practice mode reads the file directly), and use the Explorer / Trailblazer
   toggle to read both versions.
-- **Names are used sparingly and never point at a real child.** Scenarios use
-  placeholders such as `{boy1}` and `{girl2}`, filled from the lesson's own
-  `names` pool. The app never uses the child's own name for a character, and
-  picks the same names for the same child each time. A given name may appear
-  at most 3 times in a lesson.
+- **Names are used sparingly, alternate in heritage, and never point at a
+  real child.** Scenarios use placeholders such as `{boy1}` and `{girl2}`,
+  filled from the lesson's own `names` pool, which has an `african` and an
+  `other` list for each gender. Characters ALTERNATE, in the order they appear:
+  a non-African name, then an African one, then a non-African one, and so on.
+  The app never uses the child's own name for a character, and picks the same
+  names for the same child each time. A given name may appear at most 3 times
+  in a lesson.
 - **Scripture quotes are checked, not trusted.** Run
   `node faith/children-service/content/verify-quotes.mjs` (needs internet) to
   confirm every quoted verse is in the World English Bible.
-- **Africa and every nation are in the story, not added on.** Do not claim a
-  modern country (such as Ghana) is in the Bible. Say "Africa", or name the
-  ancient places that are (Egypt, Cush, Cyrene, Ethiopia).
+- **Belonging is for every heritage, and woven in, not bolted on.** Do not
+  single out one continent or people in a card of its own; show that God's
+  story is for every family through the people the Bible itself names. Do not
+  claim a modern country (such as Ghana) is in the Bible.
 
 ## Top-level fields
 
@@ -49,7 +53,7 @@ When the database is live, the same JSON goes into
 |---|---|
 | `id`, `schemaVersion`, `status` | `status`: `sample` (placeholder), `draft`, or `published` |
 | `contentReview` | `status` (`draft` / `approved`), `note`, `reviewer`, `reviewedOn`. An approved lesson must name its reviewer and date |
-| `names` | The pool of `boy` and `girl` names scenarios draw from, plus a note. Edit it to fit your congregation |
+| `names` | Names scenarios draw from: `boy` and `girl`, each with `african` and `other` lists (at least 2 in each), plus a note. Edit it to fit your congregation |
 | `apply` | Life-application moments; see below |
 | `belonging` | The "who else is in this story?" spotlight; see below |
 | `character` | name, era, `places`, `trait`, `cardTagline` for the collectible card, and `mapStop`: which stop on the Bible map this lesson unlocks (`creation`, `abraham`, `exodus`, `judges`, `kings`, `exile`, `jesus`, `church`) |

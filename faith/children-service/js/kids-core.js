@@ -68,7 +68,8 @@
     var bottom = document.getElementById('chrome-bottom');
     if (top) {
       var nav = opts.signedIn
-        ? '<a href="' + C.base + '/parent/index.html">My family</a><button type="button" class="linkbtn" id="signout">Sign out</button>'
+        ? (opts.teacher ? '<a href="' + C.base + '/teacher/index.html">Teacher home</a>' : '') +
+          '<a href="' + C.base + '/parent/index.html' + (opts.teacher ? '?stay=1' : '') + '">My family</a><button type="button" class="linkbtn" id="signout">Sign out</button>'
         : '<a href="' + C.base + '/parent/login.html">Sign in</a><a class="keep" href="' + C.base + '/parent/join.html">Create account</a>';
       top.innerHTML =
         '<header class="top"><div class="wrap">' +
