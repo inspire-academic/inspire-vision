@@ -18,7 +18,7 @@
 
   var cs = null, child = null, lesson = null, lessonId = null, practice = !childId;
   var band = 'explorer', doneSteps = {}, badgeInfo = {}, cur = 0;
-  var steps = only === 'mystery' ? ['mystery'] : ['mystery', 'story', 'quiz', 'verse', 'reflect'];
+  var steps = only === 'mystery' ? ['mystery'] : ['mystery', 'story', 'quiz', 'verse', 'belong', 'reflect'];
 
   try {
     if (childId) {
@@ -61,6 +61,77 @@
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
+  // ---------- names in the life-application scenarios ----------
+  // Scenarios use tokens such as {boy1} and {girl2}. They resolve to names from the
+  // lesson's own pool, the same way every time for the same child (a reload shows
+  // the same names), and NEVER to the child's own name: a real child must not meet
+  // "themselves" as the one who is left out or laughed at.
+  function hashSeed(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function seededOrder(list, seed) {
+    var a = list.slice(), s = seed || 1;
+    function rnd() { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  var nameCache = null;
+  function nameFor(kind, n) {
+    if (!nameCache) {
+      var pool = lesson.names || {}, own = child ? String(child.display_name).toLowerCase() : '';
+      var seed = hashSeed((childId || 'practice') + ':' + slug);
+      nameCache = {};
+      ['boy', 'girl'].forEach(function (g) {
+        var all = pool[g] || [];
+        var list = all.filter(function (x) { return x.toLowerCase() !== own; });
+        if (!list.length) list = all.length ? all : ['a friend'];
+        nameCache[g] = seededOrder(list, seed + (g === 'girl' ? 7 : 0));
+      });
+    }
+    var l = nameCache[kind];
+    return l[(n - 1) % l.length];
+  }
+  function fill(text) {
+    return String(text == null ? '' : text).replace(/\{(boy|girl)(\d+)\}/g, function (_, g, n) { return nameFor(g, parseInt(n, 10)); });
+  }
+
+  // ---------- "Think about it" life-application moments ----------
+  // Placed where the story meets a child's week (see lesson "apply"). Each choice gets
+  // a kind reply and a prompt to talk with a grown-up. Nothing tapped here is saved.
+  function momentsFor(anchor) {
+    return ((lesson.apply && lesson.apply.moments) || []).filter(function (m) { return m.after === anchor && m.bands.indexOf(band) >= 0; });
+  }
+  function momentHtml(m) {
+    return '<div class="q-count"><span class="moment-tag">Think about it</span></div><h2>' + K.esc(fill(m.title)) + '</h2>' +
+      '<p class="story">' + K.esc(fill(m.scenario)) + '</p><p class="story"><b>' + K.esc(fill(m.question)) + '</b></p>' +
+      '<div class="choices">' + m.choices.map(function (c, i) {
+        return '<button type="button" class="choice" data-mi="' + i + '">' + K.esc(fill(c.text)) + '</button>';
+      }).join('') + '</div><div id="mresp" aria-live="polite"></div>';
+  }
+  function wireMoment(stage, m) {
+    Array.prototype.forEach.call(stage.querySelectorAll('[data-mi]'), function (b) {
+      b.addEventListener('click', function () {
+        Array.prototype.forEach.call(stage.querySelectorAll('[data-mi]'), function (x) { x.classList.remove('picked'); });
+        b.classList.add('picked');
+        var c = m.choices[parseInt(b.dataset.mi, 10)];
+        document.getElementById('mresp').innerHTML = '<blockquote class="quote">' + K.esc(fill(c.response)) + '</blockquote>' +
+          '<p class="small muted">' + K.esc(fill(m.grownUpTalk)) + '</p>';
+      });
+    });
+  }
+  function momentSpeech(m) { return fill(m.scenario) + ' ' + fill(m.question); }
+  // Run every moment attached to an anchor (e.g. after the quiz), then carry on.
+  function runMoments(anchor, done) {
+    var list = momentsFor(anchor), i = 0, stage = document.getElementById('stage');
+    if (!list.length) return done();
+    draw();
+    function draw() {
+      var m = list[i];
+      stage.innerHTML = momentHtml(m) + '<div class="nav-row"><div class="row">' + readBtn() + '</div><button type="button" class="btn btn-sun" id="nx">Keep going</button></div>';
+      wireRead(momentSpeech(m)); wireMoment(stage, m);
+      document.getElementById('nx').addEventListener('click', function () { stopSpeech(); if (++i < list.length) draw(); else done(); });
+      stage.focus({ preventScroll: true });
+    }
+  }
+
   // Split a passage into story cards of a few sentences each: shorter cards
   // for Explorers (pre-readers, read aloud), longer for Trailblazers.
   function chunk(text) {
@@ -133,7 +204,7 @@
       return '<i class="' + (i < cur ? 'on' : i === cur ? 'now' : '') + '"></i>';
     }).join('');
     var step = cur < steps.length ? steps[cur] : 'finish';
-    ({ mystery: stepMystery, story: stepStory, quiz: stepQuiz, verse: stepVerse, reflect: stepReflect, finish: stepFinish })[step](stage);
+    ({ mystery: stepMystery, story: stepStory, quiz: stepQuiz, verse: stepVerse, belong: stepBelong, reflect: stepReflect, finish: stepFinish })[step](stage);
     stage.focus({ preventScroll: true });
     window.scrollTo({ top: 0 });
   }
@@ -178,9 +249,11 @@
     var st = lesson.live.story, cards = [];
     chunk(st.part1.retelling).forEach(function (t) { cards.push({ title: st.part1.title, text: t }); });
     if (st.part1.quoted) cards.push({ title: 'The Bible says', quote: st.part1.quoted });
+    momentsFor('story.part1').forEach(function (m) { cards.push({ moment: m }); });
     var t2 = band === 'explorer' && st.part2.explorerVersion ? st.part2.explorerVersion : st.part2.retelling;
     chunk(t2).forEach(function (t) { cards.push({ title: st.part2.title, text: t }); });
     if (band === 'trailblazer') (st.part2.quoted || []).forEach(function (q) { cards.push({ title: 'The Bible says', quote: q }); });
+    momentsFor('story.part2').forEach(function (m) { cards.push({ moment: m }); });
     return cards;
   }
   function stepStory(stage) {
@@ -188,13 +261,20 @@
     draw();
     function draw() {
       var c = cards[i], last = i === cards.length - 1;
-      var body = c.quote
-        ? '<blockquote class="quote">' + K.esc(c.quote.text) + '<small>' + K.esc(c.quote.ref) + ' (' + K.esc(lesson.translation.id) + ')</small></blockquote>'
-        : '<p class="story">' + K.esc(c.text) + '</p>';
-      stage.innerHTML = '<div class="q-count">Story ' + (i + 1) + ' of ' + cards.length + '</div><h2>' + K.esc(c.title) + '</h2>' + body +
-        '<div class="nav-row"><div class="row">' + (i > 0 ? '<button type="button" class="btn btn-line btn-small" id="back">Back</button>' : '') + readBtn() + '</div>' +
-        '<button type="button" class="btn btn-sun" id="fwd">' + (last ? 'I finished the story!' : 'Next') + '</button></div>';
-      wireRead(c.quote ? c.quote.text : c.text);
+      var nav = '<div class="nav-row"><div class="row">' + (i > 0 ? '<button type="button" class="btn btn-line btn-small" id="back">Back</button>' : '') + readBtn() + '</div>' +
+        '<button type="button" class="btn btn-sun" id="fwd">' + (last ? 'I finished the story!' : (c.moment ? 'Keep going' : 'Next')) + '</button></div>';
+      if (c.moment) {
+        stage.innerHTML = momentHtml(c.moment) + nav;
+        wireRead(momentSpeech(c.moment)); wireMoment(stage, c.moment);
+      } else {
+        var body = c.quote
+          ? '<blockquote class="quote">' + K.esc(c.quote.text) + '<small>' + K.esc(c.quote.ref) + ' (' + K.esc(lesson.translation.id) + ')</small></blockquote>'
+          : '<p class="story">' + K.esc(c.text) + '</p>';
+        var storyOnly = cards.filter(function (x) { return !x.moment; });
+        var storyNum = cards.slice(0, i + 1).filter(function (x) { return !x.moment; }).length;
+        stage.innerHTML = '<div class="q-count">Story ' + storyNum + ' of ' + storyOnly.length + '</div><h2>' + K.esc(c.title) + '</h2>' + body + nav;
+        wireRead(c.quote ? c.quote.text : c.text);
+      }
       var b = document.getElementById('back');
       if (b) b.addEventListener('click', function () { stopSpeech(); i--; draw(); });
       document.getElementById('fwd').addEventListener('click', function () {
@@ -232,7 +312,7 @@
           var nx = document.getElementById('nx'); nx.focus();
           nx.addEventListener('click', function () {
             stopSpeech();
-            if (last) { save('quiz', { correct: right, total: qs.length }); next(); } else { i++; draw(); }
+            if (last) { save('quiz', { correct: right, total: qs.length }); runMoments('quiz', next); } else { i++; draw(); }
           });
         });
       });
@@ -272,11 +352,38 @@
         });
       });
       var nx = document.getElementById('nx');
-      if (nx) { nx.focus(); nx.addEventListener('click', function () { stopSpeech(); save('verse', {}); next(); }); }
+      if (nx) { nx.focus(); nx.addEventListener('click', function () { stopSpeech(); save('verse', {}); runMoments('verse', next); }); }
     }
   }
 
-  // ---------- 5. mission, family and reflection ----------
+  // ---------- 5. you belong in this story ----------
+  // Every lesson carries a "who else is in this story?" spotlight (lesson "belonging").
+  // Scripture here is quoted exactly (checked by content/verify-quotes.mjs).
+  function stepBelong(stage) {
+    var bel = lesson.belonging;
+    var cards = ((bel && bel.cards) || []).filter(function (c) { return c.bands.indexOf(band) >= 0; }), i = 0;
+    // A lesson without belonging cards (e.g. an older version) is skipped WITHOUT recording the
+    // step, so a child still sees the cards once they exist.
+    if (!cards.length) return next();
+    draw();
+    function draw() {
+      var c = cards[i], last = i === cards.length - 1;
+      var body = '<p class="story">' + K.esc(c.text) + '</p>' +
+        (c.quote ? '<blockquote class="quote">' + K.esc(c.quote.text) + '<small>' + K.esc(c.quote.ref) + ' (' + K.esc(lesson.translation.id) + ')</small></blockquote>' : '');
+      stage.innerHTML = '<div class="q-count"><span class="moment-tag belong">You belong in this story</span> ' + (i + 1) + ' of ' + cards.length + '</div><h2>' + K.esc(c.title) + '</h2>' + body +
+        '<div class="nav-row"><div class="row">' + (i > 0 ? '<button type="button" class="btn btn-line btn-small" id="back">Back</button>' : '') + readBtn() + '</div>' +
+        '<button type="button" class="btn btn-sun" id="fwd">' + (last ? 'On to my mission' : 'Next') + '</button></div>';
+      wireRead(c.text + (c.quote ? ' ' + c.quote.text : ''));
+      var b = document.getElementById('back');
+      if (b) b.addEventListener('click', function () { stopSpeech(); i--; draw(); });
+      document.getElementById('fwd').addEventListener('click', function () {
+        stopSpeech();
+        if (last) { save('belong', { cards: cards.length }); next(); } else { i++; draw(); }
+      });
+    }
+  }
+
+  // ---------- 6. mission, family and reflection ----------
   function stepReflect(stage) {
     var pc = lesson.postClass, chosen = null;
     stage.innerHTML = '<div class="q-count">Your mission</div><h2>' + K.esc(pc.mission.title) + '</h2><p class="story">' + K.esc(pc.mission.description) + '</p>' +

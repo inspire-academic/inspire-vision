@@ -439,8 +439,142 @@ test.describe('leader tools', () => {
   });
 });
 
+// Click through any "Think about it" moment cards that follow the quiz / verse steps,
+// tapping a choice on each (which must reveal a reply) before carrying on.
+async function passMoments(page) {
+  while (await page.locator('.q-count .moment-tag:not(.belong)').count()) {
+    await page.locator('#stage .choice').first().click();
+    await expect(page.locator('#mresp')).not.toBeEmpty();
+    await page.click('#nx');
+  }
+}
+// Solve the mystery and page through the story until the first moment card; return its scenario text.
+async function toFirstMoment(page) {
+  await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
+  // a child who already solved the mystery resumes at the story, so the mystery may not be there
+  await page.locator('#stage').waitFor();
+  if (await page.locator('.choice', { hasText: 'David' }).count()) {
+    await page.locator('.choice', { hasText: 'David' }).click();
+    await page.click('#go');
+  }
+  for (let n = 0; n < 40 && !(await page.locator('.moment-tag').count()); n++) await page.click('#fwd');
+  return page.locator('#stage .story').first().innerText();
+}
+
+test.describe('life application and belonging', () => {
+  test('Explorers and Trailblazers get different, age-fitted moments', async ({ page, browser }) => {
+    await setup(page, seed());
+    const explorer = await toFirstMoment(page);
+    expect(explorer).toMatch(/picked last/);
+    await expect(page.getByRole('heading', { name: 'Left out at break' })).toBeVisible();
+
+    const s = seed(); s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
+    const p2 = await (await browser.newContext()).newPage();                    // its own storage, so its own seed
+    await setup(p2, s);
+    const trailblazer = await toFirstMoment(p2);
+    expect(trailblazer).toMatch(/laugh at how her name sounds/);
+    await expect(p2.getByRole('heading', { name: /A name that.s hard to say/ })).toBeVisible();
+  });
+
+  test("a scenario never uses the child's own name, and the names are stable across visits", async ({ page, browser }) => {
+    const s = seed(); s.t.children[0].display_name = 'Adjoa'; s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
+    await setup(page, s);
+    const first = await toFirstMoment(page);
+    expect(first).not.toContain('Adjoa');                                      // a real Adjoa must not meet herself as the one laughed at
+    expect(first).toMatch(/Ama|Abena/);                                        // it used the other girls' names in the pool
+    expect(first).not.toMatch(/\{(boy|girl)\d\}/);                             // no unresolved placeholder
+    const again = await toFirstMoment(page);
+    expect(again).toBe(first);                                                 // same names next time, not random
+
+    const s2 = seed(); s2.t.children[0].display_name = 'Kojo';
+    const p2 = await (await browser.newContext()).newPage();
+    await setup(p2, s2);
+    expect(await toFirstMoment(p2)).not.toContain('Kojo');                     // same rule for boys' names (Explorer moment)
+  });
+
+  test('tapping a choice gives a kind reply and a grown-up prompt, and saves nothing', async ({ page }) => {
+    await setup(page, seed());
+    await toFirstMoment(page);
+    await expect(page.locator('#mresp')).toBeEmpty();
+    await page.locator('#stage .choice').first().click();
+    await expect(page.locator('#mresp blockquote.quote')).not.toBeEmpty();
+    await expect(page.locator('#mresp')).toContainText('Ask a grown-up');
+    await expect(page.locator('#stage input, #stage textarea')).toHaveCount(0);      // children never type
+    const s = await db(page);
+    expect(s.t.progress.map((p) => p.step_key)).toEqual(['mystery']);           // only the mystery was recorded: the moment stored nothing
+    // ...and nothing about the moment reached any table that records a child's activity
+    expect(JSON.stringify([s.t.progress, s.t.awards, s.t.attendance, s.t.consents])).not.toMatch(/picked last|hard to say|Ask a grown-up|picked/);
+  });
+
+  test('every choice in every moment has a reply (nobody is left with a wrong answer)', async () => {
+    for (const m of DAVID.apply.moments) {
+      expect(m.choices.length).toBeGreaterThanOrEqual(2);
+      for (const c of m.choices) expect(c.response.length).toBeGreaterThan(20);
+      expect(m.grownUpTalk.length).toBeGreaterThan(10);
+    }
+  });
+
+  test('the Belong step: 3 cards for Explorers with the exact Bible words, then on to the mission', async ({ page }) => {
+    const s = seed();
+    s.t.progress = ['mystery', 'story', 'quiz', 'verse'].map((k) => ({ id: k, child_id: 'kid1', lesson_id: 'lesson-david', step_key: k, detail: {} }));
+    await setup(page, s);
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);        // existing players resume at the new step
+    const cards = DAVID.belonging.cards.filter((c) => c.bands.includes('explorer'));
+    expect(cards).toHaveLength(3);
+    for (let i = 0; i < cards.length; i++) {
+      await expect(page.locator('.q-count .moment-tag.belong')).toBeVisible();
+      await expect(page.getByRole('heading', { name: cards[i].title })).toBeVisible();
+      if (cards[i].quote) await expect(page.locator('blockquote.quote')).toContainText(cards[i].quote.text);
+      await page.click('#fwd');
+    }
+    await expect(page.getByRole('heading', { name: DAVID.postClass.mission.title })).toBeVisible();   // straight on to the mission
+    expect((await db(page)).t.progress.map((p) => p.step_key)).toContain('belong');
+  });
+
+  test('a Trailblazer gets the two extra Belong cards (Africa, and every nation)', async ({ page }) => {
+    const s = seed(); s.t.children[0].age_band = 'trailblazer'; s.t.children[0].class_id = 'class-trb';
+    s.t.progress = ['mystery', 'story', 'quiz', 'verse'].map((k) => ({ id: k, child_id: 'kid1', lesson_id: 'lesson-david', step_key: k, detail: {} }));
+    await setup(page, s);
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
+    const titles = [];
+    for (;;) {
+      titles.push(await page.locator('#stage h2').innerText());
+      const label = await page.locator('#fwd').innerText();
+      await page.click('#fwd');
+      if (label.includes('mission')) break;
+    }
+    expect(titles).toEqual(DAVID.belonging.cards.map((c) => c.title));           // all five, in order
+    expect(titles).toContain('Africa is in the story too');
+  });
+
+  test('an older lesson without moments or belonging still plays, and does not record a Belong step it never showed', async ({ page }) => {
+    const s = seed();
+    const old = JSON.parse(JSON.stringify(DAVID));
+    delete old.apply; delete old.belonging; delete old.names;
+    s.t.lessons[0].content = old;
+    await setup(page, s);
+    await page.goto(`${BASE}/play/lesson.html?lesson=david-01&child=kid1`);
+    await page.locator('.choice', { hasText: 'David' }).click(); await page.click('#go');
+    for (;;) { const l = await page.locator('#fwd').innerText(); await page.click('#fwd'); if (l.includes('finished')) break; }
+    for (let i = 0; i < old.live.quiz.explorer.length; i++) { await page.locator('.choice').first().click(); await page.click('#nx'); }
+    await expect(page.locator('.q-count .moment-tag')).toHaveCount(0);        // no moments in the old lesson
+    await page.locator('.bank button', { hasText: 'outward' }).click();
+    await page.locator('.bank button', { hasText: 'looks' }).click();
+    await page.click('#nx');
+    await expect(page.getByRole('heading', { name: old.postClass.mission.title })).toBeVisible();   // Belong skipped straight to the mission
+    expect((await db(page)).t.progress.map((p) => p.step_key)).not.toContain('belong');
+  });
+
+  test('every scripture quote on the Belong cards is the exact text in the lesson file', async () => {
+    for (const c of DAVID.belonging.cards.filter((x) => x.quote)) {
+      expect(c.quote.ref).toMatch(/\d+:\d+/);
+      expect(c.quote.text.length).toBeGreaterThan(15);
+    }
+  });
+});
+
 test.describe('the David adventure', () => {
-  test('play all five steps as an Explorer: progress saved, badges earned, map unlocked', async ({ page }) => {
+  test('play all steps as an Explorer: moments, belonging, progress saved, badges earned, map unlocked', async ({ page }) => {
     const errs = await setup(page, seed());
     await page.goto(`${BASE}/play/home.html?child=kid1`);
     await expect(page.getByRole('heading', { name: 'Hi, Kofi!' })).toBeVisible();
@@ -460,11 +594,13 @@ test.describe('the David adventure', () => {
       await page.click('#fwd');
       if (label.includes('finished')) break;
     }
-    // 3. quiz (Explorer has 3 questions)
+    // 3. quiz (Explorer has 3 questions), then the "new girl at lunch" moment
     for (let i = 0; i < DAVID.live.quiz.explorer.length; i++) {
       await page.locator('.choice').first().click();
       await page.click('#nx');
     }
+    await expect(page.getByRole('heading', { name: 'The new girl at lunch' })).toBeVisible();
+    await passMoments(page);
     // 4. memory verse: outward, then looks (a wrong word first)
     await page.locator('.bank button', { hasText: 'looks' }).click();
     await expect(page.locator('#msg')).toContainText('Not that one');
@@ -473,8 +609,16 @@ test.describe('the David adventure', () => {
     await expect(page.getByText('You did it! Now say it out loud')).toBeVisible();
     await page.click('#nx');                                                   // saves the verse step, which completes the map-marker requirements
     await expect(page.locator('#toasts')).toContainText('Map Marker');
+    await passMoments(page);                                                    // "When could I use this verse?"
 
-    // 5. mission / reflect, with a grown-up confirming one badge
+    // 5. you belong in this story
+    for (;;) {
+      const label = await page.locator('#fwd').innerText();
+      await page.click('#fwd');
+      if (label.includes('mission')) break;
+    }
+
+    // 6. mission / reflect, with a grown-up confirming one badge
     await page.locator('.choice').first().click();
     await page.getByRole('button', { name: 'We did the mission' }).click();
     await expect(page.locator('#toasts')).toContainText('Helping Hands');
@@ -483,7 +627,7 @@ test.describe('the David adventure', () => {
     await expect(page.locator('.cardface .who')).toHaveText('David');
 
     const s = await db(page);
-    expect(s.t.progress.map((p) => p.step_key).sort()).toEqual(['mystery', 'quiz', 'reflect', 'story', 'verse']);
+    expect(s.t.progress.map((p) => p.step_key).sort()).toEqual(['belong', 'mystery', 'quiz', 'reflect', 'story', 'verse']);
     expect(s.t.progress.find((p) => p.step_key === 'mystery').detail.solved).toBe(true);
     expect(s.t.awards.map((a) => a.badge_key).sort()).toEqual(['helping-hands', 'map-marker', 'story-detective']);
     // free-text is never collected: reflection is one of the fixed choices
@@ -513,6 +657,8 @@ test.describe('the David adventure', () => {
     }
     expect(quotes).toBe(3);                                                    // 16:7, 17:37, 17:45
     for (let i = 0; i < DAVID.live.quiz.trailblazer.length; i++) { await page.locator('.choice').first().click(); await page.click('#nx'); }
+    await expect(page.getByRole('heading', { name: 'More than a mark' })).toBeVisible();   // the Trailblazer quiz moment
+    await passMoments(page);
     await expect(page.locator('.bank button')).toHaveCount(3);                 // 3 gaps for the older band
   });
 

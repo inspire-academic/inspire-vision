@@ -107,6 +107,10 @@ body.app{background:linear-gradient(180deg,#eaf6fb 0,#fffaf0 320px)}
 .choice{min-height:60px;padding:12px 20px;border-radius:18px;border:3px solid var(--ink);background:#fff;font:500 20px var(--body);text-align:left;cursor:pointer}
 .choice:hover:not([disabled]){background:#fff3cf}
 .choice.right{background:#cdeed4;border-color:var(--leaf)}
+.choice.picked{background:#fff3cf;border-color:var(--ink)}
+.moment-tag{display:inline-block;background:#e0d5f3;color:#3d2a73;border-radius:999px;padding:4px 14px;font-weight:600;font-size:15px}
+.moment-tag.belong{background:#cdeed4;color:#1f5c2c}
+#mresp{margin-top:16px}
 .choice.wrong{background:#f7e3df;border-color:#d99b91;opacity:.8}
 .choice[disabled]{cursor:default}
 .nav-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:22px}

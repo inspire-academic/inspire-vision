@@ -18,7 +18,7 @@
     ['creation', 'Creation'], ['abraham', 'Abraham’s family'], ['exodus', 'Escape from Egypt'], ['judges', 'Judges and heroes'],
     ['kings', 'Kings'], ['exile', 'Exile and home'], ['jesus', 'Jesus'], ['church', 'The Church']
   ];
-  var STEPS = [['mystery', 'Mystery'], ['story', 'Story'], ['quiz', 'Quiz'], ['verse', 'Verse'], ['reflect', 'Reflect']];
+  var STEPS = [['mystery', 'Mystery'], ['story', 'Story'], ['quiz', 'Quiz'], ['verse', 'Verse'], ['belong', 'Belong'], ['reflect', 'Reflect']];
   var CORE = ['mystery', 'story', 'quiz', 'verse'];
 
   try {
