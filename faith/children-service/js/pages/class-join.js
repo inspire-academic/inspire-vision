@@ -46,7 +46,7 @@
   function windowState(s) {
     var start = new Date(s.starts_at).getTime(), now = Date.now();
     var opens = start - C.joinOpensMinutesBefore * 60000;
-    var closes = start + s.duration_min * 60000 + C.joinOpensMinutesBefore * 60000;
+    var closes = start + s.duration_min * 60000 + C.joinStaysOpenMinutesAfter * 60000;
     if (s.status === 'cancelled') return 'cancelled';
     if (s.status === 'ended' || now > closes) return 'over';
     return now < opens ? 'early' : 'open';
@@ -110,7 +110,11 @@
     var st = windowState(s);
     var name = s.platform === 'teams' ? 'Teams' : 'Zoom';
     if (info && /^https:\/\//i.test(info.join_url)) {
-      box.innerHTML = '<h2>Join the class</h2><div class="zoombox"><p class="big">The class is open</p>' +
+      // Inside the short grace period after the scheduled end the link still works
+      // (a class may overrun), but don't call it "open" when the time is up.
+      var ended = Date.now() > new Date(s.starts_at).getTime() + s.duration_min * 60000;
+      box.innerHTML = '<h2>Join the class</h2><div class="zoombox"><p class="big">' + (ended ? 'The class time is over' : 'The class is open') + '</p>' +
+        (ended ? '<p class="small muted">The meeting may still be running if the class is finishing late.</p>' : '') +
         '<p><a class="btn btn-sun" target="_blank" rel="noopener noreferrer" href="' + K.esc(info.join_url) + '">Open ' + name + '</a></p>' +
         (info.meeting_id ? '<p class="small">Meeting ID <code>' + K.esc(info.meeting_id) + '</code></p>' : '') +
         (info.passcode ? '<p class="small">Passcode <code>' + K.esc(info.passcode) + '</code></p>' : '') +

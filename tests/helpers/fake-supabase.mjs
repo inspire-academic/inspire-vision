@@ -97,7 +97,7 @@ function rpc(name, a) {
     const d = T('session_join_details').find((x) => x.session_id === a.p_session);
     if (!s || !d || !['scheduled', 'live'].includes(s.status)) return { data: [], error: null };
     const start = new Date(s.starts_at).getTime(), now = Date.now();
-    const inWindow = now >= start - 30 * 60000 && now <= start + s.duration_min * 60000 + 30 * 60000;
+    const inWindow = now >= start - 30 * 60000 && now <= start + s.duration_min * 60000 + 10 * 60000;
     const mine = T('children').some((c) => c.class_id === s.class_id && c.parent_id === me);
     return { data: inWindow && mine ? [{ join_url: d.join_url, meeting_id: d.meeting_id, passcode: d.passcode, platform: s.platform }] : [], error: null };
   }
