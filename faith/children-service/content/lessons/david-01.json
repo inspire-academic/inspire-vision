@@ -428,12 +428,10 @@
     "questions": {
       "explorer": [
         "What was your favourite part of the story about David today?",
-        "David was the smallest in his family, but God chose him because God looks at the heart. What do you think God sees when God looks at {child}'s heart?",
-        "Can you say our memory verse, \"God looks at the heart\" (1 Samuel 16:7), and show me the actions?"
+        "David was the smallest in his family, but God chose him because God looks at the heart. What do you think God sees when God looks at {child}'s heart?"
       ],
       "trailblazer": [
         "David faced a giant because he remembered how God had helped him before. What is one thing that feels like a giant to you right now, and how could you ask God for help with it?",
-        "Some giants are not big people. They are the pressure to go along with the crowd when others are being unkind. When might that be hard for you, and who could you talk to?",
         "We learned that David's great-grandmother Ruth came from a different land and still belonged in God's family. Why do you think it matters that God's family includes people from every nation?"
       ]
     }

@@ -13,6 +13,8 @@
 //  * ONE email per child per class, ever. Each attendance row is CLAIMED (summary_sent_at set,
 //    only where it was still empty) BEFORE sending, so two overlapping runs cannot both send.
 //    If the send fails the claim is released and the next run retries, until the 24 hours pass.
+//  * A class with no lesson attached sends NOTHING (there would be no "what they studied" and no
+//    questions). Nobody is marked as emailed, so attaching a lesson within 24 hours still sends.
 //  * A parent who has switched the emails off (consents row, type "communications", given=false)
 //    is skipped, and the row is marked so it is not looked at again.
 //  * At most 40 emails per run, so a mistake can never turn into a flood.
@@ -22,7 +24,7 @@
 // them to be called over HTTP, so there is no caller to authenticate.
 'use strict';
 const { getAdminClient } = require('./_lib/adminAuth');
-const { buildEmail, sessionIsDue, COUNTS_AS_ATTENDED } = require('./_lib/classSummary');
+const { buildEmail, sessionIsDue, lessonReady, COUNTS_AS_ATTENDED } = require('./_lib/classSummary');
 
 const FROM = 'Inspire Children’s Service <noreply@inspireacademic.org>';   // the one domain Resend is verified for
 const MAX_PER_RUN = 40;
@@ -42,7 +44,7 @@ async function run(deps) {
   if (sr.error) throw sr.error;
   const due = (sr.data || []).filter((s) => sessionIsDue(s, now.getTime()));
 
-  const out = { classes: due.length, sent: 0, optedOut: 0, noEmail: 0, skippedChild: 0, failed: 0, capped: false };
+  const out = { classes: due.length, sent: 0, optedOut: 0, noEmail: 0, noLesson: 0, skippedChild: 0, failed: 0, capped: false };
 
   for (const s of due) {
     if (out.sent >= MAX_PER_RUN) { out.capped = true; break; }
@@ -57,6 +59,9 @@ async function run(deps) {
       cs.from('children').select('id,display_name,age_band,parent_id,archived_at').in('id', att.data.map((a) => a.child_id))
     ]);
     const lesson = lessonRow.data && lessonRow.data.content;
+    // No lesson attached (or an empty one): nothing to say about what was studied, so send nothing.
+    // Nobody is marked as emailed, so if a leader attaches a lesson within the 24 hours, the next run sends.
+    if (!lessonReady(lesson)) { out.noLesson += att.data.length; continue; }
     const kidById = {}; (kids.data || []).forEach((k) => { kidById[k.id] = k; });
 
     for (const a of att.data) {
