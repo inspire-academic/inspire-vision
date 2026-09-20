@@ -84,7 +84,7 @@ test.describe('who may call it', () => {
   for (const [who, tok] of [['a teacher', 'tok-teacher'], ['a parent', 'tok-parent'], ["another church's admin", 'tok-other'], ['a SUSPENDED admin', 'tok-susp']]) {
     test(`refuses ${who}, for every action`, async () => {
       const w = world();
-      for (const action of ['list', 'invite', 'assign_role', 'set_status', 'remove_role', 'send_reset']) {
+      for (const action of ['list', 'invite', 'assign_role', 'set_status', 'remove_role', 'set_checks', 'send_reset']) {
         const r = await call(w, tok, { action, email: 'x@y.org', role: 'facilitator', user_id: ids.parent, member_id: U(102), status: 'suspended' });
         expect(r.status, `${who} / ${action}`).toBe(403);
       }
@@ -192,6 +192,50 @@ test.describe('roles and status', () => {
     expect((await call(w, 'tok-admin', { action: 'remove_role', member_id: U(104) })).status).toBe(404);            // other church
     expect((await call(w, 'tok-admin', { action: 'remove_role', member_id: U(102) })).status).toBe(200);
     expect(w.t.church_members.some((m) => m.id === U(102))).toBe(false);
+  });
+});
+
+test.describe('set_checks (DBS and safeguarding-training dates)', () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const row = (w, id) => w.t.church_members.find((m) => m.id === id);
+
+  test('records both dates, shows them in the list, and changes nothing else', async () => {
+    const w = world();
+    const before = JSON.stringify(w.t.church_members.filter((m) => m.id !== U(102)));
+    const r = await call(w, 'tok-admin', { action: 'set_checks', member_id: U(102), dbs_checked_on: '2026-03-04', safeguarding_trained_on: today });
+    expect(r.status).toBe(200);
+    expect(row(w, U(102))).toMatchObject({ dbs_checked_on: '2026-03-04', safeguarding_trained_on: today, role: 'facilitator', status: 'active' });
+    expect(JSON.stringify(w.t.church_members.filter((m) => m.id !== U(102)))).toBe(before);         // nobody else touched
+    const list = await call(w, 'tok-admin', { action: 'list' });
+    expect(list.body.people.find((p) => p.user_id === ids.teacher).roles[0]).toMatchObject({ dbs_checked_on: '2026-03-04', safeguarding_trained_on: today });
+  });
+
+  test('one date alone is saved, and either can be cleared', async () => {
+    const w = world();
+    await call(w, 'tok-admin', { action: 'set_checks', member_id: U(102), dbs_checked_on: '2026-03-04', safeguarding_trained_on: null });
+    expect(row(w, U(102))).toMatchObject({ dbs_checked_on: '2026-03-04', safeguarding_trained_on: null });
+    await call(w, 'tok-admin', { action: 'set_checks', member_id: U(102), dbs_checked_on: '', safeguarding_trained_on: '' });
+    expect(row(w, U(102))).toMatchObject({ dbs_checked_on: null, safeguarding_trained_on: null });      // the teacher loses sight of children again
+  });
+
+  test('refuses future, impossible, malformed and ancient dates', async () => {
+    const w = world();
+    const before = JSON.stringify(row(w, U(102)));
+    for (const bad of ['2099-01-01', '2026-02-30', '20/01/2026', '2026-1-5', '1999-12-31', 'yesterday', 20260101, {}, '2026-13-01']) {
+      const r = await call(w, 'tok-admin', { action: 'set_checks', member_id: U(102), dbs_checked_on: bad, safeguarding_trained_on: null });
+      expect(r.status, JSON.stringify(bad)).toBe(400);
+    }
+    expect(JSON.stringify(row(w, U(102)))).toBe(before);                                                 // nothing was written
+  });
+
+  test('only for teachers and leaders in this church', async () => {
+    const w = world();
+    expect((await call(w, 'tok-admin', { action: 'set_checks', member_id: U(103), dbs_checked_on: today })).status).toBe(400);     // a family
+    expect((await call(w, 'tok-admin', { action: 'set_checks', member_id: U(104), dbs_checked_on: today })).status).toBe(404);     // another church
+    expect((await call(w, 'tok-admin', { action: 'set_checks', member_id: U(999), dbs_checked_on: today })).status).toBe(404);     // nobody
+    expect((await call(w, 'tok-admin', { action: 'set_checks', member_id: 'nope', dbs_checked_on: today })).status).toBe(400);
+    expect(row(w, U(103)).dbs_checked_on).toBeUndefined();
+    expect(row(w, U(104)).dbs_checked_on).toBeUndefined();
   });
 });
 
